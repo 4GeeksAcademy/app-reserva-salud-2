@@ -1,12 +1,13 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BackendURL } from "./component/backendURL";
 
 import { Home } from "./pages/Home.jsx";
 import { VistaRegistro } from "./pages/RegistroUsuario.jsx";
 import { VistaTerminosYCondiciones } from "./pages/TerminosYCondiciones.jsx";
 import injectContext from "./store/appContext";
 
-import { Navbar } from "./component/ Navbar.jsx";
+import { Navbar } from "./component/Navbar.jsx";
 import { Footer } from "./component/Footer.jsx";
 
 //create your first component
