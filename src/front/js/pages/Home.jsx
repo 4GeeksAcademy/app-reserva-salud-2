@@ -7,8 +7,8 @@ export const Home = () => {
 
   return (
     <>
-      <section className="container">
-        <div className="d-flex flex-column align-items-center gap-4">
+      <section className="container" style={{ paddingTop: "64px" }}>
+        <div className="d-flex flex-column align-items-center gap-4 py-4">
           <h2 className="text-title text-center">
             Reserva tu cita médica en línea, fácil y rápido
           </h2>
