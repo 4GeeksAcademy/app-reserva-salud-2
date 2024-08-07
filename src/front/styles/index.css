@@ -167,3 +167,8 @@ h6 {
 .shadow-md {
   box-shadow: var(--shadow-medium);
 }
+/* 
+.contenido {
+  margin-top: 56px;
+  height: calc(100vh - 56px);
+} */
