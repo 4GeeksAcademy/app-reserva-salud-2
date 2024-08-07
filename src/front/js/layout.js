@@ -2,11 +2,12 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { Home } from "./pages/Home.jsx";
+import { VistaRegistro } from "./pages/RegistroUsuario.jsx";
+import { VistaTerminosYCondiciones } from "./pages/TerminosYCondiciones.jsx";
 import injectContext from "./store/appContext";
 
-import { Navbar } from "./component/ Navbar.jsx";
+import { Navbar } from "./component/Navbar.jsx";
 import { Footer } from "./component/Footer.jsx";
-
 
 //create your first component
 const Layout = () => {
@@ -20,6 +21,11 @@ const Layout = () => {
         <Navbar />
         <Routes>
           <Route element={<Home />} path="/" />
+          <Route element={<VistaRegistro />} path="/registro-usuario" />
+          <Route
+            element={<VistaTerminosYCondiciones />}
+            path="/terminos-y-condiciones"
+          />
           <Route element={<h1>Not found!</h1>} />
         </Routes>
         <Footer />
