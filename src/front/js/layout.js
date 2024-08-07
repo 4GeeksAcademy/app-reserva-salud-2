@@ -2,7 +2,9 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { BackendURL } from "./component/backendURL";
 
-import { Home } from "./pages/home";
+import { Home } from "./pages/Home.jsx";
+import { VistaRegistro } from "./pages/RegistroUsuario.jsx";
+import { VistaTerminosYCondiciones } from "./pages/TerminosYCondiciones.jsx";
 import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/navbar";
@@ -23,6 +25,8 @@ const Layout = () => {
                     <Navbar />
                     <Routes>
                         <Route element={<Home />} path="/" />
+                        <Route element={<VistaRegistro />} path="/registro-usuario" />
+                        <Route element={<VistaTerminosYCondiciones />} path="/terminos-y-condiciones" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
