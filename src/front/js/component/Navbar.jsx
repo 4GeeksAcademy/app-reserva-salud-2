@@ -49,7 +49,7 @@ export function Navbar() {
               </Link>
             </li>
             <button className="btn text-white text-btn bg-primary">
-              <i class="fa-solid fa-arrow-right-to-bracket"></i> Ingresar
+              <i className="fa-solid fa-arrow-right-to-bracket"></i> Ingresar
             </button>
           </ul>
         </div>
