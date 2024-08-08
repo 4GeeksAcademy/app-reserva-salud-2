@@ -174,7 +174,11 @@ h6 {
   box-shadow: var(--shadow-medium);
 }
 
+.form-select {
+  overflow: scroll;
+}
+
 .contenido {
   margin-top: 56px;
-  height: calc(100vh - 176px);
+  min-height: calc(100vh - 56px);
 }

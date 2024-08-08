@@ -37,7 +37,7 @@ export const RegistroUsuario = () => {
     });
 
     return (
-        <div className="container">
+        <div className="container contenido py-4">
             <div className="row bg-secondary text-white p-3 mx-0 mt-2 rounded-top row align-items-center">
                 <div className="col-8">
                     <h1 className="text-title mb-1">Registro</h1>
