@@ -113,23 +113,23 @@ h6 {
 }
 
 .text-secondary {
-  color: var(--color-secondary);
+  color: var(--color-secondary) !important;
 }
 
 .text-tertiary {
-  color: var(--color-tertiary);
+  color: var(--color-tertiary) !important;
 }
 
 .text-light {
-  color: var(--color-light);
+  color: var(--color-light) !important;
 }
 
 .text-white {
-  color: var(--color-white);
+  color: var(--color-white) !important;
 }
 
 .text-black {
-  color: var(--color-black);
+  color: var(--color-black) !important;
 }
 
 .bg-primary {
@@ -160,10 +160,21 @@ h6 {
   background-color: var(--color-black) !important;
 }
 
+.btn-primary {
+  background-color: var(--color-primary) !important;
+  border: var(--color-primary) !important;
+  color: var(--color-white) !important;
+}
+
 .shadow-sm {
   box-shadow: var(--shadow-small);
 }
 
 .shadow-md {
   box-shadow: var(--shadow-medium);
+}
+
+.contenido {
+  margin-top: 56px;
+  height: calc(100vh - 176px);
 }
