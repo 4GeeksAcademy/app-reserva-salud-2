@@ -4,10 +4,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home.jsx";
 import { VistaRegistro } from "./pages/RegistroUsuario.jsx";
 import { VistaTerminosYCondiciones } from "./pages/TerminosYCondiciones.jsx";
+import { VistaRegistroProfesional } from "./pages/RegistroProfesional.jsx";
 import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/Navbar.jsx";
 import { Footer } from "./component/Footer.jsx";
+import { Login } from "./pages/Login.jsx";
 
 //create your first component
 const Layout = () => {
@@ -22,6 +24,8 @@ const Layout = () => {
         <Routes>
           <Route element={<Home />} path="/" />
           <Route element={<VistaRegistro />} path="/registro-usuario" />
+          <Route element={<VistaRegistroProfesional />} path="/registro-profesional" />
+          <Route element={<Login />} path="/login" />
           <Route
             element={<VistaTerminosYCondiciones />}
             path="/terminos-y-condiciones"

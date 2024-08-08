@@ -4,14 +4,18 @@ from enum import Enum
 
 db = SQLAlchemy()
 
+
 class RolEnum(Enum):
     ADMINISTRADOR= "administrador"
     PACIENTE= "paciente"
     PROFESIONAL= "profesional"
 
+
+    
+
 class Usuario(db.Model):
     __tablename__ = 'usuario'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(25), unique=False, nullable=False)
@@ -21,6 +25,7 @@ class Usuario(db.Model):
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
     paciente = db.relationship('Paciente', uselist=False, backref='usuario', lazy=True) 
     profesional= db.relationship('Profesional',uselist=False,backref='usuario', lazy=True)
+    roles = db.relationship('Role', secondary=user_role, lazy='subquery', backref=db.backref('users', lazy=True))
 
     def __repr__(self):
         return f'<Usuario {self.id},{self.rol},{self.email}>'
@@ -347,3 +352,4 @@ class Consulta(db.Model):
 #             "id_profesional": self.id_profesional,
 #             "id_consulta": self.id_consulta         
 #         }        
+
