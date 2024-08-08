@@ -57,7 +57,7 @@ export const RegistroProfesional = () => {
     });
 
     return (
-        <div className="contenido container">
+        <div className="contenido container mb-5">
             <div className="row bg-secondary text-white p-3 mx-0 mt-2 rounded-top row align-items-center">
                 <div className="col-8">
                     <h1 className="text-title mb-1">Registro</h1>
@@ -106,6 +106,13 @@ export const RegistroProfesional = () => {
                     <input type="email" name="email" className="form-control" id="email" aria-describedby="emailHelp" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.email} />
                     {formik.touched.email && formik.errors.email ? (
                         <div className="text-primary">{formik.errors.email}</div>
+                    ) : null}
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="telefono" className="text-label">Teléfono de contacto</label>
+                    <input type="text" name="telefono" className="form-control" id="telefono" aria-describedby="telefono" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.telefono} />
+                    {formik.touched.telefono && formik.errors.telefono ? (
+                        <div className="text-primary">{formik.errors.telefono}</div>
                     ) : null}
                 </div>
                 <div className="mb-3">
@@ -168,13 +175,6 @@ export const RegistroProfesional = () => {
                     ) : null}
                 </div>
                 <hr />
-                <div className="mb-3">
-                    <label htmlFor="telefono" className="text-label">Teléfono de contacto</label>
-                    <input type="text" name="telefono" className="form-control" id="telefono" aria-describedby="telefono" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.telefono} />
-                    {formik.touched.telefono && formik.errors.telefono ? (
-                        <div className="text-primary">{formik.errors.telefono}</div>
-                    ) : null}
-                </div>
                 <div className="mb-3">
                     <label htmlFor="especialidad" className="text-label">Especialidad</label>
                     <select className="form-select" id="especialidad" name="especialidad" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.especialidad}>
