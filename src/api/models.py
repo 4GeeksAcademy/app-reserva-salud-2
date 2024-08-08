@@ -1,17 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
 from enum import Enum 
 
-
 db = SQLAlchemy()
-
 
 class RolEnum(Enum):
     ADMINISTRADOR= "administrador"
     PACIENTE= "paciente"
     PROFESIONAL= "profesional"
-
-
-    
 
 class Usuario(db.Model):
     __tablename__ = 'usuario'
@@ -25,7 +20,6 @@ class Usuario(db.Model):
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
     paciente = db.relationship('Paciente', uselist=False, backref='usuario', lazy=True) 
     profesional= db.relationship('Profesional',uselist=False,backref='usuario', lazy=True)
-    roles = db.relationship('Role', secondary=user_role, lazy='subquery', backref=db.backref('users', lazy=True))
 
     def __repr__(self):
         return f'<Usuario {self.id},{self.rol},{self.email}>'
@@ -51,7 +45,7 @@ class Paciente(db.Model):
     notificaciones_paciente=db.relationship('Notificacion',backref='paciente',lazy=True)
 
     def __repr__(self):
-        return f'<Paciente {self.id_paciente},{self.id}>'
+        return f'<Paciente {self.id_usuario},{self.id}>'
 
     def serialize(self):
         return {
