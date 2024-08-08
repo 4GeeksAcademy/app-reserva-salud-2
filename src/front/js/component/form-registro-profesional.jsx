@@ -138,7 +138,7 @@ export const RegistroProfesional = () => {
                 <div className="mb-3">
                     <label htmlFor="departamento" className="text-label">Departamento de residencia</label>
                     <select className="form-select" id="departamento" name="departamento" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.departamento}>
-                    <option value="" label="Seleccione un departamento"></option>
+                        <option value="" label="Seleccione un departamento"></option>
                         <option value="artigas" label="Artigas"></option>
                         <option value="canelones" label="Canelones"></option>
                         <option value="colonia" label="Colonia"></option>

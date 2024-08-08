@@ -171,3 +171,8 @@ h6 {
 .form-select {
   overflow: scroll;
 }
+
+.contenido {
+  margin-top: 56px;
+  min-height: calc(100vh - 56px);
+}
