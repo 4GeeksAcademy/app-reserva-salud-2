@@ -10,42 +10,46 @@ export const RegistroProfesional = () => {
             nombre: "",
             apellido: "",
             fecha_de_nacimiento: "",
+            genero: "",
             email: "",
+            telefono: "",
             foto: "",
             pais_nacimiento: "",
             departamento: "",
             ciudad: "",
-            telefono: "",
             especialidad: "",
             antiguedad: "",
-            modalidad: "",
+            modalidad: [],
         },
         validationSchema: Yup.object({
             nombre: Yup.string()
                 .required('Este campo es obligatorio'),
             apellido: Yup.string()
                 .required('Este campo es obligatorio'),
-            fecha_de_nacimiento: Yup.string()
+            fecha_de_nacimiento: Yup.date()
+                .required('Este campo es obligatorio')
+                .max(new Date(), 'Fecha no válida'),
+            genero: Yup.string()
                 .required('Este campo es obligatorio'),
             email: Yup.string()
                 .email('Dirección de email inválida')
                 .required('Este campo es obligatorio'),
-            foto: Yup.string()
+            telefono: Yup.string()
                 .required('Este campo es obligatorio'),
+            foto: Yup.string(),
             pais_nacimiento: Yup.string()
                 .required('Este campo es obligatorio'),
             departamento: Yup.string()
                 .required('Este campo es obligatorio'),
             ciudad: Yup.string()
                 .required('Este campo es obligatorio'),
-            telefono: Yup.string()
-                .required('Este campo es obligatorio'),
+
             especialidad: Yup.string()
                 .required('Este campo es obligatorio'),
             antiguedad: Yup.string()
                 .required('Este campo es obligatorio'),
-            modalidad: Yup.string()
-                .required('Este campo es obligatorio'),
+            modalidad: Yup.array()
+                .min(1, 'Debe seleccionar al menos una modalidad'),
         }),
         onSubmit: values => {
             console.log(values);
@@ -86,6 +90,18 @@ export const RegistroProfesional = () => {
                     ) : null}
                 </div>
                 <div className="mb-3">
+                    <label htmlFor="genero" className="text-label">Género</label>
+                    <select className="form-select" id="genero" name="genero" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.genero}>
+                        <option value="" label="Seleccione un genero" />
+                        <option value="artigas" label="Masculino" />
+                        <option value="canelones" label="Femenino" />
+                        <option value="colonia" label="Otro" />
+                    </select>
+                    {formik.touched.genero && formik.errors.genero ? (
+                        <div className="text-primary">{formik.errors.genero}</div>
+                    ) : null}
+                </div>
+                <div className="mb-3">
                     <label htmlFor="email" className="text-label">Email</label>
                     <input type="email" name="email" className="form-control" id="email" aria-describedby="emailHelp" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.email} />
                     {formik.touched.email && formik.errors.email ? (
@@ -113,12 +129,27 @@ export const RegistroProfesional = () => {
                     ) : null}
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="departamento" className="text-label">Departamento</label>
+                    <label htmlFor="departamento" className="text-label">Departamento de residencia</label>
                     <select className="form-select" id="departamento" name="departamento" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.departamento}>
-                        <option value="" label="Seleccione un departamento" />
-                        <option value="artigas" label="Artigas" />
-                        <option value="canelones" label="Canelones" />
-                        <option value="colonia" label="Colonia" />
+                    <option value="" label="Seleccione un departamento"></option>
+                        <option value="artigas" label="Artigas"></option>
+                        <option value="canelones" label="Canelones"></option>
+                        <option value="colonia" label="Colonia"></option>
+                        <option value="durazno" label="Durazno"></option>
+                        <option value="flores" label="Flores"></option>
+                        <option value="florida" label="Florida"></option>
+                        <option value="lavalleja" label="Lavalleja"></option>
+                        <option value="maldonado" label="Maldonado"></option>
+                        <option value="montevideo" label="Montevideo"></option>
+                        <option value="paysandu" label="Paysandú"></option>
+                        <option value="rio-negro" label="Río Negro"></option>
+                        <option value="rivera" label="Rivera"></option>
+                        <option value="rocha" label="Rocha"></option>
+                        <option value="salto" label="Salto"></option>
+                        <option value="san-jose" label="San José"></option>
+                        <option value="soriano" label="Soriano"></option>
+                        <option value="tacuarembo" label="Tacuarembó"></option>
+                        <option value="treinta-y-tres" label="Treinta y Tres"></option>
                     </select>
                     {formik.touched.departamento && formik.errors.departamento ? (
                         <div className="text-primary">{formik.errors.departamento}</div>
@@ -161,6 +192,28 @@ export const RegistroProfesional = () => {
                     <input type="number" name="antiguedad" className="form-control" id="antiguedad" aria-describedby="antiguedad" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.antiguedad} />
                     {formik.touched.antiguedad && formik.errors.antiguedad ? (
                         <div className="text-primary">{formik.errors.antiguedad}</div>
+                    ) : null}
+                </div>
+                <label htmlFor="modalidad" className="text-label">Modalidad de consulta</label>
+                <div className="mb-3" role="group">
+                    <div className="form-check">
+                        <input type="checkbox" name="modalidad" className="form-check-input" id="remoto"
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            value="Remoto"
+                            checked={formik.values.modalidad.includes("Remoto")} />
+                        <label className="form-check-label" htmlFor="remoto">Remoto</label>
+                    </div>
+                    <div className="form-check">
+                        <input type="checkbox" name="modalidad" className="form-check-input" id="presencial"
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            value="Presencial"
+                            checked={formik.values.modalidad.includes("Presencial")} />
+                        <label className="form-check-label" htmlFor="presencial">Presencial</label>
+                    </div>
+                    {formik.touched.modalidad && formik.errors.modalidad ? (
+                        <div className="text-primary">{formik.errors.modalidad}</div>
                     ) : null}
                 </div>
                 <div className="d-flex justify-content-center">
