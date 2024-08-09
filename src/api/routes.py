@@ -13,28 +13,45 @@ api = Blueprint('api', __name__)
 CORS(api)
 
 
-@api.route('/users', methods=['GET'])
-def get_users():
+# @api.route('/users', methods=['GET'])
+# def get_users():
     
-    users = User.query.all()
+#     users = User.query.all()
     
-    users = list(map(lambda x: x.serialize(), users))
+#     users = list(map(lambda x: x.serialize(), users))
     
-    return jsonify(users), 200
+#     return jsonify(users), 200
 
-@api.route('/users/<int:id>', methods=['GET'])
-def get_user(id):
-    user = User.query.get(id)
+@api.route('/usuario', methods=['POST'])
+def get_user_login():
+   
+    request_data_api= request.get_json()
     
-    if user is None:
-        raise APIException("User not found", status_code=404)
+    user_email = request_data_api.get('email')
+    password= request_data_api.get('password')    
     
-    return jsonify(user.serialize()), 200
+    user_app= Usuario.query.filter_by(email=user_email).first()
+    
+    if not user_app:
+        return jsonify({"message": "user app not found"}), 404
+    
+    if user_app.password != password:
+        return jsonify({"message": "password invalid, check!!"}), 401
+    
+    
+    return jsonify({
+         "message": "login succeful! Welcome to the System!!",
+         "user": user_app.serialize()
+        }), 200
 
-@api.route('/roles', methods=['GET'])
-def get_roles():
-    roles = Role.query.all()
+
+
+
+
+# @api.route('/roles', methods=['GET'])
+# def get_roles():
+#     roles = Role.query.all()
     
-    roles = list(map(lambda x: x.serialize(), roles))
+#     roles = list(map(lambda x: x.serialize(), roles))
     
-    return jsonify(roles), 200
+#     return jsonify(roles), 200

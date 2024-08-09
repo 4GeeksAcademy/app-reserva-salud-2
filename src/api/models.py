@@ -28,7 +28,7 @@ class Usuario(db.Model):
         return {
             "id": self.id,
             "email": self.email,
-            "rol": self.rol,
+            "rol": self.rol.value,
             "nombre": self.nombre,
             "apellido": self.apellido,
             "is_active": self.is_active

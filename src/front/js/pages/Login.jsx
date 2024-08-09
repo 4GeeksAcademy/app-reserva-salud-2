@@ -25,6 +25,8 @@ export const Login = () => {
               password: Yup.string().required('Campo requerido').min(6, 'La contraseña debe tener al menos 6 caracteres')
             })}
             onSubmit={(values) => {
+              
+              
               console.log(values)
             }}
           >
@@ -32,7 +34,9 @@ export const Login = () => {
               <Form className='w-100' noValidate>
                 <div className='mb-3'>
                   <label htmlFor='email' className='form-label text-label'>Correo electrónico</label>
-                  <Field className='form-control' type='email' id='email' name='email' placeholder='Correo electrónico' />
+                  <Field className='form-control' type='email' id='email' name='email' placeholder='Correo electrónico' 
+                    
+                  />
                   {errors.email && touched.email && (
                     <p className='text-danger text-label'>{errors.email}</p>
                   )}
