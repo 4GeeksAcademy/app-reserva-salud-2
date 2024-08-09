@@ -5,6 +5,39 @@ import 'swiper/css';
 import 'swiper/css/autoplay';
 import { ProfesionalCard } from '../component/ProfesionalCard.jsx';
 
+const profesionales = [
+  {
+    id: 1,
+    usuario: {
+      nombre: 'Juan',
+      apellido: 'Pérez'
+    },
+    foto_perfil: 'https://via.placeholder.com/150',
+    fecha_nacimiento: '1990-01-01',
+    genero: 'masculino',
+    pais_nacimiento: 'Uruguay',
+    telefono: 94843304,
+    matricula: 123456,
+    cjpu: 32563456743255,
+    titulo_habilitante: 'Licenciado en Fisioterapia',
+  },
+  {
+    id: 2,
+    usuario: {
+      nombre: 'María',
+      apellido: 'González',
+    },
+    foto_perfil: 'https://via.placeholder.com/150',
+    fecha_nacimiento: '1995-06-12',
+    genero: 'femenino',
+    pais_nacimiento: 'Uruguay',
+    telefono: 94853535,
+    matricula: 123456,
+    cjpu: 32563456743255,
+    titulo_habilitante: 'Licenciado en Psicología',
+  }
+]
+
 export const Profesionales = () => {
   return (
     <div className='container contenido'>
@@ -30,18 +63,13 @@ export const Profesionales = () => {
               },
             }}
           >
-            <SwiperSlide>
-              <ProfesionalCard />
-            </SwiperSlide>
-            <SwiperSlide>
-              <ProfesionalCard />
-            </SwiperSlide>
-            <SwiperSlide>
-              <ProfesionalCard />
-            </SwiperSlide>
-            <SwiperSlide>
-              <ProfesionalCard />
-            </SwiperSlide>
+            {
+              profesionales.map(profesional => (
+                <SwiperSlide key={profesional.id}>
+                  <ProfesionalCard profesional={profesional} />
+                </SwiperSlide>
+              ))
+            }
           </Swiper>
         </div>
 
@@ -51,7 +79,7 @@ export const Profesionales = () => {
             <div className='d-flex flex-column'>
               <label htmlFor="especialidad" className="form-label">Especialidad</label>
               <select className="form-select" id='especialidad' aria-label="Especialidad">
-                <option selected>Seleccionar especialidad</option>
+                <option defaultValue>Seleccionar especialidad</option>
                 <option value="fisioterapeuta">Fisioterapeuta</option>
                 <option value="psicologo">Psicólogo</option>
                 <option value="nutricionista">Nutricionista</option>
@@ -66,7 +94,7 @@ export const Profesionales = () => {
             <div className='d-flex flex-column'>
               <label htmlFor="departamento" className="form-label">Departamento</label>
               <select className="form-select" id='departamento' aria-label="Departamento">
-                <option selected>Seleccionar departamento</option>
+                <option defaultValue>Seleccionar departamento</option>
                 <option value="artigas">Artigas</option>
                 <option value="canelones">Canelones</option>
                 <option value="cerro-largo">Cerro Largo</option>
