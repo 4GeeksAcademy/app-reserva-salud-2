@@ -18,8 +18,8 @@ export const DescripcionProfesional = () => {
                     <p className="text-secondary"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></p>
                 </div>
                 <div className="col text-center">
-                    <h6>Calificación</h6>
-                    <p className="text-secondary fw-bold">Num</p>
+                    <h6>Reseñas</h6>
+                    <p className="text-secondary fw-bold">1</p>
                 </div>
                 <hr />
                 <div>
