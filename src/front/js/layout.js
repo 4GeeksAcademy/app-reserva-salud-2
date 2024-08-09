@@ -5,6 +5,9 @@ import { Home } from "./pages/Home.jsx";
 import { VistaRegistro } from "./pages/RegistroUsuario.jsx";
 import { VistaTerminosYCondiciones } from "./pages/TerminosYCondiciones.jsx";
 import { VistaRegistroProfesional } from "./pages/RegistroProfesional.jsx";
+import { VistaInfoProfesional } from "./pages/InfoProfesional.jsx";
+import { VistaAgendaProfesional } from "./pages/Agenda.jsx";
+import { VistaPago } from "./pages/Pago.jsx";
 import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/Navbar.jsx";
@@ -25,7 +28,10 @@ const Layout = () => {
           <Route element={<Home />} path="/" />
           <Route element={<VistaRegistro />} path="/registro-usuario" />
           <Route element={<VistaRegistroProfesional />} path="/registro-profesional" />
+          <Route element={<VistaPago />} path="/pago" />
+          <Route element={<VistaAgendaProfesional />} path="/agenda-profesional" />
           <Route element={<Login />} path="/login" />
+          <Route element={<VistaInfoProfesional />} path="/info-profesional" />
           <Route
             element={<VistaTerminosYCondiciones />}
             path="/terminos-y-condiciones"

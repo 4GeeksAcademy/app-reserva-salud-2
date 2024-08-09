@@ -1,9 +1,9 @@
-import React, { useContext } from "react";
+import React from "react";
 import "../../styles/home.css";
 
 export const TerminosYCondiciones = () => {
     return (
-        <div clasName="container">
+        <div >
             <div className="p-3">
                 <h1 className="text-title mb-3 text-center">Términos y condiciones</h1>
                     <h3 className="text-subtitle">1. Aceptación de los términos</h3>
