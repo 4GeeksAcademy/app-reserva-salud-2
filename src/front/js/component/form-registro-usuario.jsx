@@ -37,14 +37,14 @@ export const RegistroUsuario = () => {
     });
 
     return (
-        <div className="container contenido py-4">
-            <div className="row bg-secondary text-white p-3 mx-0 mt-2 rounded-top row align-items-center">
+        <div className="my-4">
+            <div className="row bg-secondary text-white p-3 mx-0 rounded-top row align-items-center">
                 <div className="col-8">
                     <h1 className="text-title mb-1">Registro</h1>
                     <p className="text-normal">Regístrate e ingresa hoy mismo</p>
                 </div>
                 <div className="col text-end">
-                    <i className="fa-solid fa-circle-user display-1"></i>
+                    <i className="fa-solid fa-circle-user fa-3x"></i>
                 </div>
             </div>
             <form className="bg-tertiary p-2 rounded-bottom" onSubmit={formik.handleSubmit}>
@@ -89,7 +89,7 @@ export const RegistroUsuario = () => {
                         onBlur={formik.handleBlur}
                         checked={formik.values.check}
                     />
-                    <label className="text-label" htmlFor="exampleCheck1">He leído los <Link className="link-underline-primary" to="/terminos-y-condiciones">términos y condiciones</Link> </label>
+                    <label className="text-label" htmlFor="exampleCheck1">He leído los <Link className="text-primary" to={"/terminos-y-condiciones"}>términos y condiciones</Link> </label>
                     {formik.touched.check && formik.errors.check ? (
                         <div className="text-primary">{formik.errors.check}</div>
                     ) : null}
@@ -98,7 +98,7 @@ export const RegistroUsuario = () => {
                     <button type="submit" className="btn bg-primary text-white"><i className="fa-solid fa-user-plus"></i> Registrarse</button>
                 </div>
                 <div className="mt-3 d-flex justify-content-center">
-                    <p>¿Ya tienes una cuenta? <span className="fw-bold text-primary">Inicia sesión</span></p>
+                    <p>¿Ya tienes una cuenta? <Link to={"/login"} className="fw-bold text-primary">Inicia sesión</Link></p>
                 </div>
             </form>
         </div>
