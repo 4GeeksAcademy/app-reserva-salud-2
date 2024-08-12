@@ -7,7 +7,7 @@ from api.models import db, Usuario
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required
 
 api = Blueprint('api', __name__)
 
@@ -47,7 +47,7 @@ def crear_usuario():
 def obtener_usuario(id):
     usuario = Usuario.query.get(id)
     if usuario is None:
-        raise APIException("Usuario no encontrado", status_code=404)
+        raise APIException("User not found", status_code=404)
     return jsonify(usuario.serialize()), 200
 
 @api.route('/usuario/<int:id>', methods=['PUT'])
@@ -55,7 +55,7 @@ def actualizar_usuario(id):
     usuario = Usuario.query.get(id)
     
     if usuario is None:
-        raise APIException("Usuario no encontrado", status_code=404)
+        raise APIException("User not found", status_code=404)
     
     request_body = request.get_json()
     
@@ -75,39 +75,44 @@ def actualizar_usuario(id):
     
     db.session.commit()
     
-    return jsonify({ "message": "Usuario actualizado satisfactoriamente" }), 200
+    return jsonify({ "message": "User successfully updated" }), 200
 
 @api.route('/usuario/<int:id>', methods=['DELETE'])
 def eliminar_usuario(id):
     usuario = Usuario.query.get(id)
     
     if usuario is None:
-        raise APIException("Usuario no encontrado", status_code=404)
+        raise APIException("User not found", status_code=404)
     
     db.session.delete(usuario)
     db.session.commit()
     
-    return jsonify({ "message": "Usuario eliminado satisfactoriamente" }), 200
+    return jsonify({ "message": "User successfully deleted" }), 200
 
+# Login con JWT
 @api.route('/login', methods=['POST'])
 def login():
     request_body = request.get_json()
-    
     email = request_body.get("email")
     password = request_body.get("password")
     
     if not email or not password:
-        raise APIException("Faltan campos requeridos", status_code=400)
+        raise APIException("Required fields are missing", status_code=400)
     
     usuario = Usuario.query.filter_by(email=email).first()
     
     if usuario is None:
-        raise APIException("Usuario no encontrado", status_code=404)
+        raise APIException("User not found", status_code=404)
     
     if not check_password_hash(usuario.password, password):
-        raise APIException("Contraseña incorrecta", status_code=400)
+        raise APIException("Password incorrect", status_code=400)
     
     # Implementar JWT
     access_token = create_access_token(identity=usuario.id)
     
-    return jsonify({ "message": "Login exitoso", "token": access_token }), 200
+    return jsonify({ "message": "Login successful", "token": access_token }), 200
+
+@api.route('/verify_token', methods=['GET'])
+@jwt_required()
+def verify_token():
+    return jsonify({ "status": 200, "message": "Token is valid" }), 200
