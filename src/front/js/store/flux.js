@@ -19,7 +19,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			// login user
 			login_user: async(email,password)=>{
 				try{
-					let response= await fetch(process.env.BACKEND_URL + '/api/login',{
+					let response= await fetch('https://verbose-space-orbit-q5wjv57g6gvh965-3001.app.github.dev/api/usuario',{
 						method: 'POST',
 						headers: {
 								'Content-Type': 'application/json'
@@ -30,7 +30,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 						})
 					})
 					let data= await response.json()				
-					return true;		
+					
+					if (response.ok) {
+						// Almaceno el token de forma global
+						localStorage.setItem("token", data.token)  
+						return true;
+					} else {
+						console.log(data.message);
+						return false;
+					}	
+				
 				}catch (error){
 					console.log(error);
 					return false;
@@ -42,18 +51,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 				getActions().changeColor(0, "green");
 			},
 
-			getMessage: async () => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
-					console.log("Error loading message from backend", error)
-				}
-			},
+			// getMessage: async () => {
+			// 	try{
+			// 		// fetching data from the backend
+			// 		const resp = await fetch(process.env.BACKEND_URL + '/api/hello')
+			// 		const data = await resp.json()
+			// 		setStore({ message: data.message })
+			// 		// don't forget to return something, that is how the async resolves
+			// 		return data;
+			// 	}catch(error){
+			// 		console.log("Error loading message from backend", error)
+			// 	}
+			// },
 			changeColor: (index, color) => {
 				//get the store
 				const store = getStore();
@@ -65,8 +74,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return elm;
 				});
 
-				//reset the global store
-				setStore({ demo: demo });
+				// //reset the global store
+				// setStore({ demo: demo });
 			}
 		}
 	};

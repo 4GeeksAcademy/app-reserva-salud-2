@@ -12,14 +12,14 @@ class Usuario(db.Model):
     __tablename__ = 'usuario'
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(25), unique=False, nullable=False)
-    rol=db.Column(db.Enum(RolEnum),nullable=False)
-    nombre = db.Column(db.String(50), unique=False, nullable=False)
-    apellido = db.Column(db.String(50), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    paciente = db.relationship('Paciente', uselist=False, backref='usuario', lazy=True) 
-    profesional= db.relationship('Profesional',uselist=False,backref='usuario', lazy=True)
+    email = db.Column(db.String(200), unique=True, nullable=False)
+    password = db.Column(db.String(200), unique=False, nullable=False)
+    rol=db.Column(db.Enum(RolEnum),nullable=False, default=RolEnum.PACIENTE)
+    nombre = db.Column(db.String(100), unique=False, nullable=False)
+    apellido = db.Column(db.String(100), unique=False, nullable=False)
+    is_active = db.Column(db.Boolean(), unique=False, default=False)
+    paciente = db.relationship('Paciente', uselist=False, backref='usuario', lazy=True, cascade='all, delete-orphan') 
+    profesional= db.relationship('Profesional',uselist=False,backref='usuario', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f'<Usuario {self.id},{self.rol},{self.email}>'
