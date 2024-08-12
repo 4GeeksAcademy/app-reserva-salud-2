@@ -7,8 +7,7 @@ export const VistaInfoProfesional = () => {
     return (
         <div className="contenido mb-5">
             <DescripcionProfesional/>
-            <h6 className="text-center text"></h6>
-            <Valoraciones/>
+            <Valoraciones />
             <div className="d-flex justify-content-center">
                 <Link to="/agenda-profesional" className="btn bg-primary text-white"><i className="fa-sharp fa-solid fa-calendar-days"></i> Ver agenda de este profesional</Link>
             </div>

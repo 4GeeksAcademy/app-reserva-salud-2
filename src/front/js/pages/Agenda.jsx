@@ -1,7 +1,7 @@
 import React from "react";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { Link } from "react-router-dom";
+import { Calendly } from "../component/calendly.jsx";
 
 export const VistaAgendaProfesional = () => {
     const formik = useFormik({
@@ -24,7 +24,7 @@ export const VistaAgendaProfesional = () => {
             <h2 className="text-center text-subtitle text-secondary">Nutricionista</h2>
             <div>
                 <p className="text-normal fw-semibold pt-4 px-2">Seleccione el día y horario para su cita: </p>
-                <img src="https://cdn.prod.website-files.com/5b7f24cc900973de13d7beb4/63bde3d8571e7cbd01401722_DNNOAjJ92DJwlBAm2cLtigWs9TFiO9p2zxmohakANewkA-udpzu454gxw9O011gNo5lmB68qVh8NtHHFEayXP5G6zdPD5gyr62jW6FlYFb6b5tfb2pv-h6WGNcNUfclyenZ7s7M2tZiM29JVuGWR9Wv0oaeJUCZPF9uRV-VD0oqjIPYATqc-6vMV6si9lA.png" className="img-fluid" alt="..."></img>
+                <Calendly/>
             </div>
             <div>
                 <h6 className="text-normal text-secondary fw-bold py-3 px-2">Modalidad de la consulta</h6>
