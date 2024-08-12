@@ -48,9 +48,9 @@ export function Navbar() {
                 Contacto
               </Link>
             </li>
-            <button className="btn text-white text-btn bg-primary">
+            <Link to={"/login"} className="btn text-white text-btn bg-primary">
               <i className="fa-solid fa-arrow-right-to-bracket"></i> Ingresar
-            </button>
+            </Link>
           </ul>
         </div>
       </div>

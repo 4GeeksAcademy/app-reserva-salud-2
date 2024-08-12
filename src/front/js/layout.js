@@ -13,6 +13,7 @@ import injectContext from "./store/appContext";
 import { Navbar } from "./component/Navbar.jsx";
 import { Footer } from "./component/Footer.jsx";
 import { Login } from "./pages/Login.jsx";
+import { Profesionales } from "./pages/Profesionales.jsx";
 
 //create your first component
 const Layout = () => {
@@ -27,7 +28,10 @@ const Layout = () => {
         <Routes>
           <Route element={<Home />} path="/" />
           <Route element={<VistaRegistro />} path="/registro-usuario" />
-          <Route element={<VistaRegistroProfesional />} path="/registro-profesional" />
+          <Route
+            element={<VistaRegistroProfesional />}
+            path="/registro-profesional"
+          />
           <Route element={<VistaPago />} path="/pago" />
           <Route element={<VistaAgendaProfesional />} path="/agenda-profesional" />
           <Route element={<Login />} path="/login" />
@@ -36,6 +40,7 @@ const Layout = () => {
             element={<VistaTerminosYCondiciones />}
             path="/terminos-y-condiciones"
           />
+          <Route element={<Profesionales />} path="/profesionales" />
           <Route element={<h1>Not found!</h1>} />
         </Routes>
         <Footer />
