@@ -1,18 +1,16 @@
-import { Field, Form, Formik, useFormik } from 'formik'
-//importo el hook useContext, para poder tener acceso al Context
-import React,{useContext} from 'react';
-import { Link } from 'react-router-dom'
+import { Field, Form, Formik } from 'formik'
+import React, { useContext } from 'react';
+import { Link, Navigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import { Context } from "../store/appContext";
-//importo la libreria sweetalert2 para realizar alertas personalizadas
-import Swal from 'sweetalert2'
-//importo el hook useNavigate para poder redirigir a un usuario a diferentes rutas
-import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
-  const navigate = useNavigate();
-  const {store,actions}=useContext(Context);
-  
+  const { store, actions } = useContext(Context);
+
+  if (store.isAuthenticated) {
+    return <Navigate to='/perfil' replace />
+  }
+
   return (
     <div className='container contenido d-flex flex-column align-items-center justify-content-center'>
       <div className='d-flex flex-column justify-content-center align-items-center h-100'>
@@ -33,36 +31,11 @@ export const Login = () => {
               email: Yup.string().email('Correo electrónico inválido').required('Campo requerido'),
               password: Yup.string().required('Campo requerido').min(6, 'La contraseña debe tener al menos 6 caracteres')
             })}
-            onSubmit= {async (values) => {
-               
-               try {
-                const login = await actions.login_user(values.email,values.password);
-                if (login) {
-                  //Utilizo la funcion "fire" de la libreria sweetalert para enviar un alerta personalizado al realizar el login
-                  Swal.fire({
-                    title: 'Login successfully!',
-                    text: `Welcome to the system ${values.email}!`,
-                    icon: 'success',
-                    timer: 3000
-                  });
-                  navigate("/");
-                } else {
-                  Swal.fire({
-                    title: 'Error,could not log in!',
-                    text: 'incorrect username or password ',
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    timer: 3000
-                  });
-                }
-              } catch (error) {
-                Swal.fire({
-                  title: 'Error!',
-                  text: 'ups, problem with the server!',
-                  icon: 'error',
-                  confirmButtonText: 'OK',
-                  timer: 3000
-                });
+            onSubmit={async ({ email, password }) => {
+              const response = await actions.loginUser(email, password);
+
+              if (response) {
+                return <Navigate to='/perfil' replace />
               }
             }}
           >
@@ -70,8 +43,8 @@ export const Login = () => {
               <Form className='w-100 p-3' noValidate>
                 <div className='mb-3'>
                   <label htmlFor='email' className='form-label text-label'>Correo electrónico</label>
-                  <Field className='form-control' type='email' id='email' name='email' placeholder='Correo electrónico' 
-                  
+                  <Field className='form-control' type='email' id='email' name='email' placeholder='Correo electrónico'
+
                   />
                   {errors.email && touched.email && (
                     <p className='text-danger text-label'>{errors.email}</p>
@@ -79,8 +52,8 @@ export const Login = () => {
                 </div>
                 <div>
                   <label htmlFor='password' className='form-label text-label'>Contraseña</label>
-                  <Field className='form-control' type='password' id='password' name='password' placeholder='Contraseña' 
-                  
+                  <Field className='form-control' type='password' id='password' name='password' placeholder='Contraseña'
+
                   />
                   {errors.password && touched.password && (
                     <p className='text-danger text-label'>{errors.password}</p>
@@ -88,7 +61,7 @@ export const Login = () => {
                 </div>
                 <p className='mt-3 text-label text-center'>¿Olvidaste tu contraseña? <Link to={"/"} className='text-primary'>Restablecer</Link></p>
 
-                <button className='btn btn-primary w-100 text-btn'>Iniciar sesión</button>
+                <button type='submit' className='btn btn-primary w-100 text-btn'>Iniciar sesión</button>
 
                 <p className='mt-3 text-label text-center'>¿Aún no tienes cuenta? <Link to={"/registro-usuario"} className='text-primary'>Registrate</Link></p>
               </Form>

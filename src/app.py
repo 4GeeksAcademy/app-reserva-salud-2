@@ -54,9 +54,31 @@ app.register_blueprint(api, url_prefix='/api')
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
+# Modify this function to add a new field to the response when token is expired
+@jwt.expired_token_loader
+def my_expired_token_callback(jwt_header, jwt_payload):
+    return jsonify({
+        'status': 401,
+        'message': 'The token has expired'
+    }), 401
+
+# Modify this function to add a new field to the response when token is invalid or missing
+@jwt.unauthorized_loader
+def my_unauthorized_loader_callback(jwt_identity):
+    return jsonify({
+        'status': 401,
+        'message': 'Missing Authorization Header'
+    }), 401
+    
+# Modify this function to add a new field to the response when token is invalid
+@jwt.invalid_token_loader
+def my_invalid_token_loader_callback(error_string):
+    return jsonify({
+        'status': 401,
+        'message': 'Invalid token'
+    }), 401
+
 # generate sitemap with all your endpoints
-
-
 @app.route('/')
 def sitemap():
     if ENV == "development":

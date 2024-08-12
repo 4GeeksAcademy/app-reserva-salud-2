@@ -1,84 +1,68 @@
+import axios from "axios";
+import toast from "react-hot-toast";
+
+const backendApi = axios.create({
+  baseURL: `${process.env.BACKEND_URL}/api`,
+});
+
 const getState = ({ getStore, getActions, setStore }) => {
-	return {
-		store: {
-			message: null,
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
-		},
-		actions: {
-			// login user
-			login_user: async(email,password)=>{
-				try{
-					let response= await fetch('https://verbose-space-orbit-q5wjv57g6gvh965-3001.app.github.dev/api/usuario',{
-						method: 'POST',
-						headers: {
-								'Content-Type': 'application/json'
-						},
-						body: JSON.stringify({
-							"email":email,
-							"password":password
-						})
-					})
-					let data= await response.json()				
-					
-					if (response.ok) {
-						// Almaceno el token de forma global
-						localStorage.setItem("token", data.token)  
-						return true;
-					} else {
-						console.log(data.message);
-						return false;
-					}	
-				
-				}catch (error){
-					console.log(error);
-					return false;
-				}
-			}, 
-			
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
+  return {
+    store: {
+      isAuthenticated: false,
+    },
+    actions: {
+      // login user
+      loginUser: async (email, password) => {
+        try {
+          toast.loading("Iniciando sesión...");
+          const response = await backendApi.post("/login", {
+            email,
+            password,
+          });
 
-			// getMessage: async () => {
-			// 	try{
-			// 		// fetching data from the backend
-			// 		const resp = await fetch(process.env.BACKEND_URL + '/api/hello')
-			// 		const data = await resp.json()
-			// 		setStore({ message: data.message })
-			// 		// don't forget to return something, that is how the async resolves
-			// 		return data;
-			// 	}catch(error){
-			// 		console.log("Error loading message from backend", error)
-			// 	}
-			// },
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
+          localStorage.setItem("token", response.data.token);
+          setStore({ isAuthenticated: true });
+          toast.dismiss();
+          toast.success("Inicio de sesión exitoso", { icon: "🚀" });
+          return true;
+        } catch (error) {
+          if (error.response.status === 400) {
+            setStore({ isAuthenticated: false });
+            toast.dismiss();
+            return toast.error("Credenciales inválidas");
+          }
+        }
+      },
+      verifyToken: async () => {
+        const token = localStorage.getItem("token");
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+        if (!token) {
+          setStore({ isAuthenticated: false });
+          return false;
+        }
 
-				// //reset the global store
-				// setStore({ demo: demo });
-			}
-		}
-	};
+        try {
+          const response = await backendApi.get("/verify_token", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          setStore({ isAuthenticated: true });
+          return true;
+        } catch (error) {
+          localStorage.removeItem("token");
+          setStore({ isAuthenticated: false });
+          return false;
+        }
+      },
+      logout: () => {
+        localStorage.removeItem("token");
+        setStore({ isAuthenticated: false });
+        toast.success("Cierre de sesión exitoso", { icon: "👋" });
+      },
+    },
+  };
 };
 
 export default getState;
