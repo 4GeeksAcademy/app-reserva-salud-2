@@ -1,3 +1,4 @@
+import base64
 from flask import jsonify, url_for
 
 class APIException(Exception):
@@ -19,6 +20,9 @@ def has_no_empty_params(rule):
     defaults = rule.defaults if rule.defaults is not None else ()
     arguments = rule.arguments if rule.arguments is not None else ()
     return len(defaults) >= len(arguments)
+
+def encode_credentials(client_id, client_secret):
+    return base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
 
 def generate_sitemap(app):
     links = ['/admin/']

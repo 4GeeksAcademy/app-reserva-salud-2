@@ -4,10 +4,12 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from flask import Flask, request, jsonify, url_for, Blueprint
 
 from api.models import db, Usuario
-from api.utils import generate_sitemap, APIException
+from api.utils import generate_sitemap, APIException, encode_credentials
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required
+import os
+import requests
 
 api = Blueprint('api', __name__)
 
@@ -116,3 +118,30 @@ def login():
 @jwt_required()
 def verify_token():
     return jsonify({ "status": 200, "message": "Token is valid" }), 200
+
+# Endpoint para obtener el access token de calendly
+@api.route('/calendly/token', methods=['POST'])
+def get_calendly_token():
+    code = request.json.get('code', None)
+    
+    client_id = os.getenv('CALENDLY_CLIENT_ID')
+    client_secret = os.getenv('CALENDLY_CLIENT_SECRET')
+    redirect_uri = os.getenv('CALENDLY_REDIRECT_URI')
+    
+    if not code:
+        raise APIException("Missing code", status_code=400)
+    
+    encode_authentication = encode_credentials(client_id, client_secret)
+    
+    try:
+        response = requests.post('https://auth.calendly.com/oauth/token', json={
+            'grant_type': 'authorization_code',
+            'code': code,
+            'redirect_uri': redirect_uri,
+        }, headers={
+            'Authorization': f'Basic {encode_authentication}',
+        })
+        response.raise_for_status()
+        return jsonify(response.json()), 200
+    except requests.exceptions.RequestException as e:
+        return jsonify({ "message": "Error al obtener el token de Calendly" }), 400

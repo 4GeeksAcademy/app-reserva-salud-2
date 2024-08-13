@@ -9,6 +9,7 @@ const getState = ({ getStore, getActions, setStore }) => {
   return {
     store: {
       isAuthenticated: false,
+      userUri: "",
     },
     actions: {
       // login user
@@ -60,6 +61,12 @@ const getState = ({ getStore, getActions, setStore }) => {
         localStorage.removeItem("token");
         setStore({ isAuthenticated: false });
         toast.success("Cierre de sesión exitoso", { icon: "👋" });
+      },
+      getCalendlyAccessToken: (code) => {
+        backendApi.post("/calendly/token", { code })
+          .then((response) => {
+            localStorage.setItem("calendlyResponse", JSON.stringify(response.data));
+          });
       },
     },
   };
