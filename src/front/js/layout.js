@@ -7,6 +7,7 @@ import { VistaTerminosYCondiciones } from "./pages/TerminosYCondiciones.jsx";
 import { VistaRegistroProfesional } from "./pages/RegistroProfesional.jsx";
 import { VistaInfoProfesional } from "./pages/InfoProfesional.jsx";
 import { VistaAgendaProfesional } from "./pages/Agenda.jsx";
+import { VistaPoliticaPrivacidad } from "./pages/PoliticaDePrivacidad.jsx";
 import injectContext, { Context } from "./store/appContext";
 
 import { Navbar } from "./component/Navbar.jsx";
@@ -33,6 +34,7 @@ const Layout = () => {
           <Route element={<VistaRegistro />} path="/registro-usuario" />
           <Route element={<VistaRegistroProfesional />} path="/registro-profesional"/>
           <Route element={<VistaAgendaProfesional />} path="/agenda-profesional" />
+          <Route element={<VistaPoliticaPrivacidad />} path="/politica-privacidad" />
           <Route element={<Login />} path="/login" />
           <Route
             path="/perfil"

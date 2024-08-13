@@ -29,7 +29,7 @@ export const Footer = () => {
           </li>
           <li className="nav-item">
             <Link
-              to={"/politica-de-privacidad"}
+              to={"/politica-privacidad"}
               className="nav-link text-white"
             >
               Política de privacidad
