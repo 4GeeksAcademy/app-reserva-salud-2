@@ -1,17 +1,21 @@
-import React from "react";
+import React,{useContext} from "react";
+import { Context } from "../store/appContext";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import "../../styles/home.css";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 
 export const RegistroUsuario = () => {
+    const {store,actions}=useContext(Context);
+    const navigate= useNavigate();
+    
     const formik = useFormik({
         initialValues: {
             nombre: '',
             apellido: "",
-            fecha_de_nacimiento: "",
+            fechaNacimiento: "",
             email: "",
-            contraseña: "",
+            password: "",
             check: false,
         },
         validationSchema: Yup.object({
@@ -19,20 +23,24 @@ export const RegistroUsuario = () => {
                 .required('Este campo es obligatorio'),
             apellido: Yup.string()
                 .required('Este campo es obligatorio'),
-            fecha_de_nacimiento: Yup.string()
+                fechaNacimiento: Yup.string()
                 .required('Este campo es obligatorio'),
             email: Yup.string()
                 .email('Dirección de email inválida')
                 .required('Este campo es obligatorio'),
-            contraseña: Yup.string()
+                password: Yup.string()
                 .required('Este campo es obligatorio')
                 .min(6, 'Debe tener como mínimo 6 caracteres'),
             check: Yup.boolean()
                 .oneOf([true], 'Debe aceptar los términos y condiciones para continuar')
                 .required('Debe '),
         }),
-        onSubmit: values => {
-            console.log(values.nombre, values.apellido, values.fecha_de_nacimiento, values.email, values.contraseña, values.check);
+        onSubmit: async (values) => {
+            const send_Register_User= await actions.signupUser(values.email,values.password,values.fechaNacimiento,values.nombre,values.apellido)
+            console.log(values.nombre, values.apellido, values.fechaNacimiento, values.email, values.password, values.check);
+            if(send_Register_User){
+                navigate('/Login');
+            }
         },
     });
 
@@ -63,10 +71,12 @@ export const RegistroUsuario = () => {
                     ) : null}
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="fecha_de_nacimiento" className="text-label"> Fecha de nacimiento</label>
-                    <input type="date" name="fecha_de_nacimiento" className="form-control" id="fecha_de_nacimiento" aria-describedby="fecha_de_nacimiento" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.fecha_de_nacimiento} />
-                    {formik.touched.fecha_de_nacimiento && formik.errors.fecha_de_nacimiento ? (
-                        <div className="text-primary">{formik.errors.fecha_de_nacimiento}</div>
+                    <label htmlFor="fechaNacimiento" className="text-label"> Fecha de nacimiento</label>
+                    <input type="date" name="fechaNacimiento" className="form-control" id="fechaNacimiento" 
+                    aria-describedby="fechaNacimiento" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.fechaNacimiento} 
+                    />
+                    {formik.touched.fechaNacimiento && formik.errors.fechaNacimiento ? (
+                        <div className="text-primary">{formik.errors.fechaNacimiento}</div>
                     ) : null}
                 </div>
                 <div className="mb-3">
@@ -78,9 +88,11 @@ export const RegistroUsuario = () => {
                 </div>
                 <div className="mb-3">
                     <label htmlFor="exampleInputPassword1" className="text-label">Contraseña</label>
-                    <input type="password" name="contraseña" className="form-control" id="exampleInputPassword1" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.contraseña} />
-                    {formik.touched.contraseña && formik.errors.contraseña ? (
-                        <div className="text-primary">{formik.errors.contraseña}</div>
+                    <input type="password" name="password" className="form-control" 
+                    id="exampleInputPassword1" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.password} 
+                    />
+                    {formik.touched.password && formik.errors.password ? (
+                        <div className="text-primary">{formik.errors.password}</div>
                     ) : null}
                 </div>
                 <div className="mb-3 form-check">

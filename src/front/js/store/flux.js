@@ -11,6 +11,23 @@ const getState = ({ getStore, getActions, setStore }) => {
       isAuthenticated: false,
     },
     actions: {
+      // signup user
+      signupUser: async (email,password,fecha_Nacimiento,nombre,apellido) =>{
+        try{
+          toast.loading("En proceso de registro...");
+          const register= await backendApi.post("/usuario",{
+            email,password,fecha_Nacimiento,nombre,apellido
+          });
+          toast.dismiss();
+          toast.success("Registro de usuario exitoso", { icon: "🚀" });
+          return true;
+          }catch(error){
+            if (error.response.status === 400) {
+              toast.dismiss();
+              return toast.error("No sé ha realizado el registro del usuario");
+            }
+        }
+      },
       // login user
       loginUser: async (email, password) => {
         try {
