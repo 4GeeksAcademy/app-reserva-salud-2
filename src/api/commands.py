@@ -1,6 +1,8 @@
 
 import click
-from api.models import db, Usuario
+from api.models import db, User, Professional
+import random
+from api.models import StateEnum
 
 """
 In this file, you can add as many commands as you want using the @app.cli.command decorator
@@ -19,16 +21,42 @@ def setup_commands(app):
     def insert_test_users(count):
         print("Creating test users")
         for x in range(1, int(count) + 1):
-            user = User()
-            user.email = "test_user" + str(x) + "@test.com"
-            user.password = "123456"
-            user.is_active = True
-            db.session.add(user)
-            db.session.commit()
-            print("User: ", user.email, " created.")
+            first_name = "Test"
+            last_name = "User" + str(x)
+            email = "test_user" + str(x) + "@test.com"
+            password = "12345678"
+            state = random.choice(StateEnum._member_names_)
+            
+            new_user = User(first_name=first_name, last_name=last_name, email=email, password=password, state=state, is_active=True)
 
+            db.session.add(new_user)
+            db.session.commit()
+            print("User: ", new_user.email, " created.")
         print("All test users created")
+
+    @app.cli.command("insert-test-professionals")
+    @click.argument("count")
+    def insert_test_professionals(count):
+        print("Creating test professionals")
+        for x in range(1, int(count) + 1):
+            first_name = "Test"
+            last_name = "Professional" + str(x)
+            email = "test_professional" + str(x) + "@test.com"
+            password = "12345678"
+            state = random.choice(StateEnum._member_names_)
+            birth_date = "1990-01-01"
+            telephone = "099876543"
+            title = "Licenciado en Psicología"
+            url_calendly = "https://calendly.com/test" + str(x)    
+            
+            new_professional = Professional(first_name=first_name, last_name=last_name, email=email, password=password, state=state, birth_date=birth_date, telephone=telephone, title=title, url_calendly=url_calendly, is_active=True)
+
+            db.session.add(new_professional)
+            db.session.commit()
+            print("Professional: ", new_professional.email, " created.")
 
     @app.cli.command("insert-test-data")
     def insert_test_data():
-        pass
+        insert_test_users(5)
+        insert_test_professionals(5)
+        print("All test data created")

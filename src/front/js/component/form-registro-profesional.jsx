@@ -1,58 +1,81 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import "../../styles/index.css";
 import { Link } from "react-router-dom";
+import { Context } from "../store/appContext";
 
 export const RegistroProfesional = () => {
+    const { actions } = useContext(Context);
+
     const formik = useFormik({
         initialValues: {
-            nombre: "",
-            apellido: "",
-            fecha_de_nacimiento: "",
-            genero: "",
+            first_name: "",
+            last_name: "",
             email: "",
-            telefono: "",
-            foto: "",
-            pais_nacimiento: "",
-            departamento: "",
-            ciudad: "",
-            especialidad: "",
-            antiguedad: "",
-            modalidad: [],
+            password: "",
+            state: "",
+            birth_date: "",
+            telephone: "",
+            title: "",
+            profile_picture: "https://avatar.iran.liara.run/public/boy",
+            url_calendly: "",
+            is_active: false,
         },
         validationSchema: Yup.object({
-            nombre: Yup.string()
+            first_name: Yup.string()
                 .required('Este campo es obligatorio'),
-            apellido: Yup.string()
-                .required('Este campo es obligatorio'),
-            fecha_de_nacimiento: Yup.date()
-                .required('Este campo es obligatorio')
-                .max(new Date(), 'Fecha no válida'),
-            genero: Yup.string()
+            last_name: Yup.string()
                 .required('Este campo es obligatorio'),
             email: Yup.string()
                 .email('Dirección de email inválida')
                 .required('Este campo es obligatorio'),
-            telefono: Yup.string()
+            password: Yup.string()
+                .min(8, 'La contraseña debe tener al menos 8 caracteres')
                 .required('Este campo es obligatorio'),
-            foto: Yup.string(),
-            pais_nacimiento: Yup.string()
+            state: Yup.string()
+                .oneOf([
+                    "",
+                    "ARTIGAS",
+                    "CANELONES",
+                    "CERRO_LARGO",
+                    "COLONIA",
+                    "DURAZNO",
+                    "FLORES",
+                    "FLORIDA",
+                    "LAVALLEJA",
+                    "MALDONADO",
+                    "MONTEVIDEO",
+                    "PAYSANDU",
+                    "RIO_NEGRO",
+                    "RIVERA",
+                    "ROCHA",
+                    "SALTO",
+                    "SAN_JOSE",
+                    "SORIANO",
+                    "TACUAREMBO",
+                    "TREINTA_Y_TRES"
+                ], 'Debe seleccionar un departamento válido'),
+            birth_date: Yup.string()
                 .required('Este campo es obligatorio'),
-            departamento: Yup.string()
+            telephone: Yup.string()
                 .required('Este campo es obligatorio'),
-            ciudad: Yup.string()
+            title: Yup.string()
                 .required('Este campo es obligatorio'),
-
-            especialidad: Yup.string()
-                .required('Este campo es obligatorio'),
-            antiguedad: Yup.string()
-                .required('Este campo es obligatorio'),
-            modalidad: Yup.array()
-                .min(1, 'Debe seleccionar al menos una modalidad'),
+            profile_picture: Yup.string()
+                .url("Debe ser una url válida"),
+            url_calendly: Yup.string()
+                .url("Debe ser una url válida"),
+            is_active: Yup.bool()
         }),
-        onSubmit: values => {
-            console.log(values);
+        onSubmit: async (values) => {
+            console.log(values)
+
+            try {
+                await actions.createProfessional(values);
+            } catch (error) {
+                console.log(error);
+            }
         },
     });
 
@@ -69,36 +92,17 @@ export const RegistroProfesional = () => {
             </div>
             <form className="bg-tertiary p-2 rounded-bottom" onSubmit={formik.handleSubmit}>
                 <div className="mb-3">
-                    <label htmlFor="nombre" className="text-label">Nombre</label>
-                    <input type="text" name="nombre" className="form-control" id="nombre" aria-describedby="nombre" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.nombre} />
-                    {formik.touched.nombre && formik.errors.nombre ? (
-                        <div className="text-primary">{formik.errors.nombre}</div>
+                    <label htmlFor="first_name" className="text-label">Nombre</label>
+                    <input type="text" name="first_name" className="form-control" id="first_name" aria-describedby="first_name" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.first_name} />
+                    {formik.touched.first_name && formik.errors.first_name ? (
+                        <div className="text-primary">{formik.errors.first_name}</div>
                     ) : null}
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="apellido" className="text-label">Apellido</label>
-                    <input type="text" name="apellido" className="form-control" id="apellido" aria-describedby="apellido" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.apellido} />
-                    {formik.touched.apellido && formik.errors.apellido ? (
-                        <div className="text-primary">{formik.errors.apellido}</div>
-                    ) : null}
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="fecha_de_nacimiento" className="text-label">Fecha de nacimiento</label>
-                    <input type="date" name="fecha_de_nacimiento" className="form-control" id="fecha_de_nacimiento" aria-describedby="fecha_de_nacimiento" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.fecha_de_nacimiento} />
-                    {formik.touched.fecha_de_nacimiento && formik.errors.fecha_de_nacimiento ? (
-                        <div className="text-primary">{formik.errors.fecha_de_nacimiento}</div>
-                    ) : null}
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="genero" className="text-label">Género</label>
-                    <select className="form-select" id="genero" name="genero" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.genero}>
-                        <option value="" label="Seleccione un genero" />
-                        <option value="artigas" label="Masculino" />
-                        <option value="canelones" label="Femenino" />
-                        <option value="colonia" label="Otro" />
-                    </select>
-                    {formik.touched.genero && formik.errors.genero ? (
-                        <div className="text-primary">{formik.errors.genero}</div>
+                    <label htmlFor="last_name" className="text-label">Apellido</label>
+                    <input type="text" name="last_name" className="form-control" id="last_name" aria-describedby="last_name" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.last_name} />
+                    {formik.touched.last_name && formik.errors.last_name ? (
+                        <div className="text-primary">{formik.errors.last_name}</div>
                     ) : null}
                 </div>
                 <div className="mb-3">
@@ -109,111 +113,90 @@ export const RegistroProfesional = () => {
                     ) : null}
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="telefono" className="text-label">Teléfono de contacto</label>
-                    <input type="text" name="telefono" className="form-control" id="telefono" aria-describedby="telefono" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.telefono} />
-                    {formik.touched.telefono && formik.errors.telefono ? (
-                        <div className="text-primary">{formik.errors.telefono}</div>
+                    <label htmlFor="password" className="text-label">Contraseña</label>
+                    <input type="password" name="password" className="form-control" id="password" aria-describedby="password" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.password} />
+                    {formik.touched.password && formik.errors.password ? (
+                        <div className="text-primary">{formik.errors.password}</div>
                     ) : null}
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="foto" className="text-label">Foto de perfil</label>
-                    <input type="file" name="foto" className="form-control" id="foto" aria-describedby="foto" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.foto} />
-                    {formik.touched.foto && formik.errors.foto ? (
-                        <div className="text-primary">{formik.errors.foto}</div>
+                    <label htmlFor="state" className="text-label">Departamento</label>
+                    <select className="form-select" id="state" name="state" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.state}>
+
+                        <option value="ARTIGAS">Artigas</option>
+                        <option value="CANELONES">Canelones</option>
+                        <option value="CERRO_LARGO">Cerro Largo</option>
+                        <option value="COLONIA">Colonia</option>
+                        <option value="DURAZNO">Durazno</option>
+                        <option value="FLORES">Flores</option>
+                        <option value="FLORIDA">Florida</option>
+                        <option value="LAVALLEJA">Lavalleja</option>
+                        <option value="MALDONADO">Maldonado</option>
+                        <option value="MONTEVIDEO">Montevideo</option>
+                        <option value="PAYSANDU">Paysandú</option>
+                        <option value="RIO_NEGRO">Río Negro</option>
+                        <option value="RIVERA">Rivera</option>
+                        <option value="ROCHA">Rocha</option>
+                        <option value="SALTO">Salto</option>
+                        <option value="SAN_JOSE">San José</option>
+                        <option value="SORIANO">Soriano</option>
+                        <option value="TACUAREMBO">Tacuarembó</option>
+                        <option value="TREINTA_Y_TRES">Treinta y Tres</option>
+                    </select>
+                    {formik.touched.state && formik.errors.state ? (
+                        <div className="text-primary">{formik.errors.state}</div>
+                    ) : null}
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="birth_date" className="text-label">Fecha de nacimiento</label>
+                    <input type="date" name="birth_date" className="form-control" id="birth_date" aria-describedby="birth_date" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.birth_date} />
+                    {formik.touched.birth_date && formik.errors.birth_date ? (
+                        <div className="text-primary">{formik.errors.birth_date}</div>
+                    ) : null}
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="telephone" className="text-label">Teléfono de contacto</label>
+                    <input type="text" name="telephone" className="form-control" id="telephone" aria-describedby="telephone" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.telephone} />
+                    {formik.touched.telephone && formik.errors.telephone ? (
+                        <div className="text-primary">{formik.errors.telephone}</div>
+                    ) : null}
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="profile_picture" className="text-label">Foto de perfil</label>
+                    <input type="url" name="profile_picture" className="form-control" id="profile_picture" aria-describedby="profile_picture" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.profile_picture} />
+                    {formik.touched.profile_picture && formik.errors.profile_picture ? (
+                        <div className="text-primary">{formik.errors.profile_picture}</div>
+                    ) : null}
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="url_calendly" className="text-label">URL de Calendly</label>
+                    <input type="url" name="url_calendly" className="form-control" id="url_calendly" aria-describedby="url_calendly" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.url_calendly} />
+                    {formik.touched.url_calendly && formik.errors.url_calendly ? (
+                        <div className="text-primary">{formik.errors.url_calendly}</div>
                     ) : null}
                 </div>
                 <hr />
                 <div className="mb-3">
-                    <label htmlFor="pais_nacimiento" className="text-label">País de nacimiento</label>
-                    <select className="form-select" id="pais_nacimiento" name="pais_nacimiento" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.pais_nacimiento}>
-                        <option value="" label="Seleccione el país" />
-                        <option value="uruguay" label="Uruguay" />
-                        <option value="otro1" label="Otro" />
-                        <option value="otro2" label="Otro" />
+                    <label htmlFor="title" className="text-label">Título</label>
+                    <select className="form-select" id="title" name="title" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.title}>
+                        <option value="">Seleccione un título</option>
+                        <option value="psicologia">Psicología</option>
+                        <option value="odontologia">Odontología</option>
+                        <option value="nutricion">Nutrición</option>
                     </select>
-                    {formik.touched.pais_nacimiento && formik.errors.pais_nacimiento ? (
-                        <div className="text-primary">{formik.errors.pais_nacimiento}</div>
+                    {formik.touched.title && formik.errors.title ? (
+                        <div className="text-primary">{formik.errors.title}</div>
                     ) : null}
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="departamento" className="text-label">Departamento de residencia</label>
-                    <select className="form-select" id="departamento" name="departamento" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.departamento}>
-                        <option value="" label="Seleccione un departamento"></option>
-                        <option value="artigas" label="Artigas"></option>
-                        <option value="canelones" label="Canelones"></option>
-                        <option value="colonia" label="Colonia"></option>
-                        <option value="durazno" label="Durazno"></option>
-                        <option value="flores" label="Flores"></option>
-                        <option value="florida" label="Florida"></option>
-                        <option value="lavalleja" label="Lavalleja"></option>
-                        <option value="maldonado" label="Maldonado"></option>
-                        <option value="montevideo" label="Montevideo"></option>
-                        <option value="paysandu" label="Paysandú"></option>
-                        <option value="rio-negro" label="Río Negro"></option>
-                        <option value="rivera" label="Rivera"></option>
-                        <option value="rocha" label="Rocha"></option>
-                        <option value="salto" label="Salto"></option>
-                        <option value="san-jose" label="San José"></option>
-                        <option value="soriano" label="Soriano"></option>
-                        <option value="tacuarembo" label="Tacuarembó"></option>
-                        <option value="treinta-y-tres" label="Treinta y Tres"></option>
-                    </select>
-                    {formik.touched.departamento && formik.errors.departamento ? (
-                        <div className="text-primary">{formik.errors.departamento}</div>
-                    ) : null}
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="ciudad" className="text-label">Ciudad</label>
-                    <select className="form-select" id="ciudad" name="ciudad" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.ciudad}>
-                        <option value="" label="Seleccione una ciudad" />
-                        <option value="ciudad1" label="Una ciudad" />
-                        <option value="ciudad2" label="Otra ciudad" />
-                        <option value="ciudad3" label="Otra ciudad" />
-                    </select>
-                    {formik.touched.ciudad && formik.errors.ciudad ? (
-                        <div className="text-primary">{formik.errors.ciudad}</div>
-                    ) : null}
-                </div>
-                <hr />
-                <div className="mb-3">
-                    <label htmlFor="especialidad" className="text-label">Especialidad</label>
-                    <select className="form-select" id="especialidad" name="especialidad" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.especialidad}>
-                        <option value="" label="Seleccione una especialidad" />
-                        <option value="psicologia" label="Psicología" />
-                        <option value="odontologia" label="Odontología" />
-                        <option value="nutricion" label="Nutrición" />
-                    </select>
-                    {formik.touched.especialidad && formik.errors.especialidad ? (
-                        <div className="text-primary">{formik.errors.especialidad}</div>
-                    ) : null}
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="antiguedad" className="text-label">Antigüedad</label>
-                    <input type="number" name="antiguedad" className="form-control" id="antiguedad" aria-describedby="antiguedad" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.antiguedad} />
-                    {formik.touched.antiguedad && formik.errors.antiguedad ? (
-                        <div className="text-primary">{formik.errors.antiguedad}</div>
-                    ) : null}
-                </div>
-                <label htmlFor="modalidad" className="text-label">Modalidad de consulta</label>
-                <div className="mb-3" role="group">
                     <div className="form-check">
-                        <input type="checkbox" name="modalidad" className="form-check-input" id="remoto"
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            value="Remoto"
-                            checked={formik.values.modalidad.includes("Remoto")} />
-                        <label className="form-check-label" htmlFor="remoto">Remoto</label>
+                        <input className="form-check-input" type="checkbox" name="is_active" id="is_active" onChange={formik.handleChange} onBlur={formik.handleBlur} checked={formik.values.is_active} />
+                        <label className="form-check-label" htmlFor="is_active">
+                            ¿Activo?
+                        </label>
                     </div>
-                    <div className="form-check">
-                        <input type="checkbox" name="modalidad" className="form-check-input" id="presencial"
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            value="Presencial"
-                            checked={formik.values.modalidad.includes("Presencial")} />
-                        <label className="form-check-label" htmlFor="presencial">Presencial</label>
-                    </div>
-                    {formik.touched.modalidad && formik.errors.modalidad ? (
-                        <div className="text-primary">{formik.errors.modalidad}</div>
+                    {formik.touched.is_active && formik.errors.is_active ? (
+                        <div className="text-primary">{formik.errors.is_active}</div>
                     ) : null}
                 </div>
                 <div className="d-flex justify-content-center">

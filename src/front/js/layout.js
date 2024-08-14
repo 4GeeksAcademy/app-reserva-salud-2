@@ -6,7 +6,6 @@ import { VistaRegistro } from "./pages/RegistroUsuario.jsx";
 import { VistaTerminosYCondiciones } from "./pages/TerminosYCondiciones.jsx";
 import { VistaRegistroProfesional } from "./pages/RegistroProfesional.jsx";
 import { VistaInfoProfesional } from "./pages/InfoProfesional.jsx";
-import { VistaAgendaProfesional } from "./pages/Agenda.jsx";
 import injectContext, { Context } from "./store/appContext";
 
 import { Navbar } from "./component/Navbar.jsx";
@@ -31,8 +30,8 @@ const Layout = () => {
         <Routes>
           <Route element={<Home />} path="/" />
           <Route element={<VistaRegistro />} path="/registro-usuario" />
-          <Route element={<VistaRegistroProfesional />} path="/registro-profesional"/>
-          <Route element={<VistaAgendaProfesional />} path="/agenda-profesional" />
+          <Route element={<VistaRegistroProfesional />} path="/registro-profesional" />
+
           <Route element={<Login />} path="/login" />
           <Route
             path="/perfil"
@@ -41,7 +40,7 @@ const Layout = () => {
             }
           />
           <Route element={<VistaInfoProfesional />} path="/profesionales/:id" />
-          <Route element={<VistaTerminosYCondiciones />} path="/terminos-y-condiciones"/>
+          <Route element={<VistaTerminosYCondiciones />} path="/terminos-y-condiciones" />
           <Route element={<Profesionales />} path="/profesionales" />
           <Route element={<h1>Not found!</h1>} />
         </Routes>

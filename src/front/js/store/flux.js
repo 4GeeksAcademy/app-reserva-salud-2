@@ -61,6 +61,36 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ isAuthenticated: false });
         toast.success("Cierre de sesión exitoso", { icon: "👋" });
       },
+
+      // Get all the professionals
+      getProfessionals: async () => {
+        try {
+          const response = await backendApi.get("/professionals");
+          return response.data;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
+      // Get a single professional
+      getProfessional: async (id) => {
+        try {
+          const response = await backendApi.get(`/professionals/${id}`);
+          return response.data;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
+      // Register new professional
+      createProfessional: async (data) => {
+        try {
+          const response = await backendApi.post("/professionals", data);
+          return response.data;
+        } catch (error) {
+          console.error(error);
+        }
+      },
     },
   };
 };
