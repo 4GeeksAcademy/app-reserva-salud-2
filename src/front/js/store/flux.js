@@ -12,21 +12,24 @@ const getState = ({ getStore, getActions, setStore }) => {
     },
     actions: {
       // signup user
-      signupUser: async (email,password,fecha_Nacimiento,nombre,apellido) =>{
+      signupUser: async (email,password,fechaNacimiento,nombre,apellido) =>{
         try{
           toast.loading("En proceso de registro...");
           const register= await backendApi.post("/usuario",{
-            email,password,fecha_Nacimiento,nombre,apellido
+            email,password,fechaNacimiento,nombre,apellido
           });
           toast.dismiss();
           toast.success("Registro de usuario exitoso", { icon: "🚀" });
           return true;
-          }catch(error){
-            if (error.response.status === 400) {
+          
+        }catch(error){
+          toast.dismiss();
+          toast.error("Error al registrar el usuario");  
+          if (error.response.status === 400) {
               toast.dismiss();
-              return toast.error("No sé ha realizado el registro del usuario");
+              
             }
-        }
+          }
       },
       // login user
       loginUser: async (email, password) => {

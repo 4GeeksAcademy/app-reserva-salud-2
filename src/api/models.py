@@ -17,6 +17,7 @@ class Usuario(db.Model):
     rol=db.Column(db.Enum(RolEnum),nullable=False, default=RolEnum.PACIENTE)
     nombre = db.Column(db.String(100), unique=False, nullable=False)
     apellido = db.Column(db.String(100), unique=False, nullable=False)
+    fecha_nacimiento=db.Column(db.Date, unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, default=False)
     paciente = db.relationship('Paciente', uselist=False, backref='usuario', lazy=True, cascade='all, delete-orphan') 
     profesional= db.relationship('Profesional',uselist=False,backref='usuario', lazy=True, cascade='all, delete-orphan')
@@ -31,6 +32,7 @@ class Usuario(db.Model):
             "rol": self.rol.value,
             "nombre": self.nombre,
             "apellido": self.apellido,
+            "fecha_nacimiento": self.fecha_nacimiento,
             "is_active": self.is_active
             # do not serialize the password, its a security breach
         }
@@ -39,7 +41,7 @@ class Paciente(db.Model):
     __tablename__ = 'paciente'
     
     id = db.Column(db.Integer, primary_key=True)
-    historia_clinica = db.Column(db.TEXT, unique=False, nullable=False)
+    historia_clinica = db.Column(db.TEXT, unique=False, nullable=True)
     id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'),unique=False, nullable=False)
     comentarios_paciente= db.relationship('Comentario_paciente_profesional',backref='paciente',lazy=True)
     notificaciones_paciente=db.relationship('Notificacion',backref='paciente',lazy=True)
@@ -58,8 +60,7 @@ class Profesional(db.Model):
     __tablename__ = 'profesional'
     
     id = db.Column(db.Integer, primary_key=True)
-    foto_perfil = db.Column(db.String, unique=False, nullable=False)
-    fecha_nacimiento=db.Column(db.Date, unique=False, nullable=False)
+    foto_perfil = db.Column(db.String, unique=False, nullable=False)   
     genero=db.Column(db.String(12), unique=False, nullable=False) 
     telefono= db.Column(db.Integer, unique=False, nullable=False)
     matricula= db.Column(db.String(15), unique=False, nullable=False)
@@ -79,8 +80,7 @@ class Profesional(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "foto_perfil": self.foto_perfil,
-            "fecha_nacimiento": self.fecha_nacimiento,
+            "foto_perfil": self.foto_perfil,          
             "genero": self.genero,
             "pais_nacimiento": self.pais_nacimiento,
             "telefono": self.telefono,

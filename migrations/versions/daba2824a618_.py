@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: b455eaeec588
+Revision ID: daba2824a618
 Revises: 
-Create Date: 2024-08-09 20:46:33.781141
+Create Date: 2024-08-14 15:14:55.060268
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b455eaeec588'
+revision = 'daba2824a618'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -58,6 +58,7 @@ def upgrade():
     sa.Column('rol', sa.Enum('ADMINISTRADOR', 'PACIENTE', 'PROFESIONAL', name='rolenum'), nullable=False),
     sa.Column('nombre', sa.String(length=100), nullable=False),
     sa.Column('apellido', sa.String(length=100), nullable=False),
+    sa.Column('fecha_nacimiento', sa.Date(), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
@@ -87,7 +88,6 @@ def upgrade():
     op.create_table('profesional',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('foto_perfil', sa.String(), nullable=False),
-    sa.Column('fecha_nacimiento', sa.Date(), nullable=False),
     sa.Column('genero', sa.String(length=12), nullable=False),
     sa.Column('telefono', sa.Integer(), nullable=False),
     sa.Column('matricula', sa.String(length=15), nullable=False),

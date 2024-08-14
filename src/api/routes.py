@@ -3,7 +3,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
 
-from api.models import db, Usuario
+from api.models import db, Usuario,Paciente
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -28,17 +28,25 @@ def crear_usuario():
     apellido = request_body.get("apellido")
     email = request_body.get("email")
     password = request_body.get("password")
-    
+    fechaNacimiento= request_body.get("fechaNacimiento")
     # Comprobar que los campos requeridos no estén vacíos
-    if not nombre or not apellido or not email or not password:
+    if not nombre or not apellido or not email or not password or not fechaNacimiento:
         raise APIException("Faltan campos requeridos", status_code=400)
+    existingUserEmail=Usuario.query.filter_by(email=email).first();
     
+    if existingUserEmail:
+        raise APIException("El correo electrónico ya está en uso", status_code=409)
     # Hashear contraseña antes de guardarla
     password_hash = generate_password_hash(password, 10).decode('utf-8')
     
     # Crear usuario en la base de datos
-    usuario = Usuario(nombre=nombre, apellido=apellido, email=email, password=password_hash)
-    db.session.add(usuario)
+    newUser = Usuario(nombre=nombre, apellido=apellido, email=email, password=password_hash,fecha_nacimiento=fechaNacimiento)
+    db.session.add(newUser)
+    db.session.commit()
+
+    newUserId=newUser.id
+    newPatientUser=Paciente(id_usuario=newUserId,historia_clinica="datos iniciales historia clinica")
+    db.session.add(newPatientUser)
     db.session.commit()
     
     return jsonify({ "message": "Usuario creado satisfactoriamente" }), 201
