@@ -284,7 +284,7 @@ export const Profesionales = () => {
     const getProfessionals = async () => {
       const professionals = await actions.getProfessionals();
       setProfessionals(professionals);
-    }
+    };
     getProfessionals();
   }, []);
 
@@ -295,9 +295,6 @@ export const Profesionales = () => {
       return professional;
     }
   });
-
-  console.log(professionals);
-
 
   return (
     <div className="container contenido">
@@ -393,15 +390,18 @@ export const Profesionales = () => {
         </div>
 
         <div className="d-flex flex-column gap-4 py-4">
-          {
-            filteredProfessionals.length > 0 ? (
-              filteredProfessionals.map(professional => (
-                <ProfesionalCard key={professional.id} profesional={professional} />
-              ))
-            ) : (
-              <h2 className="text-subtitle text-center">No encontramos profesionales con estos filtros</h2>
-            )
-          }
+          {filteredProfessionals.length > 0 ? (
+            filteredProfessionals.map((professional) => (
+              <ProfesionalCard
+                key={professional.id}
+                profesional={professional}
+              />
+            ))
+          ) : (
+            <h2 className="text-subtitle text-center">
+              No encontramos profesionales con estos filtros
+            </h2>
+          )}
         </div>
       </div>
     </div>
