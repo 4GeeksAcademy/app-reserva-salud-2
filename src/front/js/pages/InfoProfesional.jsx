@@ -103,7 +103,7 @@ export const VistaInfoProfesional = () => {
         </div>
         {professional.comments?.length > 0 ? (
           professional.comments.map((comment) => (
-            <div className="col-12">
+            <div key={comment.id} className="col-12">
               <div className="card">
                 <div className="card-header">
                   <div className="row">

@@ -14,6 +14,8 @@ import { Login } from "./pages/Login.jsx";
 import { Profesionales } from "./pages/Profesionales.jsx";
 import { ProtectedRoute } from "./component/ProtectedRoute.jsx";
 import { Toaster } from "react-hot-toast";
+import { AccessCode } from "./pages/AccessCode.jsx";
+import { PerfilProfesional } from "./pages/PerfilProfesional.jsx";
 
 //create your first component
 const Layout = () => {
@@ -42,6 +44,8 @@ const Layout = () => {
           <Route element={<VistaInfoProfesional />} path="/profesionales/:id" />
           <Route element={<VistaTerminosYCondiciones />} path="/terminos-y-condiciones" />
           <Route element={<Profesionales />} path="/profesionales" />
+          <Route element={<AccessCode />} path="/access-code" />
+          <Route element={<PerfilProfesional />} path="/profesional/perfil" />
           <Route element={<h1>Not found!</h1>} />
         </Routes>
         <Footer />

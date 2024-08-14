@@ -9,6 +9,7 @@ const getState = ({ getStore, getActions, setStore }) => {
   return {
     store: {
       isAuthenticated: false,
+      userUri: "",
     },
     actions: {
       // login user
@@ -28,9 +29,9 @@ const getState = ({ getStore, getActions, setStore }) => {
         } catch (error) {
           if (error.response.status === 400) {
             setStore({ isAuthenticated: false });
-            toast.dismiss();
-            return toast.error("Credenciales inválidas");
           }
+          toast.dismiss();
+          toast.error("Credenciales inválidas");
         }
       },
       verifyToken: async () => {
@@ -61,6 +62,12 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ isAuthenticated: false });
         toast.success("Cierre de sesión exitoso", { icon: "👋" });
       },
+      getCalendlyAccessToken: (code) => {
+        backendApi.post("/calendly/token", { code })
+          .then((response) => {
+            localStorage.setItem("calendlyResponse", JSON.stringify(response.data));
+          });
+      },
 
       // Get all the professionals
       getProfessionals: async () => {
@@ -85,10 +92,16 @@ const getState = ({ getStore, getActions, setStore }) => {
       // Register new professional
       createProfessional: async (data) => {
         try {
+          toast.loading("Registrando profesional...");
           const response = await backendApi.post("/professionals", data);
+          toast.dismiss();
+          toast.success("Profesional registrado exitosamente", { icon: "🚀" });
           return response.data;
         } catch (error) {
+          toast.dismiss();
+          toast.error("Error al registrar profesional");
           console.error(error);
+          return null
         }
       },
     },
