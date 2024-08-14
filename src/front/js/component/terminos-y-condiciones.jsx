@@ -4,7 +4,7 @@ import "../../styles/home.css";
 export const TerminosYCondiciones = () => {
     return (
         <div >
-            <div className="p-3">
+            <div className="contenido p-3">
                 <h1 className="text-title mb-3 text-center">Términos y condiciones</h1>
                     <h3 className="text-subtitle">1. Aceptación de los términos</h3>
                         <p className="text-normal">Al utilizar esta aplicación, usted acepta los términos y condiciones aquí establecidos. Estos términos pueden ser modificados en cualquier momento, por lo que le recomendamos revisarlos periódicamente.</p>
