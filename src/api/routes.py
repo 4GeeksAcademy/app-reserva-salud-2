@@ -25,10 +25,11 @@ def handle_users():
         last_name = request_body.get("last_name")
         email = request_body.get("email")
         password = request_body.get("password")
+        birth_date = request_body.get("birth_date")
         state = request_body.get("state")
         
         # Check if required fields are not empty
-        if not first_name or not last_name or not email or not password or not state:
+        if not first_name or not last_name or not email or not password or not birth_date or not state:
             raise APIException("Missing required fields", status_code=400)
         
         if User.query.filter_by(email=email).first():
