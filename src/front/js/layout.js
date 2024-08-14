@@ -6,7 +6,6 @@ import { VistaRegistro } from "./pages/RegistroUsuario.jsx";
 import { VistaTerminosYCondiciones } from "./pages/TerminosYCondiciones.jsx";
 import { VistaRegistroProfesional } from "./pages/RegistroProfesional.jsx";
 import { VistaInfoProfesional } from "./pages/InfoProfesional.jsx";
-import { VistaAgendaProfesional } from "./pages/Agenda.jsx";
 import { VistaPoliticaPrivacidad } from "./pages/PoliticaDePrivacidad.jsx";
 import injectContext, { Context } from "./store/appContext";
 
@@ -16,6 +15,8 @@ import { Login } from "./pages/Login.jsx";
 import { Profesionales } from "./pages/Profesionales.jsx";
 import { ProtectedRoute } from "./component/ProtectedRoute.jsx";
 import { Toaster } from "react-hot-toast";
+import { AccessCode } from "./pages/AccessCode.jsx";
+import { PerfilProfesional } from "./pages/PerfilProfesional.jsx";
 
 //create your first component
 const Layout = () => {
@@ -32,9 +33,9 @@ const Layout = () => {
         <Routes>
           <Route element={<Home />} path="/" />
           <Route element={<VistaRegistro />} path="/registro-usuario" />
-          <Route element={<VistaRegistroProfesional />} path="/registro-profesional"/>
-          <Route element={<VistaAgendaProfesional />} path="/agenda-profesional" />
+          <Route element={<VistaRegistroProfesional />} path="/registro-profesional" />
           <Route element={<VistaPoliticaPrivacidad />} path="/politica-privacidad" />
+
           <Route element={<Login />} path="/login" />
           <Route
             path="/perfil"
@@ -43,8 +44,10 @@ const Layout = () => {
             }
           />
           <Route element={<VistaInfoProfesional />} path="/profesionales/:id" />
-          <Route element={<VistaTerminosYCondiciones />} path="/terminos-y-condiciones"/>
+          <Route element={<VistaTerminosYCondiciones />} path="/terminos-y-condiciones" />
           <Route element={<Profesionales />} path="/profesionales" />
+          <Route element={<AccessCode />} path="/access-code" />
+          <Route element={<PerfilProfesional />} path="/profesional/perfil" />
           <Route element={<h1>Not found!</h1>} />
         </Routes>
         <Footer />

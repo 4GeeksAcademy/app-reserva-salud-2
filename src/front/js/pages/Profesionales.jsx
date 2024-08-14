@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
+import { Context } from "../store/appContext";
 import "swiper/css";
 import "swiper/css/autoplay";
 import { ProfesionalCard } from "../component/ProfesionalCard.jsx";
@@ -274,21 +275,24 @@ const profesionales = [
 ];
 
 export const Profesionales = () => {
-  const [especialidad, setEspecialidad] = useState("");
-  const [departamento, setDepartamento] = useState("");
+  const { actions } = useContext(Context);
+  // const [especialidad, setEspecialidad] = useState("");
+  const [state, setState] = useState("");
+  const [professionals, setProfessionals] = useState([]);
 
-  const filteredProfesionales = profesionales.filter((profesional) => {
-    if (especialidad && departamento) {
-      return (
-        profesional.especialidad.toLowerCase().includes(especialidad) &&
-        profesional.departamento.toLowerCase().includes(departamento)
-      );
-    } else if (especialidad) {
-      return profesional.especialidad.toLowerCase().includes(especialidad);
-    } else if (departamento) {
-      return profesional.departamento.toLowerCase().includes(departamento);
+  useEffect(() => {
+    const getProfessionals = async () => {
+      const professionals = await actions.getProfessionals();
+      setProfessionals(professionals);
+    };
+    getProfessionals();
+  }, []);
+
+  const filteredProfessionals = professionals.filter((professional) => {
+    if (state) {
+      return professional.state.includes(state);
     } else {
-      return profesional;
+      return professional;
     }
   });
 
@@ -315,18 +319,18 @@ export const Profesionales = () => {
               },
             }}
           >
-            {destacados.map((profesional) => (
+            {/* {destacados.map((profesional) => (
               <SwiperSlide key={profesional.id}>
                 <ProfesionalCard profesional={profesional} />
               </SwiperSlide>
-            ))}
+            ))} */}
           </Swiper>
         </div>
 
         <div>
           <h3 className="text-subtitle text-center">Filtros</h3>
           <div className="d-flex justify-content-center gap-4">
-            <div className="d-flex flex-column">
+            {/* <div className="d-flex flex-column">
               <label htmlFor="especialidad" className="form-label">
                 Especialidad
               </label>
@@ -347,23 +351,23 @@ export const Profesionales = () => {
                 <option value="kinesiologo">Kinesiólogo</option>
                 <option value="odontologo">Odontólogo</option>
               </select>
-            </div>
+            </div> */}
 
             <div className="d-flex flex-column">
-              <label htmlFor="departamento" className="form-label">
+              <label htmlFor="state" className="form-label">
                 Departamento
               </label>
               <select
                 className="form-select"
-                id="departamento"
+                id="state"
                 aria-label="Departamento"
-                value={departamento}
-                onChange={(e) => setDepartamento(e.target.value)}
+                value={state}
+                onChange={(e) => setState(e.target.value)}
               >
                 <option value="">Seleccionar departamento</option>
                 <option value="artigas">Artigas</option>
                 <option value="canelones">Canelones</option>
-                <option value="cerro-largo">Cerro Largo</option>
+                <option value="cerro_largo">Cerro Largo</option>
                 <option value="colonia">Colonia</option>
                 <option value="durazno">Durazno</option>
                 <option value="flores">Flores</option>
@@ -372,29 +376,32 @@ export const Profesionales = () => {
                 <option value="maldonado">Maldonado</option>
                 <option value="montevideo">Montevideo</option>
                 <option value="paysandu">Paysandú</option>
-                <option value="rio-negro">Río Negro</option>
+                <option value="rio_negro">Río Negro</option>
                 <option value="rivera">Rivera</option>
                 <option value="rocha">Rocha</option>
                 <option value="salto">Salto</option>
-                <option value="san-jose">San José</option>
+                <option value="san_jose">San José</option>
                 <option value="soriano">Soriano</option>
                 <option value="tacuarembo">Tacuarembó</option>
-                <option value="treinta-y-tres">Treinta y Tres</option>
+                <option value="treinta_y_tres">Treinta y Tres</option>
               </select>
             </div>
           </div>
         </div>
 
         <div className="d-flex flex-column gap-4 py-4">
-          {
-            filteredProfesionales.length > 0 ? (
-              filteredProfesionales.map(profesional => (
-                <ProfesionalCard key={profesional.id} profesional={profesional} />
-              ))
-            ) : (
-              <h2 className="text-subtitle text-center">No encontramos profesionales con estos filtros</h2>
-            )
-          }
+          {filteredProfessionals.length > 0 ? (
+            filteredProfessionals.map((professional) => (
+              <ProfesionalCard
+                key={professional.id}
+                profesional={professional}
+              />
+            ))
+          ) : (
+            <h2 className="text-subtitle text-center">
+              No encontramos profesionales con estos filtros
+            </h2>
+          )}
         </div>
       </div>
     </div>
