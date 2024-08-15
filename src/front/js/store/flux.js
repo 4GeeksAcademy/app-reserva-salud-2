@@ -12,6 +12,21 @@ const getState = ({ getStore, getActions, setStore }) => {
       userUri: "",
     },
     actions: {
+      createUser: async (user) => {
+        try {
+          toast.loading("Creando usuario...");
+          const response = await backendApi.post("/users", user);
+          toast.dismiss();
+          toast.success("Usuario creado exitosamente", { icon: "🚀" });
+          return response;
+        } catch (error) {
+          toast.dismiss();
+          toast.error("Error al crear usuario");
+          console.error(error);
+          return null;
+        }
+      },
+
       // login user
       loginUser: async (email, password) => {
         try {

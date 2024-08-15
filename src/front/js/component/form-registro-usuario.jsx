@@ -1,106 +1,201 @@
-import React from "react";
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import React, { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import * as Yup from "yup";
+import { Context } from "../store/appContext";
+
 import "../../styles/home.css";
-import { Link } from "react-router-dom";
 
 export const RegistroUsuario = () => {
-    const formik = useFormik({
-        initialValues: {
-            nombre: '',
-            apellido: "",
-            fecha_de_nacimiento: "",
-            email: "",
-            contraseña: "",
-            check: false,
-        },
-        validationSchema: Yup.object({
-            nombre: Yup.string()
-                .required('Este campo es obligatorio'),
-            apellido: Yup.string()
-                .required('Este campo es obligatorio'),
-            fecha_de_nacimiento: Yup.string()
-                .required('Este campo es obligatorio'),
-            email: Yup.string()
-                .email('Dirección de email inválida')
-                .required('Este campo es obligatorio'),
-            contraseña: Yup.string()
-                .required('Este campo es obligatorio')
-                .min(6, 'Debe tener como mínimo 6 caracteres'),
-            check: Yup.boolean()
-                .oneOf([true], 'Debe aceptar los términos y condiciones para continuar')
-                .required('Debe '),
-        }),
-        onSubmit: values => {
-            console.log(values.nombre, values.apellido, values.fecha_de_nacimiento, values.email, values.contraseña, values.check);
-        },
-    });
+  const { actions } = useContext(Context);
+  const navigate = useNavigate();
 
-    return (
-        <div className="my-4">
-            <div className="row bg-secondary text-white p-3 mx-0 rounded-top row align-items-center">
-                <div className="col-8">
-                    <h1 className="text-title mb-1">Registro</h1>
-                    <p className="text-normal">Regístrate e ingresa hoy mismo</p>
-                </div>
-                <div className="col text-end">
-                    <i className="fa-solid fa-circle-user fa-3x"></i>
-                </div>
-            </div>
-            <form className="bg-tertiary p-2 rounded-bottom" onSubmit={formik.handleSubmit}>
-                <div className="mb-3">
-                    <label htmlFor="nombre" className="text-label">Nombre</label>
-                    <input type="text" name="nombre" className="form-control" id="nombre" aria-describedby="nombre" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.nombre} />
-                    {formik.touched.nombre && formik.errors.nombre ? (
-                        <div className="text-primary">{formik.errors.nombre}</div>
-                    ) : null}
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="apellido" className="text-label">Apellido</label>
-                    <input type="text" name="apellido" className="form-control" id="apellido" aria-describedby="apellido" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.apellido} />
-                    {formik.touched.apellido && formik.errors.apellido ? (
-                        <div className="text-primary">{formik.errors.apellido}</div>
-                    ) : null}
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="fecha_de_nacimiento" className="text-label"> Fecha de nacimiento</label>
-                    <input type="date" name="fecha_de_nacimiento" className="form-control" id="fecha_de_nacimiento" aria-describedby="fecha_de_nacimiento" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.fecha_de_nacimiento} />
-                    {formik.touched.fecha_de_nacimiento && formik.errors.fecha_de_nacimiento ? (
-                        <div className="text-primary">{formik.errors.fecha_de_nacimiento}</div>
-                    ) : null}
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="exampleInputEmail1" className="text-label">Email</label>
-                    <input type="email" name="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.email} />
-                    {formik.touched.email && formik.errors.email ? (
-                        <div className="text-primary">{formik.errors.email}</div>
-                    ) : null}
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="exampleInputPassword1" className="text-label">Contraseña</label>
-                    <input type="password" name="contraseña" className="form-control" id="exampleInputPassword1" onChange={formik.handleChange} onBlur={formik.handleBlur} value={formik.values.contraseña} />
-                    {formik.touched.contraseña && formik.errors.contraseña ? (
-                        <div className="text-primary">{formik.errors.contraseña}</div>
-                    ) : null}
-                </div>
-                <div className="mb-3 form-check">
-                    <input type="checkbox" name="check" className="form-check-input" id="exampleCheck1"
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        checked={formik.values.check}
-                    />
-                    <label className="text-label" htmlFor="exampleCheck1">He leído los <Link className="text-primary" to={"/terminos-y-condiciones"}>términos y condiciones</Link> </label>
-                    {formik.touched.check && formik.errors.check ? (
-                        <div className="text-primary">{formik.errors.check}</div>
-                    ) : null}
-                </div>
-                <div className="d-flex justify-content-center">
-                    <button type="submit" className="btn bg-primary text-white"><i className="fa-solid fa-user-plus"></i> Registrarse</button>
-                </div>
-                <div className="mt-3 d-flex justify-content-center">
-                    <p>¿Ya tienes una cuenta? <Link to={"/login"} className="fw-bold text-primary">Inicia sesión</Link></p>
-                </div>
-            </form>
+  return (
+    <Formik
+      initialValues={{
+        first_name: "",
+        last_name: "",
+        email: "",
+        password: "",
+        birth_date: "",
+        state: "",
+        terms_and_conditions: false,
+      }}
+      validationSchema={Yup.object({
+        first_name: Yup.string().required("Este campo es obligatorio"),
+        last_name: Yup.string().required("Este campo es obligatorio"),
+        email: Yup.string()
+          .email("Dirección de email inválida")
+          .required("Este campo es obligatorio"),
+        password: Yup.string()
+          .required("Este campo es obligatorio")
+          .min(6, "Debe tener como mínimo 6 caracteres"),
+        birth_date: Yup.date().required("Este campo es obligatorio"),
+        state: Yup.string()
+          .oneOf([
+            "ARTIGAS",
+            "CANELONES",
+            "COLONIA",
+            "DURAZNO",
+            "FLORES",
+            "FLORIDA",
+            "LAVALLEJA",
+            "MALDONADO",
+            "MONTEVIDEO",
+            "PAYSANDU",
+            "RIO_NEGRO",
+            "RIVERA",
+            "ROCHA",
+            "SALTO",
+            "SAN_JOSE",
+            "SORIANO",
+            "TACUAREMBO",
+            "TREINTA_Y_TRES",
+          ])
+          .required("Este campo es obligatorio"),
+        terms_and_conditions: Yup.boolean().oneOf(
+          [true],
+          "Debes aceptar los términos y condiciones"
+        ),
+      })}
+      onSubmit={async (values) => {
+        const response = await actions.createUser(values);
+        if (response.status === 201) {
+          navigate("/login");
+        }
+      }}
+    >
+      <div className="container contenido" style={{ maxWidth: "700px" }}>
+        <div className="row p-3 justify-content-between align-items-center bg-primary rounded-top text-white">
+          <div className="col-auto">
+            <h1 className="text-title">Registro de usuario</h1>
+            <h2 className="text-subtitle">Registrate e ingresa hoy mismo</h2>
+          </div>
+          <div className="col-auto">
+            <i className="fa-solid fa-circle-user fa-3x"></i>
+          </div>
         </div>
-    )
+        <Form className="row bg-tertiary p-3 rounded-bottom">
+          <div className="mb-3">
+            <label htmlFor="first_name" className="text-label form-label">
+              Nombre
+            </label>
+            <Field
+              type="text"
+              className="form-control"
+              id="first_name"
+              name="first_name"
+            />
+            <ErrorMessage name="first_name" />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="last_name" className="text-label form-label">
+              Apellido
+            </label>
+            <Field
+              type="text"
+              className="form-control"
+              id="last_name"
+              name="last_name"
+            />
+            <ErrorMessage name="last_name" />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="email" className="text-label form-label">
+              Email
+            </label>
+            <Field
+              type="email"
+              className="form-control"
+              id="email"
+              name="email"
+            />
+            <ErrorMessage name="email" />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="password" className="text-label form-label">
+              Contraseña
+            </label>
+            <Field
+              type="password"
+              className="form-control"
+              id="password"
+              name="password"
+            />
+            <ErrorMessage name="password" />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="birth_date" className="text-label form-label">
+              Fecha de nacimiento
+            </label>
+            <Field
+              type="date"
+              className="form-control"
+              id="birth_date"
+              name="birth_date"
+            />
+            <ErrorMessage name="birth_date" />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="state" className="text-label form-label">
+              Departamento
+            </label>
+            <Field as="select" className="form-select" id="state" name="state">
+              <option value="">Seleccione un departamento</option>
+              <option value="ARTIGAS">Artigas</option>
+              <option value="CANELONES">Canelones</option>
+              <option value="COLONIA">Colonia</option>
+              <option value="DURAZNO">Durazno</option>
+              <option value="FLORES">Flores</option>
+              <option value="FLORIDA">Florida</option>
+              <option value="LAVALLEJA">Lavalleja</option>
+              <option value="MALDONADO">Maldonado</option>
+              <option value="MONTEVIDEO">Montevideo</option>
+              <option value="PAYSANDU">Paysandú</option>
+              <option value="RIO_NEGRO">Río Negro</option>
+              <option value="RIVERA">Rivera</option>
+              <option value="ROCHA">Rocha</option>
+              <option value="SALTO">Salto</option>
+              <option value="SAN_JOSE">San José</option>
+              <option value="SORIANO">Soriano</option>
+              <option value="TACUAREMBO">Tacuarembó</option>
+              <option value="TREINTA_Y_TRES">Treinta y Tres</option>
+            </Field>
+          </div>
+
+          <div className="mb-3 form-check">
+            <label className="form-label">
+              <Field
+                type="checkbox"
+                name="terms_and_conditions"
+                className="form-check-input"
+                id="terms_and_conditions"
+              />
+              He leído los{" "}
+              <Link className="text-primary" to={"/terminos-y-condiciones"}>
+                {" "}
+                términos y condiciones
+              </Link>
+            </label>
+            <ErrorMessage name="terms_and_conditions" />
+          </div>
+
+          <div className="col-12 text-center">
+            <button type="submit" className="btn bg-primary text-white">
+              <i className="fa-solid fa-user-plus"></i> Registrarse
+            </button>
+          </div>
+
+          <div className="mt-3 d-flex justify-content-center">
+            <p>
+              ¿Ya tienes una cuenta?{" "}
+              <Link to={"/login"} className="fw-bold text-primary">
+                Inicia sesión
+              </Link>
+            </p>
+          </div>
+        </Form>
+      </div>
+    </Formik>
+  );
 };
