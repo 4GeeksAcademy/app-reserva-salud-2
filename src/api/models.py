@@ -1,5 +1,9 @@
+from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
-from enum import Enum 
+from flask_bcrypt import generate_password_hash, check_password_hash
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, Boolean, DateTime, event, Enum as SQLAEnum
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 
 db = SQLAlchemy()
 
@@ -22,13 +26,52 @@ class Usuario(db.Model):
     paciente = db.relationship('Paciente', uselist=False, backref='usuario', lazy=True, cascade='all, delete-orphan') 
     profesional= db.relationship('Profesional',uselist=False,backref='usuario', lazy=True, cascade='all, delete-orphan')
 
-    def __repr__(self):
-        return f'<Usuario {self.id},{self.rol},{self.email}>'
 
+class StateEnum(Enum):
+    ARTIGAS = "artigas"
+    CANELONES = "canelones"
+    CERRO_LARGO = "cerro_largo"
+    COLONIA = "colonia"
+    DURAZNO = "durazno"
+    FLORES = "flores"
+    FLORIDA = "florida"
+    LAVALLEJA = "lavalleja"
+    MALDONADO = "maldonado"
+    MONTEVIDEO = "montevideo"
+    PAYSANDU = "paysandu"
+    RIO_NEGRO = "rio_negro"
+    RIVERA = "rivera"
+    ROCHA = "rocha"
+    SALTO = "salto"
+    SAN_JOSE = "san_jose"
+    SORIANO = "soriano"
+    TACUAREMBO = "tacuarembo"
+    TREINTA_Y_TRES = "treinta_y_tres"
+
+class User(db.Model):
+    __tablename__ = 'user'
+    
+    id = Column(Integer, primary_key=True)
+    first_name = Column(String(100), nullable=False)
+    last_name = Column(String(100), nullable=False)
+    email = Column(String(200), unique=True, nullable=False, index=True)
+    password = Column(String(200), nullable=False)
+    state = Column(SQLAEnum(StateEnum), nullable=False)
+    is_active = Column(Boolean, nullable=False, default=False)
+    
+    comments = relationship("Comment", back_populates="user", cascade='all, delete-orphan')
+    
+
+    def __repr__(self):
+        return f'<User {self.first_name} {self.last_name}>'
+    
     def serialize(self):
         return {
             "id": self.id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
             "email": self.email,
+
             "rol": self.rol.value,
             "nombre": self.nombre,
             "apellido": self.apellido,
@@ -47,18 +90,38 @@ class Paciente(db.Model):
     # notificaciones_paciente=db.relationship('Notificacion',backref='paciente',lazy=True)
 
     def __repr__(self):
-        return f'<Paciente {self.id_usuario},{self.id}>'
-
+        return f'<Professional {self.first_name} {self.last_name}>'
+    
     def serialize(self):
         return {
             "id": self.id,
-            "historia_clinica": self.historia_clinica,
-            "id_usuario": self.id_usuario
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "email": self.email,
+            "state": self.state.value,
+            "profile_picture": self.profile_picture,
+            "birth_date": self.birth_date,
+            "telephone": self.telephone,
+            "title": self.title,
+            "url_calendly": self.url_calendly,
+            "comments": [comment.serialize() for comment in self.comments],
+            "is_active": self.is_active,
+            "is_validated": self.is_validated,
         }
-
-class Profesional(db.Model):
-    __tablename__ = 'profesional'
+        
+class Comment(db.Model):
+    __tablename__ = 'comment'
     
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    professional_id = Column(Integer, ForeignKey('professional.id'), nullable=False)
+    comment = Column(Text)
+    score = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=db.func.current_timestamp(), nullable=False)
+    
+    user = relationship('User', back_populates='comments')
+    professional = relationship('Professional', back_populates='comments')
+
     id = db.Column(db.Integer, primary_key=True)
     foto_perfil = db.Column(db.String, unique=False, nullable=False)   
     genero=db.Column(db.String(12), unique=False, nullable=False) 
@@ -75,11 +138,12 @@ class Profesional(db.Model):
     # notificaciones_profesional=db.relationship('Notificacion',backref='profesional',lazy=True)
 
     def __repr__(self):
-        return f'<Profesional {self.matricula},{self.id}>'
-
+        return f'<Comment {self.id}>'
+    
     def serialize(self):
         return {
             "id": self.id,
+
             "foto_perfil": self.foto_perfil,          
             "genero": self.genero,
             "pais_nacimiento": self.pais_nacimiento,
@@ -90,9 +154,170 @@ class Profesional(db.Model):
             "id_departamento": self.id_departamento,
             "id_ciudad": self.id_ciudad,
             "id_usuario": self.id_usuario
-        }
 
-class Especialidad(db.Model):
+            "user": self.user.serialize(),
+            "professional_id": self.professional_id,
+            "comment": self.comment,
+            "score": self.score,
+            "created_at": self.created_at,
+        }
+    
+def hash_password(mapper, connection, target):
+    if target.password:
+        target.password = generate_password_hash(target.password, 10).decode('utf-8')
+        
+event.listen(User, 'before_insert', hash_password)
+event.listen(User, 'before_update', hash_password)
+event.listen(Professional, 'before_insert', hash_password)
+event.listen(Professional, 'before_update', hash_password)
+    
+# class BaseUser(db.Model):
+#     __abstract__ = True
+
+#     id = db.Column(db.Integer, primary_key=True)
+#     email = db.Column(db.String(200), unique=True, nullable=False, index=True)
+#     password = db.Column(db.String(200), nullable=False)
+#     first_name = db.Column(db.String(100), nullable=False)
+#     last_name = db.Column(db.String(100), nullable=False)
+#     is_active = db.Column(db.Boolean(), default=False)
+#     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+# class Professional(BaseUser):
+#     __tablename__ = 'professional'
+
+#     state_id = db.Column(db.Integer, db.ForeignKey('state.id'), nullable=False)
+#     state = db.relationship('State', back_populates='professional', uselist=False)
+#     profile_picture = db.Column(db.String(200), nullable=False)
+#     birth_date = db.Column(db.Date, nullable=False)
+#     telephone = db.Column(db.String(200), nullable=False)
+#     title = db.Column(db.String(200), nullable=False)
+#     url_calendly = db.Column(db.String(200), nullable=False)
+
+# class Patient(BaseUser):
+#     __tablename__ = 'patient'
+    
+#     medical_history = db.Column(db.Text, nullable=False)
+#     state_id = db.Column(db.Integer, db.ForeignKey('state.id'), nullable=False)
+#     state = db.relationship('State', back_populates='patient', uselist=False)
+    
+# class State(db.Model):
+#     __tablename__ = 'state'
+    
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(200), unique=True, nullable=False)
+#     patient = db.relationship('Patient', back_populates='state')
+#     professional = db.relationship('Professional', back_populates='state')
+    
+#     def __repr__(self):
+#         return f'<State {self.name}>'
+
+#     def serialize(self):
+#         return {
+#             "id": self.id,
+#             "name": self.name, 
+#         }
+
+
+# class RolEnum(Enum):
+#     ADMINISTRADOR= "administrador"
+#     PACIENTE= "paciente"
+#     PROFESIONAL= "profesional"
+
+# class Usuario(db.Model):
+#     __tablename__ = 'usuario'
+
+#     id = db.Column(db.Integer, primary_key=True)
+#     id_departamento = db.Column(db.Integer, db.ForeignKey('departamento.id'), nullable=False)
+#     departamento = db.relationship('Departamento', back_populates='usuario', uselist=False)
+#     email = db.Column(db.String(200), unique=True, nullable=False, index=True)
+#     password = db.Column(db.String(200), nullable=False)
+#     rol = db.Column(db.Enum(RolEnum), nullable=False, default=RolEnum.PACIENTE)
+#     nombre = db.Column(db.String(100), nullable=False)
+#     apellido = db.Column(db.String(100), nullable=False)
+#     is_active = db.Column(db.Boolean(), default=False)
+#     paciente = db.relationship('Paciente', uselist=False, back_populates='usuario', cascade='all, delete-orphan')
+#     profesional = db.relationship('Profesional',uselist=False, back_populates='usuario', cascade='all, delete-orphan')
+
+
+#     def __repr__(self):
+#         return f'<Usuario {self.email} ({self.rol.value})>'
+
+#     def serialize(self):
+#         return {
+#             "id": self.id,
+#             "email": self.email,
+#             "rol": self.rol.value,
+#             "nombre": self.nombre,
+#             "apellido": self.apellido,
+#             "is_active": self.is_active,
+#             "departamento": self.departamento.serialize(),
+#             # do not serialize the password, its a security breach
+#         }
+    
+# class Paciente(db.Model):
+#     __tablename__ = 'paciente'
+    
+#     id = db.Column(db.Integer, primary_key=True)
+#     id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), unique=True, nullable=False)
+#     usuario = db.relationship('Usuario', back_populates='paciente')
+#     # historia_clinica = db.Column(db.TEXT, unique=False, nullable=False)
+#     # comentarios_paciente= db.relationship('Comentario_paciente_profesional',backref='paciente',lazy=True)
+#     # notificaciones_paciente=db.relationship('Notificacion',backref='paciente',lazy=True)
+
+#     def __repr__(self):
+#         return f'<Paciente {self.usuario},{self.id}>'
+
+#     def serialize(self):
+#         return {
+#             "id": self.id,
+#             "id_usuario": self.id_usuario,
+#             "usuario": self.usuario.serialize(),
+#             # "historia_clinica": self.historia_clinica,
+#         }
+
+# class Profesional(db.Model):
+#     __tablename__ = 'profesional'
+    
+#     id = db.Column(db.Integer, primary_key=True)
+#     id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), unique=True, nullable=False)
+#     usuario = db.relationship('Usuario', back_populates='profesional')
+#     foto_perfil = db.Column(db.String(200), nullable=False)
+#     fecha_nacimiento = db.Column(db.Date, nullable=False)
+#     genero = db.Column(db.String(200), nullable=False) 
+#     telefono = db.Column(db.String(200), nullable=False)
+#     matricula = db.Column(db.String(200), nullable=False)
+#     cjpu = db.Column(db.String(200), nullable=False)
+#     titulo_habilitante = db.Column(db.String(200), nullable=False)
+#     # profesionales_tipo_consulta = db.relationship('Tipo_consulta_profesional', back_populates='profesional')
+#     # comentarios_profesional = db.relationship('Comentario_paciente_profesional',backref='profesional',lazy=True)
+#     # notificaciones_profesional = db.relationship('Notificacion',backref='profesional',lazy=True)
+#     # id_pais = db.Column(db.Integer, db.ForeignKey('pais.id'))
+#     # id_ciudad = db.Column(db.Integer, db.ForeignKey('ciudad.id'))
+#     # id_departamento = db.Column(db.Integer, db.ForeignKey('departamento.id'), nullable=False)
+
+#     def __repr__(self):
+#         return f'<Profesional {self.matricula},{self.id}>'
+
+#     def serialize(self):
+#         return {
+#             "id": self.id,
+#             "usuario": self.usuario.serialize(),
+#             "foto_perfil": self.foto_perfil,
+#             "fecha_nacimiento": self.fecha_nacimiento,
+#             "genero": self.genero,
+#             "telefono": self.telefono,
+#             "matricula": self.matricula,
+#             "cjpu": self.cjpu,
+#             "titulo_habilitante": self.titulo_habilitante,
+#             # "id_departamento": self.id_departamento,
+#             # "pais_nacimiento": self.pais_nacimiento,
+#             # "id_ciudad": self.id_ciudad,
+#         }
+
+
+        
+
+""" class Especialidad(db.Model):
     __tablename__ = 'especialidad'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -159,24 +384,7 @@ class Tipo_consulta_profesional(db.Model):
             "id": self.id,
             "id_tipo_consulta": self.id_tipo_consulta, 
             "id_profesional": self.id_profesional    
-        }    
-    
-class Departamento(db.Model):
-    __tablename__ = 'departamento'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    descripcion = db.Column(db.String(15), unique=False, nullable=False)
-    departamentos=db.relationship('Profesional', backref='departamento', lazy=True)
-    ciudades=db.relationship('Ciudad', backref='departamento', lazy=True)
-    
-    def __repr__(self):
-        return f'<Departamento {self.id},{self.descripcion}>'
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "descripcion": self.descripcion, 
-        }    
+        }
     
 class Ciudad(db.Model):
     __tablename__ = 'ciudad'
@@ -314,19 +522,23 @@ class Consulta(db.Model):
             "valor_consulta": self.valor_consulta,
             "motivo_consulta": self.motivo_consulta,
             "id_tipo_consulta": self.id_tipo_consulta         
-        }        
-###############################ver de aplicar o no, cuando se incorpore calendly################################################
-# class Disponibilidad(db.Model):
-#     __tablename__ = 'disponibilidad'
+        }    """     
+        
+        
+        
+        
+""" ##############################ver de aplicar o no, cuando se incorpore calendly################################################
+class Disponibilidad(db.Model):
+    __tablename__ = 'disponibilidad'
     
-#     id = db.Column(db.Integer, primary_key=True)
-#     dia = db.Column(db.Date,unique=False, nullable=False)
-#     hora=db.Column(db.datetime,unique=False, nullable=False)
-#     id_profesional=db.Column(db.Integer, db.ForeignKey('profesional.id'),unique=False, nullable=False)
-#     id_consulta=db.Column(db.Integer, db.ForeignKey('consulta.id'),unique=False, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    dia = db.Column(db.Date,unique=False, nullable=False)
+    hora=db.Column(db.datetime,unique=False, nullable=False)
+    id_profesional=db.Column(db.Integer, db.ForeignKey('profesional.id'),unique=False, nullable=False)
+    id_consulta=db.Column(db.Integer, db.ForeignKey('consulta.id'),unique=False, nullable=False)
     
-#     def __repr__(self):
-#         return f'<Disponibilidad {self.id},{self.dia},{self.hora},{self.id_profesional},,{self.id_consulta}>'
+    def __repr__(self):
+        return f'<Disponibilidad {self.id},{self.dia},{self.hora},{self.id_profesional},,{self.id_consulta}>'
 
 #     def serialize(self):
 #         return {
