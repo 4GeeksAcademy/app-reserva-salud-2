@@ -17,9 +17,13 @@ export const Home = () => {
             Encuentra al profesional que necesitas y agenda tu consulta en
             cuestión de minutos
           </p>
-          <Link to={"/registro-usuario"} className="text-btn text-white bg-primary btn">
+          <Link
+            to={"/registro-usuario"}
+            className="text-btn text-white bg-primary btn"
+          >
             <i className="fa-solid fa-user-plus"></i> Registrarse
           </Link>
+          <button className="btn">Button</button>
           <img
             className="img-fluid max-w-sm"
             src="https://s3-alpha-sig.figma.com/img/ff90/f0d9/9a5bc8f8cd2610b2e82b81f2564ec111?Expires=1724025600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=O3rHVYu10HOub0jcrVBGn3gTnvlMs~7qePd3lB7zYAA4TjZrJT4v3qJr-SI0e8T6pSOvaoGFe9DTuYpbZMfV0vGqThphmFKMhd~yizpaL7A-qDxDxQ~Fm82NEGEdWuZ4qn81KkFgQk-1R16Et2XELsCMFa3uozoOGXjGp1UZrfCbvwzcE0HsFiFtm8KzYgE2wz8h1HZC2jjGBK3Ci0AeI5sGLJHrnpSwC1pZE0-m1tKVfBxG3XLNj~BqTv4ruzKtQJtQyvxYFwdcBLlqNOC8zeuZzFcyyOt4I1P7Ueqd~YM0LW2pid1ACvY0yqw9DupibdUdH4XKF~SGhSJ3Sf4kNA__"
