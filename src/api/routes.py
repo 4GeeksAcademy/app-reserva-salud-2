@@ -24,13 +24,13 @@ def obtener_usuarios():
 def crear_usuario():
     request_body = request.get_json()
     
-    nombre = request_body.get("nombre")
-    apellido = request_body.get("apellido")
+    # nombre = request_body.get("nombre")
+    # apellido = request_body.get("apellido")
     email = request_body.get("email")
     password = request_body.get("password")
-    fechaNacimiento= request_body.get("fechaNacimiento")
+    # fechaNacimiento= request_body.get("fechaNacimiento")
     # Comprobar que los campos requeridos no estén vacíos
-    if not nombre or not apellido or not email or not password or not fechaNacimiento:
+    if not email or not password :
         raise APIException("Faltan campos requeridos", status_code=400)
     existingUserEmail=Usuario.query.filter_by(email=email).first();
     
@@ -40,14 +40,14 @@ def crear_usuario():
     password_hash = generate_password_hash(password, 10).decode('utf-8')
     
     # Crear usuario en la base de datos
-    newUser = Usuario(nombre=nombre, apellido=apellido, email=email, password=password_hash,fecha_nacimiento=fechaNacimiento)
+    newUser = Usuario(email=email, password=password_hash)
     db.session.add(newUser)
     db.session.commit()
 
-    newUserId=newUser.id
-    newPatientUser=Paciente(id_usuario=newUserId,historia_clinica="datos iniciales historia clinica")
-    db.session.add(newPatientUser)
-    db.session.commit()
+    # newUserId=newUser.id
+    # newPatientUser=Paciente(id_usuario=newUserId,historia_clinica="datos iniciales historia clinica")
+    # db.session.add(newPatientUser)
+    # db.session.commit()
     
     return jsonify({ "message": "Usuario creado satisfactoriamente" }), 201
 

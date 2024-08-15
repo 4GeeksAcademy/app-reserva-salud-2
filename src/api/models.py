@@ -13,12 +13,12 @@ class Usuario(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(200), unique=True, nullable=False)
-    password = db.Column(db.String(200), unique=False, nullable=False)
+    clave = db.Column(db.String(200), unique=False, nullable=False)
     rol=db.Column(db.Enum(RolEnum),nullable=False, default=RolEnum.PACIENTE)
     nombre = db.Column(db.String(100), unique=False, nullable=False)
     apellido = db.Column(db.String(100), unique=False, nullable=False)
     fecha_nacimiento=db.Column(db.Date, unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, default=False)
+    esta_activo = db.Column(db.Boolean(), unique=False, default=False)
     paciente = db.relationship('Paciente', uselist=False, backref='usuario', lazy=True, cascade='all, delete-orphan') 
     profesional= db.relationship('Profesional',uselist=False,backref='usuario', lazy=True, cascade='all, delete-orphan')
 
@@ -33,7 +33,7 @@ class Usuario(db.Model):
             "nombre": self.nombre,
             "apellido": self.apellido,
             "fecha_nacimiento": self.fecha_nacimiento,
-            "is_active": self.is_active
+            "esta_activo": self.esta_activo
             # do not serialize the password, its a security breach
         }
     
@@ -44,7 +44,7 @@ class Paciente(db.Model):
     historia_clinica = db.Column(db.TEXT, unique=False, nullable=True)
     id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'),unique=False, nullable=False)
     comentarios_paciente= db.relationship('Comentario_paciente_profesional',backref='paciente',lazy=True)
-    notificaciones_paciente=db.relationship('Notificacion',backref='paciente',lazy=True)
+    # notificaciones_paciente=db.relationship('Notificacion',backref='paciente',lazy=True)
 
     def __repr__(self):
         return f'<Paciente {self.id_usuario},{self.id}>'
@@ -72,7 +72,7 @@ class Profesional(db.Model):
     id_usuario = db.Column(db.Integer, db.ForeignKey('departamento.id'),unique=False, nullable=False)
     profesionales_tipo_consulta= db.relationship('Tipo_consulta_profesional', back_populates='profesional')
     comentarios_profesional= db.relationship('Comentario_paciente_profesional',backref='profesional',lazy=True)
-    notificaciones_profesional=db.relationship('Notificacion',backref='profesional',lazy=True)
+    # notificaciones_profesional=db.relationship('Notificacion',backref='profesional',lazy=True)
 
     def __repr__(self):
         return f'<Profesional {self.matricula},{self.id}>'
@@ -246,26 +246,6 @@ class Comentario_paciente_profesional(db.Model):
             "id_paciente": self.id_paciente
         }    
     
-class Notificacion(db.Model):
-    __tablename__ = 'notificacion'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    descripcion = db.Column(db.Integer, db.ForeignKey('comentario.id'),unique=False, nullable=False)
-    id_reserva=db.Column(db.Integer, db.ForeignKey('reserva.id'),unique=False, nullable=False)
-    id_paciente=db.Column(db.Integer, db.ForeignKey('paciente.id'),unique=False, nullable=False)
-    id_profesional=db.Column(db.Integer, db.ForeignKey('profesional.id'),unique=False, nullable=False)
-    
-    def __repr__(self):
-        return f'<Notificacion {self.id},{self.id_reserva},{self.descripcion}>'
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "id_reserva": self.id_comentario,
-            "id_profesional": self.id_profesional,
-            "id_paciente": self.id_paciente
-        }    
-
 class Reserva(db.Model):
     __tablename__ = 'reserva'
     
@@ -274,7 +254,12 @@ class Reserva(db.Model):
     id_medio_pago=db.Column(db.Integer, db.ForeignKey('medio_de_pago.id'),unique=False, nullable=False)
     id_paciente=db.Column(db.Integer, db.ForeignKey('paciente.id'),unique=False, nullable=False)
     id_consulta=db.Column(db.Integer, db.ForeignKey('consulta.id'),unique=False, nullable=False)
-    notificaciones_reserva=db.relationship('Notificacion',backref='reserva',lazy=True)
+    cancelar_cita_url=db.Column(db.String(200),unique=False, nullable=False)
+    reprogramar_url=db.Column(db.String(200),unique=False, nullable=False)
+    crear_cita=db.Column(db.String(200),unique=False, nullable=False)
+    estado=db.Column(db.String(200),unique=False, nullable=False)
+    url_usuario_calendly=db.Column(db.String(200),unique=False, nullable=False)
+    # notificaciones_reserva=db.relationship('Notificacion',backref='reserva',lazy=True)
     
     def __repr__(self):
         return f'<Reserva {self.id},{self.confirmacion},{self.id_paciente}>'
@@ -285,7 +270,12 @@ class Reserva(db.Model):
             "confirmacion": self.confirmacion,
             "id_medio_pago": self.id_medio_pago,
             "id_paciente": self.id_paciente,
-            "id_consulta": self.id_consulta
+            "id_consulta": self.id_consulta,
+            "cancelar_cita_url": self.cancelar_cita_url,
+            "reprogramar_url": self.reprogramar_url,
+            "crear_cita": self.crear_cita,
+            "estado": self.estado,
+            "url_usuario_calendly": self.url_usuario_calendly
         }    
     
 class Medio_de_pago(db.Model):
@@ -347,3 +337,22 @@ class Consulta(db.Model):
 #             "id_consulta": self.id_consulta         
 #         }        
 
+# class Notificacion(db.Model):
+#     __tablename__ = 'notificacion'
+    
+#     id = db.Column(db.Integer, primary_key=True)
+#     descripcion = db.Column(db.Integer, db.ForeignKey('comentario.id'),unique=False, nullable=False)
+#     id_reserva=db.Column(db.Integer, db.ForeignKey('reserva.id'),unique=False, nullable=False)
+#     id_paciente=db.Column(db.Integer, db.ForeignKey('paciente.id'),unique=False, nullable=False)
+#     id_profesional=db.Column(db.Integer, db.ForeignKey('profesional.id'),unique=False, nullable=False)
+    
+#     def __repr__(self):
+#         return f'<Notificacion {self.id},{self.id_reserva},{self.descripcion}>'
+
+#     def serialize(self):
+#         return {
+#             "id": self.id,
+#             "id_reserva": self.id_comentario,
+#             "id_profesional": self.id_profesional,
+#             "id_paciente": self.id_paciente
+#         }    
