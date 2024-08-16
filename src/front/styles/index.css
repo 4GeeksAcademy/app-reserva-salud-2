@@ -181,4 +181,5 @@ h6 {
 .contenido {
   margin-top: 56px;
   min-height: calc(100vh - 180px);
+  height: 100vh;
 }

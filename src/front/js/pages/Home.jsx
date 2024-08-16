@@ -7,7 +7,7 @@ export const Home = () => {
   const { store, actions } = useContext(Context);
 
   return (
-    <>
+    <div className="contenido">
       <section className="container" style={{ paddingTop: "64px" }}>
         <div className="d-flex flex-column align-items-center gap-4 py-4">
           <h2 className="text-title text-center">
@@ -164,6 +164,6 @@ export const Home = () => {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 };
