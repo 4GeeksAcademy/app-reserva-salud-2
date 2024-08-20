@@ -301,7 +301,7 @@ export const RegistroProfesional = () => {
 
             <div className="d-flex justify-content-center">
               <button type="submit" className="btn bg-primary text-white">
-                <i className="fa-solid fa-user-plus"></i> Registrarse
+                <i className="fa-solid fa-user-plus"></i> Registrarse como paciente
               </button>
             </div>
 

@@ -22,7 +22,7 @@ export const Home = () => {
           </Link>
           <img
             className="img-fluid max-w-sm"
-            src="https://s3-alpha-sig.figma.com/img/ff90/f0d9/9a5bc8f8cd2610b2e82b81f2564ec111?Expires=1724025600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=O3rHVYu10HOub0jcrVBGn3gTnvlMs~7qePd3lB7zYAA4TjZrJT4v3qJr-SI0e8T6pSOvaoGFe9DTuYpbZMfV0vGqThphmFKMhd~yizpaL7A-qDxDxQ~Fm82NEGEdWuZ4qn81KkFgQk-1R16Et2XELsCMFa3uozoOGXjGp1UZrfCbvwzcE0HsFiFtm8KzYgE2wz8h1HZC2jjGBK3Ci0AeI5sGLJHrnpSwC1pZE0-m1tKVfBxG3XLNj~BqTv4ruzKtQJtQyvxYFwdcBLlqNOC8zeuZzFcyyOt4I1P7Ueqd~YM0LW2pid1ACvY0yqw9DupibdUdH4XKF~SGhSJ3Sf4kNA__"
+            src="https://s3-alpha-sig.figma.com/img/ff90/f0d9/9a5bc8f8cd2610b2e82b81f2564ec111?Expires=1725235200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=oaLk4cOSRNUQ8ZS9chLpryVcm7qxO72QlQ6AIhFgQ1FwLsDFV8IyRSHy8Lr0XL~DZ8-KLvv4G91hiM2W92dndbvSe14WCsS0l4ulXtazDFowr8XpuL8y9SqoxqMEOZJEhh701cedhgUIGMfI2xQcq7x20mMDUXSrJa7q--sUlfvHBf3vpRxKuzgwY6w~IUmgphZICHKAoULt~aVITk5ALqptRXk3HnYACpqLYfMRAb8kgf1fXLVwUU494LgaWCw0-hoX7Nl0eCwM5b9HE~JKQo~Do-rkl7owyLITF-Qna6wzjkRDQ2-wyyIte8Gl5WesivMqnKqlXdnSpL~d9eexAg__"
             alt="Illustration"
           />
         </div>
@@ -81,8 +81,8 @@ export const Home = () => {
                 data-bs-parent="#faq"
               >
                 <div className="accordion-body text-normal">
-                  Si, es posible tener reservadas varias citas siempre y cuando
-                  no coincidan en día y horario
+                  Sí, es posible tener reservadas varias citas, siempre y cuando
+                  no coincidan en día y horario. Podrás ver todas tus citas agendadas en tu cuenta.
                 </div>
               </div>
             </div>
@@ -96,7 +96,7 @@ export const Home = () => {
                   aria-expanded="false"
                   aria-controls="faq-2"
                 >
-                  ¿Puedo cancelar / reprogramar una cita?
+                  ¿Puedo cancelar o reprogramar una cita?
                 </button>
               </h2>
               <div
@@ -130,9 +130,9 @@ export const Home = () => {
                 data-bs-parent="#faq"
               >
                 <div className="accordion-body text-normal">
-                  Es muy sencillo. Solo tienes que seleccionar la el profesional
+                  Es muy sencillo. Solo tienes que seleccionar el o la profesional
                   o servicio que necesitas,&nbsp;&nbsp;hacer click en reservar y
-                  seguir los pasos indicados en el formulario de reserva
+                  seguir los pasos indicados en el formulario de reserva.
                 </div>
               </div>
             </div>
@@ -146,7 +146,7 @@ export const Home = () => {
                   aria-expanded="false"
                   aria-controls="faq-4"
                 >
-                  ¿Que formas de pago aceptan?
+                  ¿Qué formas de pago aceptan?
                 </button>
               </h2>
               <div
@@ -157,7 +157,7 @@ export const Home = () => {
                 <div className="accordion-body text-normal">
                   Utilizamos Mercado Pago como pasarela de pago, por lo que
                   aceptamos una amplia variedad de tarjetas e incluso pagos por
-                  redes de cobranza
+                  redes de cobranza.
                 </div>
               </div>
             </div>

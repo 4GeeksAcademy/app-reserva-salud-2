@@ -7,7 +7,7 @@ export const FormContacto = () => {
     const enviarEmail = (e) => {
         e.preventDefault();
 
-        emailjs.sendForm('service_6magqem', 'template_h7wasn9', e.target, 'b-Y87PuXzcXZd84sl')
+        emailjs.sendForm("service_kpmxqe2", "template_hjbtiki", e.target, "SKitr_wXakQ1aObmk")
             .then((result) => {
                 console.log(result.text);
                 toast.success("Mensaje enviado con éxito", { icon: "👋" });
@@ -31,15 +31,16 @@ export const FormContacto = () => {
                             <input type="text" className="form-control" id="nombre" name="nombre" aria-describedby="nombre" />
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="exampleInputPassword1" className="text-label">Email</label>
-                            <input type="email" className="form-control" id="exampleInputPassword1" name="email" />
+                            <label className="text-label">Correo Electrónico</label>
+                            <input type="email" className="form-control" id="correo_electronico" name="correo_electronico" />
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="exampleInputPassword1" className="text-label">Texto de la consulta</label>
-                            <textarea id="msg" name="msg" rows="4" cols="50" type="text" className="form-control" />
+                            <label className="text-label">Mensaje</label>
+                            <textarea id="mensaje" name="mensaje" rows="4" cols="50" className="form-control" />
                         </div>
                         <button type="submit" className="btn btn-primary">Enviar</button>
                     </form>
+
                 </div>
                 <div className="col container">
                     <div className="bg-gray p-3 m-5 h-75" >
