@@ -9,5 +9,6 @@ export const ProtectedRoute = ({ element, ...rest }) => {
     return <Navigate to='/login' replace />
   }
 
-  return element;
+  return element
 }
+
