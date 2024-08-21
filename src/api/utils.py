@@ -29,7 +29,7 @@ def generate_recurrent_dates(my_date):
     dates = []
     given_date = datetime.strptime(my_date, '%Y-%m-%d')
     today = datetime.now()
-    print(today)     
+    
     day_of_week = given_date.strftime('%A') 
     
     for i in range(60):
