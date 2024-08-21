@@ -128,8 +128,8 @@ export const VistaInfoProfesional = () => {
             <p>No hay comentarios</p>
           </div>
         )}
-                <div className="d-flex justify-content-center m-4">
-          <Link to={"/agenda"} className="btn text-btn text-white bg-primary">
+        <div className="d-flex justify-content-center m-4">
+          <Link to={`/agenda/${id}`} className="btn text-btn text-white bg-primary">
             <i className="fa-solid fa-user-plus"></i> Agendar nueva cita
           </Link>
         </div>

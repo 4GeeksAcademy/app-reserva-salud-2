@@ -77,6 +77,7 @@ class Professional(db.Model):
             "is_active": self.is_active,
             "is_validated": self.is_validated,
             "comments": [comment.serialize() for comment in self.comments],
+            "state_id": self.state_id
         }
     
     def serialize_availabilities(self):
@@ -133,7 +134,7 @@ class State(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "cities": [city.name for city in self.cities]
+            "cities": [city.serialize() for city in self.cities]
         }
     
 class City(db.Model):

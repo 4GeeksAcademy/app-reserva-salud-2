@@ -276,8 +276,9 @@ const profesionales = [
 
 export const Profesionales = () => {
   const { actions } = useContext(Context);
-  // const [especialidad, setEspecialidad] = useState("");
-  const [state, setState] = useState("");
+  const [states, setStates] = useState([]);
+  const [currentState, setCurrentState] = useState("");
+  const [currentCity, setCurrentCity] = useState("");
   const [professionals, setProfessionals] = useState([]);
 
   useEffect(() => {
@@ -286,11 +287,19 @@ export const Profesionales = () => {
       setProfessionals(professionals);
     };
     getProfessionals();
+
+    const getStates = async () => {
+      const states = await actions.getStates();
+      setStates(states);
+    }
+    getStates();
   }, []);
 
+  console.log(professionals)
+
   const filteredProfessionals = professionals.filter((professional) => {
-    if (state) {
-      return professional.state.includes(state);
+    if (currentState) {
+      return professional.state_id == currentState;
     } else {
       return professional;
     }
@@ -361,29 +370,41 @@ export const Profesionales = () => {
                 className="form-select"
                 id="state"
                 aria-label="Departamento"
-                value={state}
-                onChange={(e) => setState(e.target.value)}
+                value={currentState}
+                onChange={(e) => setCurrentState(e.target.value)}
               >
                 <option value="">Seleccionar departamento</option>
-                <option value="artigas">Artigas</option>
-                <option value="canelones">Canelones</option>
-                <option value="cerro_largo">Cerro Largo</option>
-                <option value="colonia">Colonia</option>
-                <option value="durazno">Durazno</option>
-                <option value="flores">Flores</option>
-                <option value="florida">Florida</option>
-                <option value="lavalleja">Lavalleja</option>
-                <option value="maldonado">Maldonado</option>
-                <option value="montevideo">Montevideo</option>
-                <option value="paysandu">Paysandú</option>
-                <option value="rio_negro">Río Negro</option>
-                <option value="rivera">Rivera</option>
-                <option value="rocha">Rocha</option>
-                <option value="salto">Salto</option>
-                <option value="san_jose">San José</option>
-                <option value="soriano">Soriano</option>
-                <option value="tacuarembo">Tacuarembó</option>
-                <option value="treinta_y_tres">Treinta y Tres</option>
+                {
+                  states?.map((state) => (
+                    <option key={state.id} value={state.id}>
+                      {state.name}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div className="d-flex flex-column">
+              <label htmlFor="city" className="form-label">
+                Ciudad
+              </label>
+              <select
+                className="form-select"
+                id="city"
+                aria-label="Ciudad"
+                value={currentCity}
+                onChange={(e) => setCurrentCity(e.target.value)}
+              >
+                <option value="">Seleccionar ciudad</option>
+                {
+                  states
+                    .find((state) => state.id == currentState)
+                    ?.cities.map((city) => (
+                      <option key={city.id} value={city.id}>
+                        {city.name}
+                      </option>
+                    ))
+                }
               </select>
             </div>
           </div>

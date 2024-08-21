@@ -1,6 +1,6 @@
 
 import click
-from api.models import db, User, Professional
+from api.models import State, db, User, Professional
 import random
 
 """
@@ -20,12 +20,11 @@ def setup_commands(app):
     def insert_test_users(count):
         print("Creating test users")
         for x in range(1, int(count) + 1):
-            first_name = "Test"
-            last_name = "User" + str(x)
+            name = f"Test User {x}"
             email = "test_user" + str(x) + "@test.com"
             password = "12345678"
             
-            new_user = User(first_name=first_name, last_name=last_name, email=email, password=password, is_active=True)
+            new_user = User(name=name, email=email, password=password, is_active=True)
 
             db.session.add(new_user)
             db.session.commit()
@@ -40,17 +39,95 @@ def setup_commands(app):
             first_name = "Test"
             last_name = "Professional" + str(x)
             email = "test_professional" + str(x) + "@test.com"
-            password = "12345678"
-            birth_date = "1990-01-01"
-            telephone = "099876543"
-            title = "Licenciado en Psicología"
-            url_calendly = "https://calendly.com/test" + str(x)    
+            password = "12345678"  
             
-            new_professional = Professional(first_name=first_name, last_name=last_name, email=email, password=password, birth_date=birth_date, telephone=telephone, title=title, url_calendly=url_calendly, is_active=True)
+            new_professional = Professional(first_name=first_name, last_name=last_name, email=email, password=password, is_active=True)
 
             db.session.add(new_professional)
             db.session.commit()
             print("Professional: ", new_professional.email, " created.")
+
+    @app.cli.command("insert-test-states")
+    def insert_test_states():
+        print("Creating test states")
+
+        new_state = State(name="Artigas")
+        db.session.add(new_state)
+        db.session.commit()
+
+        new_state = State(name="Canelones")
+        db.session.add(new_state)
+        db.session.commit()
+
+        new_state = State(name="Cerro Largo")
+        db.session.add(new_state)
+        db.session.commit()
+
+        new_state = State(name="Colonia")
+        db.session.add(new_state)
+        db.session.commit()
+        
+        new_state = State(name="Durazno")
+        db.session.add(new_state)
+        db.session.commit()
+        
+        new_state = State(name="Flores")
+        db.session.add(new_state)
+        db.session.commit()
+
+        new_state = State(name="Florida")
+        db.session.add(new_state)
+        db.session.commit()
+
+        new_state = State(name="Lavalleja")
+        db.session.add(new_state)
+        db.session.commit()
+        
+        new_state = State(name="Maldonado")
+        db.session.add(new_state)
+        db.session.commit()
+
+        new_state = State(name="Montevideo")
+        db.session.add(new_state)
+        db.session.commit()
+
+        new_state = State(name="Paysandú")
+        db.session.add(new_state)
+        db.session.commit()
+
+        new_state = State(name="Río Negro")
+        db.session.add(new_state)
+        db.session.commit()
+        
+        new_state = State(name="Rivera")
+        db.session.add(new_state)
+        db.session.commit()
+        
+        new_state = State(name="Rocha")
+        db.session.add(new_state)
+        db.session.commit()
+
+        new_state = State(name="Salto")
+        db.session.add(new_state)
+        db.session.commit()
+
+        new_state = State(name="San José")
+        db.session.add(new_state)
+        db.session.commit()
+
+        new_state = State(name="Soriano")
+        db.session.add(new_state)
+        db.session.commit()
+        
+        new_state = State(name="Tacuarembó")
+        db.session.add(new_state)
+        db.session.commit()
+        
+        new_state = State(name="Treinta y Tres")
+        db.session.add(new_state)
+        db.session.commit()
+        
+        print("All states created")
 
     @app.cli.command("insert-test-data")
     def insert_test_data():

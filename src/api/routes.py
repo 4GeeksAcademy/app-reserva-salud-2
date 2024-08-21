@@ -3,13 +3,11 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
 
-from api.models import db, User, Professional, Comment, Availability
+from api.models import db, User, Professional, Comment, Availability, State, City
 from api.utils import generate_sitemap, APIException, generate_recurrent_dates
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required
-import os
-import requests
 
 api = Blueprint('api', __name__)
 
@@ -105,16 +103,16 @@ def handle_professionals():
       professionals = list(map(lambda x: x.serialize(), professionals))
       return jsonify(professionals), 200
     
-@api.route('/professionals/<int:id>', methods=['GET', 'PUT', 'DELETE'])
-def handle_professional(id):
+@api.route('/professionals/<int:professional_id>', methods=['GET', 'PUT', 'DELETE'])
+def handle_professional(professional_id):
   if request.method == 'GET':
-    professional = Professional.query.get(id)
+    professional = Professional.query.get(professional_id)
     if professional is None:
       raise APIException("Professional not found", status_code=404)
     return jsonify(professional.serialize()), 200
     
-@api.route('/professionals/<int:id>/availabilities', methods=['GET', 'POST'])
-def handle_professional_availabilities(id):
+@api.route('/professionals/<int:professional_id>/availabilities', methods=['GET', 'POST'])
+def handle_professional_availabilities(professional_id):
   if request.method == 'POST':
     request_body = request.json
     
@@ -132,16 +130,25 @@ def handle_professional_availabilities(id):
     if not date or not start_time or not end_time:
       raise APIException("Missing required fields", status_code=400)
     
-    print(generate_recurrent_dates(date))
-    
-    exist_availability = Availability.query.filter_by(professional_id=id, date=date, start_time=start_time, end_time=end_time).first()
+    exist_availability = Availability.query.filter_by(professional_id=professional_id, date=date, start_time=start_time, end_time=end_time).first()
     
     if exist_availability:
       raise APIException("Availability already exists", status_code=400)
     
+    overlapping_availability = Availability.query.filter(
+      Availability.date == date,
+      Availability.professional_id == professional_id,
+      ((Availability.start_time <= start_time) & (Availability.end_time > start_time)) |
+      ((Availability.start_time < end_time) & (Availability.end_time >= end_time)) |
+      ((Availability.start_time >= start_time) & (Availability.end_time <= end_time))
+    ).first()
+    
+    if overlapping_availability:
+      raise APIException("Availability overlaps with an existing one", status_code=400)
+    
     try:
       new_availability = Availability(
-        professional_id=id,
+        professional_id=professional_id,
         date=date,
         start_time=start_time,
         end_time=end_time,
@@ -157,9 +164,27 @@ def handle_professional_availabilities(id):
     
     return jsonify({ "message": "Availability created successfully" }), 201
   elif request.method == 'GET':
-    professional = Professional.query.get(id)
+    professional = Professional.query.get(professional_id)
     return jsonify(professional.serialize_availabilities()), 200
   
+@api.route('/professionals/<int:professional_id>/availabilities/<int:availability_id>', methods=['GET', 'DELETE'])
+def handle_professional_availability(professional_id, availability_id):
+  if request.method == 'GET':
+    availability = Availability.query.filter_by(professional_id=professional_id, id=availability_id).first()
+    if availability is None:
+      raise APIException("Professional availability not found", status_code=404)
+    return jsonify(availability.serialize()), 200
+  elif request.method == 'DELETE':
+    availability = Availability.query.filter_by(professional_id=professional_id, id=availability_id).first()
+    
+    if availability is None:
+      raise APIException("Professional availability not found", status_code=404)
+    
+    db.session.delete(availability)
+    db.session.commit()
+    
+    return jsonify({ "message": "Availability deleted successfully" }), 200
+
 @api.route('/comments', methods=['GET', 'POST'])
 def handle_comments():
   if request.method == 'POST':
@@ -182,7 +207,96 @@ def handle_comments():
     comments = Comment.query.all()
     comments = list(map(lambda x: x.serialize(), comments))
     return jsonify(comments), 200
-  
+
+@api.route('/comments/<int:comment_id>', methods=['GET', 'PUT', 'DELETE'])
+def handle_comment(comment_id):
+  if request.method == 'GET':
+    comment = Comment.query.get(comment_id)
+    if comment is None:
+      raise APIException("Comment not found", status_code=404)
+    return jsonify(comment.serialize()), 200
+  elif request.method == 'PUT':
+    request_body = request.json
+    
+    comment = Comment.query.get(comment_id)
+    
+    if comment is None:
+      raise APIException("Comment not found", status_code=404)
+    
+    comment.comment = request_body.get("comment", comment.comment)
+    comment.score = request_body.get("score", comment.score)
+    
+    db.session.commit()
+    
+    return jsonify({ "message": "Comment updated successfully" }), 200
+  elif request.method == 'DELETE':
+    comment = Comment.query.get(comment_id)
+    
+    if comment is None:
+      raise APIException("Comment not found", status_code=404)
+    
+    db.session.delete(comment)
+    db.session.commit()
+    
+    return jsonify({ "message": "Comment deleted successfully" }), 200
+
+@api.route('/states', methods=['GET', 'POST'])
+def handle_states():
+  if request.method == 'POST':
+    request_body = request.json
+    
+    name = request_body.get("name")
+    
+    if not name:
+      raise APIException("Missing required fields", status_code=400)
+    
+    if State.query.filter_by(name=name).first():
+      raise APIException("State already exists", status_code=400)
+    
+    try:
+      new_state = State(name=name)
+      db.session.add(new_state)
+      db.session.commit()
+    except Exception as e:
+      raise APIException("An error ocurred while creating the state", status_code=400)
+    
+    return jsonify({ "message": "State created successfully" }), 201
+  elif request.method == 'GET':
+    states = State.query.all()
+    states = list(map(lambda x: x.serialize(), states))
+    return jsonify(states), 200
+
+@api.route('/states/<int:state_id>', methods=['GET', 'PUT', 'DELETE'])
+def handle_state(state_id):
+  if request.method == 'GET':
+    state = State.query.get(state_id)
+    if state is None:
+      raise APIException("State not found", status_code=404)
+    return jsonify(state.serialize()), 200
+  elif request.method == 'PUT':
+    request_body = request.json
+    
+    state = State.query.get(state_id)
+    
+    if state is None:
+      raise APIException("State not found", status_code=404)
+    
+    state.name = request_body.get("name", state.name)
+    
+    db.session.commit()
+    
+    return jsonify({ "message": "State updated successfully" }), 200
+  elif request.method == 'DELETE':
+    state = State.query.get(state_id)
+    
+    if state is None:
+      raise APIException("State not found", status_code=404)
+    
+    db.session.delete(state)
+    db.session.commit()
+    
+    return jsonify({ "message": "State deleted successfully" }), 200
+
 # Login con JWT
 @api.route('/login', methods=['POST'])
 def login():

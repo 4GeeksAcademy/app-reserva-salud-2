@@ -56,9 +56,6 @@ const Layout = () => {
 
 
           <Route element={<Paciente />} path="datos-paciente" />
-
-
-
           <Route element={<Login />} path="/login" />
           <Route
             path="/perfil"

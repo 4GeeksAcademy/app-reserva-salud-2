@@ -14,14 +14,12 @@ export const AgendaProfesional = () => {
     }
 
     if (professional) {
-
         console.log(getAllRecurrentDates());
     }
 
     const tileDisabled = ({ date, view }) => {
         if (view === 'month') {
             const dateString = date.toISOString().split('T')[0];
-            // console.log(professional?.availabilities[0])
             return !getAllRecurrentDates().includes(dateString);
         }
         return false;

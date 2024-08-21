@@ -119,6 +119,15 @@ const getState = ({ getStore, getActions, setStore }) => {
           return null
         }
       },
+
+      getStates: async () => {
+        try {
+          const response = await backendApi.get("/states");
+          return response.data;
+        } catch (error) {
+          console.error(error);
+        }
+      }
     },
   };
 };
