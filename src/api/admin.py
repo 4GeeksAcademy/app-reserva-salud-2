@@ -2,7 +2,7 @@
 import os
 from flask_admin import Admin
 
-from .models import db, User, Professional
+from .models import db, User, Professional, Appointment, City, State, Availability, Comment
 
 from flask_admin.contrib.sqla import ModelView
 
@@ -16,17 +16,8 @@ def setup_admin(app):
     
     admin.add_view(ModelView(User, db.session))
     admin.add_view(ModelView(Professional, db.session))
-    # admin.add_view(ModelView(State, db.session))
-    # admin.add_view(ModelView(Departamento, db.session))
-    # admin.add_view(ModelView(Especialidad, db.session))
-    # admin.add_view(ModelView(Especialidad_profesional, db.session))
-    # admin.add_view(ModelView(Tipo_consulta, db.session))
-    # admin.add_view(ModelView(Tipo_consulta_profesional, db.session))
-    # admin.add_view(ModelView(Ciudad, db.session))
-    # admin.add_view(ModelView(Pais, db.session))
-    # admin.add_view(ModelView(Comentario, db.session))
-    # admin.add_view(ModelView(Comentario_paciente_profesional, db.session))
-    # admin.add_view(ModelView(Notificacion, db.session))
-    # admin.add_view(ModelView(Reserva, db.session))
-    # admin.add_view(ModelView(Medio_de_pago, db.session))
-    # admin.add_view(ModelView(Consulta, db.session))
+    admin.add_view(ModelView(Appointment, db.session))
+    admin.add_view(ModelView(Availability, db.session))
+    admin.add_view(ModelView(Comment, db.session))
+    admin.add_view(ModelView(City, db.session))
+    admin.add_view(ModelView(State, db.session))

@@ -3,8 +3,8 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
 
-from api.models import db, User, Professional, StateEnum, Comment
-from api.utils import generate_sitemap, APIException, encode_credentials
+from api.models import db, User, Professional, Comment, Availability
+from api.utils import generate_sitemap, APIException, generate_recurrent_dates
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required
@@ -21,28 +21,22 @@ def handle_users():
     if request.method == 'POST':
         request_body = request.json
         
-        first_name = request_body.get("first_name")
-        last_name = request_body.get("last_name")
+        name = request_body.get("name")
         email = request_body.get("email")
         password = request_body.get("password")
         birth_date = request_body.get("birth_date")
-        state = request_body.get("state")
+        state_id = request_body.get("state_id")
         
         # Check if required fields are not empty
-        if not first_name or not last_name or not email or not password or not birth_date or not state:
+        if not email or not password:
             raise APIException("Missing required fields", status_code=400)
         
         if User.query.filter_by(email=email).first():
             raise APIException("User already exists", status_code=400)
-          
-        print(StateEnum._member_names_)
-        
-        if state not in StateEnum._member_names_: 
-            raise APIException("Invalid state", status_code=400)
         
         # Create user in the database
         try:
-          new_user = User(first_name=first_name, last_name=last_name, email=email, password=password, state=state)
+          new_user = User(name=name, email=email, password=password, birth_date=birth_date, state_id=state_id)
           db.session.add(new_user)
           db.session.commit()
         except Exception as e:
@@ -63,32 +57,43 @@ def handle_professionals():
       last_name = request_body.get("last_name")
       email = request_body.get("email")
       password = request_body.get("password")
-      state = request_body.get("state")
-      profile_picture = request_body.get("profile_picture")
       birth_date = request_body.get("birth_date")
+      gender = request_body.get("gender")
+      speciality = request_body.get("speciality")
+      certificate = request_body.get("certificate")
+      profile_picture = request_body.get("profile_picture")
       telephone = request_body.get("telephone")
-      title = request_body.get("title")
-      url_calendly = request_body.get("url_calendly")
+      appointment_type = request_body.get("appointment_type")
       is_active = request_body.get("is_active")
       is_validated = request_body.get("is_validated")
-        
+      state_id = request_body.get("state")
+      
       # Check if required fields are not empty
-      if not first_name or not last_name or not email or not password or not state or not birth_date or not telephone or not title or not url_calendly:
+      if not email or not password:
         raise APIException("Missing required fields", status_code=400)
         
-      if User.query.filter_by(email=email).first():
-        raise APIException("User with this email already exists", status_code=400)
-      
-      if Professional.query.filter_by(email=email).first():
-        raise APIException("Professional already exists", status_code=400)
-      
-      # Check if state is valid
-      if state not in StateEnum.__members__: 
-        raise APIException("Invalid state", status_code=400)
+      if Professional.query.filter_by(email=email).first() or User.query.filter_by(email=email).first():
+        raise APIException("Professional or User with this email already exist", status_code=400)
         
       # Create professional in the database
       try:
-        new_professional = Professional(first_name=first_name, last_name=last_name, email=email, password=password, state=state, profile_picture=profile_picture, birth_date=birth_date, telephone=telephone, title=title, url_calendly=url_calendly, is_active=is_active, is_validated=is_validated)
+        new_professional = Professional(
+          first_name=first_name,
+          last_name=last_name,
+          email=email,
+          password=password,
+          birth_date=birth_date,
+          gender=gender,
+          speciality=speciality,
+          certificate=certificate,
+          profile_picture=profile_picture,
+          telephone=telephone,
+          appointment_type=appointment_type,
+          is_active=is_active,
+          is_validated=is_validated,
+          state_id=state_id
+        )
+        
         db.session.add(new_professional)
         db.session.commit()
       except Exception as e:
@@ -107,7 +112,53 @@ def handle_professional(id):
     if professional is None:
       raise APIException("Professional not found", status_code=404)
     return jsonify(professional.serialize()), 200
-  
+    
+@api.route('/professionals/<int:id>/availabilities', methods=['GET', 'POST'])
+def handle_professional_availabilities(id):
+  if request.method == 'POST':
+    request_body = request.json
+    
+    date = request_body.get("date")
+    start_time = request_body.get("start_time")
+    end_time = request_body.get("end_time")
+    weekly = request_body.get("weekly")
+    is_remote = request_body.get("is_remote", False)
+    is_presential = request_body.get("is_presential", False)
+    
+    
+    if not is_remote and not is_presential:
+      raise APIException("One of is_remote or is_presential must be true", status_code=400)
+    
+    if not date or not start_time or not end_time:
+      raise APIException("Missing required fields", status_code=400)
+    
+    print(generate_recurrent_dates(date))
+    
+    exist_availability = Availability.query.filter_by(date=date, start_time=start_time, end_time=end_time).first()
+    
+    if exist_availability:
+      raise APIException("Availability already exists", status_code=400)
+    
+    try:
+      new_availability = Availability(
+        professional_id=id,
+        date=date,
+        start_time=start_time,
+        end_time=end_time,
+        weekly=weekly,
+        is_remote=is_remote,
+        is_presential=is_presential
+      )
+      
+      db.session.add(new_availability)
+      db.session.commit()
+    except Exception as e:
+      raise APIException(f"An error ocurred while creating the availability {e}", status_code=400)
+    
+    return jsonify({ "message": "Availability created successfully" }), 201
+  elif request.method == 'GET':
+    professional = Professional.query.get(id)
+    return jsonify(professional.serialize_availabilities()), 200
   
 @api.route('/comments', methods=['GET', 'POST'])
 def handle_comments():
@@ -142,16 +193,25 @@ def login():
     if not email or not password:
         raise APIException("Required fields are missing", status_code=400)
     
-    usuario = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=email).first()
+    professional = Professional.query.filter_by(email=email).first()
     
-    if usuario is None:
-        raise APIException("User not found", status_code=404)
-    
-    if not check_password_hash(usuario.password, password):
-        raise APIException("Password incorrect", status_code=400)
-    
-    # Implementar JWT
-    access_token = create_access_token(identity=usuario.id)
+    # Chequear si el usuario o el profesional existen
+    if user:
+      # Si existe el usuario, chequear si la contraseña es correcta
+      if not check_password_hash(user.password, password):
+        raise APIException("Credentials incorrect", status_code=400)
+      # Devolver un token de acceso
+      access_token = create_access_token(identity=user.id)
+    elif professional:
+      # Si existe el profesional, chequear si la contraseña es correcta
+      if not check_password_hash(professional.password, password):
+        raise APIException("Credentials incorrect", status_code=400)
+      # Devolver un token de acceso
+      access_token = create_access_token(identity=professional.id)
+    else:
+      # Si no existe el usuario o el profesional, devolver un error
+      raise APIException("User or Professional not found", status_code=404)
     
     return jsonify({ "message": "Login successful", "token": access_token }), 200
 
@@ -159,94 +219,3 @@ def login():
 @jwt_required()
 def verify_token():
     return jsonify({ "status": 200, "message": "Token is valid" }), 200
-
-@api.route('/calendly/token', methods=['POST'])
-def get_calendly_token():
-    code = request.json.get('code', None)
-    
-    client_id = os.getenv('CALENDLY_CLIENT_ID')
-    client_secret = os.getenv('CALENDLY_CLIENT_SECRET')
-    redirect_uri = os.getenv('CALENDLY_REDIRECT_URI')
-    
-    if not code:
-        raise APIException("Missing code", status_code=400)
-    
-    encode_authentication = encode_credentials(client_id, client_secret)
-    
-    try:
-        response = requests.post('https://auth.calendly.com/oauth/token', json={
-            'grant_type': 'authorization_code',
-            'code': code,
-            'redirect_uri': redirect_uri,
-        }, headers={
-            'Authorization': f'Basic {encode_authentication}',
-        })
-        response.raise_for_status()
-        return jsonify(response.json()), 200
-    except requests.exceptions.RequestException as e:
-        return jsonify({ "message": "Error al obtener el token de Calendly" }), 400
-# @api.route('/usuario', methods=['POST'])
-# def crear_usuario():
-#     request_body = request.get_json()
-    
-#     nombre = request_body.get("nombre")
-#     apellido = request_body.get("apellido")
-#     email = request_body.get("email")
-#     password = request_body.get("password")
-    
-#     # Comprobar que los campos requeridos no estén vacíos
-#     if not nombre or not apellido or not email or not password:
-#         raise APIException("Faltan campos requeridos", status_code=400)
-    
-#     # Crear usuario en la base de datos
-#     usuario = Usuario(nombre=nombre, apellido=apellido, email=email, password=password_hash)
-#     db.session.add(usuario)
-#     db.session.commit()
-    
-#     return jsonify({ "message": "Usuario creado satisfactoriamente" }), 201
-
-# @api.route('/usuario/<int:id>', methods=['GET'])
-# def obtener_usuario(id):
-#     usuario = Usuario.query.get(id)
-#     if usuario is None:
-#         raise APIException("User not found", status_code=404)
-#     return jsonify(usuario.serialize()), 200
-
-# @api.route('/usuario/<int:id>', methods=['PUT'])
-# def actualizar_usuario(id):
-#     usuario = Usuario.query.get(id)
-    
-#     if usuario is None:
-#         raise APIException("User not found", status_code=404)
-    
-#     request_body = request.get_json()
-    
-#     nombre = request_body.get("nombre")
-#     apellido = request_body.get("apellido")
-#     email = request_body.get("email")
-#     clave = request_body.get("clave")
-    
-#     if nombre:
-#         usuario.nombre = nombre
-#     if apellido:
-#         usuario.apellido = apellido
-#     if email:
-#         usuario.email = email
-#     if clave:
-#         usuario.clave = clave
-    
-#     db.session.commit()
-    
-#     return jsonify({ "message": "User successfully updated" }), 200
-
-# @api.route('/usuario/<int:id>', methods=['DELETE'])
-# def eliminar_usuario(id):
-#     usuario = Usuario.query.get(id)
-    
-#     if usuario is None:
-#         raise APIException("User not found", status_code=404)
-    
-#     db.session.delete(usuario)
-#     db.session.commit()
-    
-#     return jsonify({ "message": "User successfully deleted" }), 200
