@@ -18,12 +18,11 @@ export const VistaNuevoRegistroProfesional = () => {
                     gender: "",
                     state: "",
                     city: "",
-                    specialty: "",
-                    title: "",
-                    photo: "",
-                    phone: "",
-                    calendly: "",
-                    modality: ""
+                    speciality: "",
+                    certificate: "",
+                    profile_picture: "",
+                    telephone: "",
+                    appointment_type: ""
                 }}
                 validationSchema={Yup.object({
                     first_name: Yup.string().required("Este campo es obligatorio"),
@@ -31,8 +30,9 @@ export const VistaNuevoRegistroProfesional = () => {
                     birth_date: Yup.date().required("Este campo es obligatorio"),
                     gender: Yup.string()
                         .oneOf([
-                            "MASCULINO",
-                            "FEMENINO",
+                            "MALE",
+                            "FEMALE",
+                            "OTHER"
                         ])
                         .required("Este campo es obligatorio"),
                     state: Yup.string()
@@ -58,7 +58,7 @@ export const VistaNuevoRegistroProfesional = () => {
                         ])
                         .required("Este campo es obligatorio"),
                     city: Yup.string().required("Este campo es obligatorio"),
-                    specialty: Yup.string()
+                    speciality: Yup.string()
                         .oneOf([
                             "PSICOLOGIA",
                             "NUTRICION",
@@ -66,12 +66,10 @@ export const VistaNuevoRegistroProfesional = () => {
                             "ODONTOLOGIA"
                         ])
                         .required("Este campo es obligatorio"),
-                    phone: Yup.string().required("Este campo es obligatorio"),
-                    title: Yup.string().required("Este campo es obligatorio"),
-                    photo: Yup.string().required("Este campo es obligatorio"),
-                    modality: Yup.array().min(
+                    telephone: Yup.string().required("Este campo es obligatorio"),
+                    appointment_type: Yup.array().min(
                         1,
-                        "Debe seleccionar al menos una modalidad"
+                        "Debe seleccionar una modalidad"
                     )
                 })}
                 onSubmit={async (values) => {
@@ -136,8 +134,9 @@ export const VistaNuevoRegistroProfesional = () => {
                                     </label>
                                     <Field as="select" className="form-select" id="gender" name="gender">
                                         <option value="">Seleccione su género</option>
-                                        <option value="MASCULINO">Hombre</option>
-                                        <option value="FEMENINO">Mujer</option>
+                                        <option value="MALE">Hombre</option>
+                                        <option value="FEMALE">Mujer</option>
+                                        <option value="OTHER">Otro</option>
                                     </Field>
                                 </div>
 
@@ -169,23 +168,23 @@ export const VistaNuevoRegistroProfesional = () => {
                                 </div>
 
                                 <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="city" className="text-label form-label">
+                                    <label htmlFor="state" className="text-label form-label">
                                         Ciudad
                                     </label>
-                                    <Field
-                                        type="text"
-                                        className="form-control"
-                                        id="city"
-                                        name="city"
-                                    />
-                                    <ErrorMessage name="city" />
+                                    <Field as="select" className="form-select" id="state" name="state">
+                                        <option value="">Seleccione una ciudad</option>
+                                        <option value="ARTIGAS">Ciudad</option>
+                                        <option value="CANELONES">Ciudad</option>
+                                        <option value="COLONIA">Ciudad</option>
+                                    </Field>
+                                    <ErrorMessage name="state" />
                                 </div>
 
                                 <div className="mb-3 col-md-12 col-sm-12">
-                                    <label htmlFor="specialty" className="text-label form-label"> {/* Cambiado a 'specialty' */}
+                                    <label htmlFor="speciality" className="text-label form-label"> {/* Cambiado a 'speciality' */}
                                         Especialidad
                                     </label>
-                                    <Field as="select" className="form-select" id="specialty" name="specialty"> {/* Cambiado a 'specialty' */}
+                                    <Field as="select" className="form-select" id="speciality" name="speciality"> {/* Cambiado a 'speciality' */}
                                         <option value="">Seleccione una especialidad</option>
                                         <option value="PSICOLOGIA">Psicología</option>
                                         <option value="NUTRICION">Nutrición</option>
@@ -194,91 +193,57 @@ export const VistaNuevoRegistroProfesional = () => {
                                     </Field>
                                 </div>
 
-
                                 <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="title" className="text-label form-label">
+                                    <label htmlFor="certificate" className="text-label form-label">
                                         Título o certificado habilitante
                                     </label>
                                     <Field
                                         type="file"
                                         className="form-control"
-                                        id="title"
-                                        name="title"
+                                        id="certificate"
+                                        name="certificate"
                                     />
-                                    <ErrorMessage name="title" />
+                                    <ErrorMessage name="certificate" />
                                 </div>
 
                                 <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="photo" className="text-label form-label">
+                                    <label htmlFor="profile_picture" className="text-label form-label">
                                         Foto de perfil
                                     </label>
                                     <Field
                                         type="file"
                                         className="form-control"
-                                        id="photo"
-                                        name="photo"
+                                        id="profile_picture"
+                                        name="profile_picture"
                                     />
-                                    <ErrorMessage name="photo" />
+                                    <ErrorMessage name="profile_picture" />
                                 </div>
 
                                 <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="phone" className="text-label form-label">
+                                    <label htmlFor="telephone" className="text-label form-label">
                                         Teléfono de contacto
                                     </label>
                                     <Field
-                                        type="phone"
+                                        type="telephone"
                                         className="form-control"
-                                        id="phone"
-                                        name="phone"
+                                        id="telephone"
+                                        name="telephone"
                                     />
-                                    <ErrorMessage name="phone" />
+                                    <ErrorMessage name="telephone" />
                                 </div>
 
                                 <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="calendly" className="text-label form-label">
-                                        URL de Calendly
-                                    </label>
-                                    <Field
-                                        type="text"
-                                        className="form-control"
-                                        id="calendly"
-                                        name="calendly"
-                                    />
-                                    <ErrorMessage name="calendly" />
-                                </div>
-
-                                <div className="mb-3">
-                                    <label htmlFor="modality" className="text-label">
+                                    <label htmlFor="appointment_type" className="text-label form-label">
                                         Modalidad de consulta
                                     </label>
-                                    <div className="mb-3" role="group">
-                                        <div className="form-check">
-                                            <Field
-                                                type="checkbox"
-                                                name="modality"
-                                                className="form-check-input"
-                                                id="remoto"
-                                                value="Remoto"
-                                            />
-                                            <label className="form-check-label" htmlFor="remoto">
-                                                Remoto
-                                            </label>
-                                        </div>
-                                        <div className="form-check">
-                                            <Field
-                                                type="checkbox"
-                                                name="modality"
-                                                className="form-check-input"
-                                                id="presencial"
-                                                value="Presencial"
-                                            />
-                                            <label className="form-check-label" htmlFor="presencial">
-                                                Presencial
-                                            </label>
-                                        </div>
-
-                                    </div>
+                                    <Field as="select" className="form-select" id="appointment_type" name="appointment_type">
+                                        <option value="">Seleccione la modalidad</option>
+                                        <option value="PSICOLOGIA">Remoto</option>
+                                        <option value="NUTRICION">Presencial</option>
+                                        <option value="FONOAUDIOLOGIA">Ambas</option>
+                                    </Field>
                                 </div>
+
                             </div>
                             <div className="col-12 text-center">
                                 <button type="submit" className="btn bg-primary text-white">

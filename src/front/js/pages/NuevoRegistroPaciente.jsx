@@ -90,7 +90,7 @@ export const VistaNuevoRegistroPaciente = () => {
                     </div>
                     </div>
                     <div className="row">
-                    <div className="mb-3 col-md-6 col-sm-12">
+                    <div className="mb-3 col-md-12 col-sm-12">
                         <label htmlFor="birth_date" className="text-label form-label">
                             Fecha de nacimiento
                         </label>
@@ -129,6 +129,20 @@ export const VistaNuevoRegistroPaciente = () => {
                         </Field>
                         <ErrorMessage name="state" />
                     </div>
+
+                    <div className="mb-3 col-md-6 col-sm-12">
+                        <label htmlFor="state" className="text-label form-label">
+                            Ciudad
+                        </label>
+                        <Field as="select" className="form-select" id="state" name="state">
+                            <option value="">Seleccione una ciudad</option>
+                            <option value="ARTIGAS">Ciudad</option>
+                            <option value="CANELONES">Ciudad</option>
+                            <option value="COLONIA">Ciudad</option>
+                        </Field>
+                        <ErrorMessage name="state" />
+                    </div>
+
                     </div>
                     <div className="col-12 text-center">
                         <button type="submit" className="btn bg-primary text-white">
