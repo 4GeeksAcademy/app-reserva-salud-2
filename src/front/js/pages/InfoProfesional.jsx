@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Context } from "../store/appContext.js";
-import { PopupButton } from "react-calendly";
+import { Link } from "react-router-dom";
+// import { PopupButton } from "react-calendly";
 
 export const VistaInfoProfesional = () => {
   const { id } = useParams();
@@ -127,9 +128,14 @@ export const VistaInfoProfesional = () => {
             <p>No hay comentarios</p>
           </div>
         )}
+                <div className="d-flex justify-content-center m-4">
+          <Link to={"/agenda"} className="btn text-btn text-white bg-primary">
+            <i className="fa-solid fa-user-plus"></i> Agendar nueva cita
+          </Link>
+        </div>
       </div>
 
-      <div className="mt-5 row">
+      {/* <div className="mt-5 row">
         <div className="col text-center">
           <PopupButton
             url={professional.url_calendly}
@@ -138,7 +144,7 @@ export const VistaInfoProfesional = () => {
             className="btn bg-primary text-white"
           />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -26,7 +26,7 @@ export function Navbar() {
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
             <li className="nav-item">
               <Link
-                className= {`text-white text-normal fw-semibold nav-link ${({ isActive }) =>
+                className= {`text-white text-normal nav-link ${({ isActive }) =>
                   isActive ? "active" : ""}`}
                 to={"/"}
               >
@@ -35,7 +35,7 @@ export function Navbar() {
             </li>
             <li className="nav-item">
               <Link
-                className={`text-white text-normal fw-semibold nav-link ${({ isActive }) =>
+                className={`text-white text-normal nav-link ${({ isActive }) =>
                   isActive ? "active" : ""}`}
                 to={"/profesionales"}
               >
@@ -44,7 +44,7 @@ export function Navbar() {
             </li>
             <li className="nav-item">
               <Link
-                className={`text-white text-normal fw-semibold nav-link ${({ isActive }) =>
+                className={`text-white text-normal nav-link ${({ isActive }) =>
                   isActive ? "active" : ""}`}
                 to={"/contacto"}
               >
@@ -54,7 +54,7 @@ export function Navbar() {
             {store.isAuthenticated && (
               <li className="nav-item">
                 <Link
-                  className={`nav-link text-white text-normal fw-semibold ${({ isActive }) =>
+                  className={`nav-link text-white text-normal ${({ isActive }) =>
                     isActive ? "active" : ""}`}
                   to={"/perfil"}
                 >
