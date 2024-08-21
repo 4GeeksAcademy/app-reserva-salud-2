@@ -8,6 +8,7 @@ import { VistaRegistroProfesional } from "./pages/RegistroProfesional.jsx";
 import { VistaInfoProfesional } from "./pages/InfoProfesional.jsx";
 import { VistaPoliticaPrivacidad } from "./pages/PoliticaDePrivacidad.jsx";
 import { VistaContacto } from "./pages/Contacto.jsx";
+import { AgendaProfesional } from "./pages/AgendaProfesional.jsx";
 
 import { VistaNuevoRegistroUnificado } from "./pages/NuevoRegistroUnificado.jsx";
 import { VistaNuevoRegistroPaciente} from "./pages/NuevoRegistroPaciente.jsx";
@@ -15,6 +16,7 @@ import { VistaPerfilPaciente } from "./pages/PerfilPacienteProvisorio.jsx";
 import { VistaNuevoRegistroProfesional } from "./pages/NuevoRegistroProfesional.jsx";
 import { VistaPerfilProfesional } from "./pages/PerfilProfesionalProvisorio.jsx";
 import { Paciente } from "./pages/DatosPaciente.jsx";
+import { DisponibilidadProfesional } from "./pages/DisponibilidadProfesional.jsx";
 
 import injectContext, { Context } from "./store/appContext";
 
@@ -50,6 +52,10 @@ const Layout = () => {
           <Route element={<VistaPerfilPaciente />} path="perfil-paciente" />
           <Route element={<VistaNuevoRegistroProfesional />} path="nuevo-registro-profesional" />
           <Route element={<VistaPerfilProfesional />} path="perfil-profesional" />
+          <Route element={<DisponibilidadProfesional />} path="disponibilidad" />
+          <Route element={<AgendaProfesional />} path="agenda" />
+      
+
           <Route element={<Paciente />} path="datos-paciente" />
 
 
