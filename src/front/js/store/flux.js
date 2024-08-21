@@ -1,7 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const backendApi = axios.create({
+export const backendApi = axios.create({
   baseURL: `${process.env.BACKEND_URL}/api`,
 });
 

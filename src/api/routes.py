@@ -134,7 +134,7 @@ def handle_professional_availabilities(id):
     
     print(generate_recurrent_dates(date))
     
-    exist_availability = Availability.query.filter_by(date=date, start_time=start_time, end_time=end_time).first()
+    exist_availability = Availability.query.filter_by(professional_id=id, date=date, start_time=start_time, end_time=end_time).first()
     
     if exist_availability:
       raise APIException("Availability already exists", status_code=400)
