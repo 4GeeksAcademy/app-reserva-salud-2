@@ -11,18 +11,18 @@ export const AgendaProfesional = () => {
 
     const getAllRecurrentDates = () => {
         return professional?.availabilities.map(availability => availability?.recurrent_dates).flat();
-    }
+    };
 
-    if (professional) {
-        console.log(getAllRecurrentDates());
-    }
+    const getAllDates = () => {
+        const recurrentDates = getAllRecurrentDates();
+        const dates = professional?.availabilities.map(availability => availability?.date).flat();
+        return [...dates, ...recurrentDates];
+    };
 
-    const tileDisabled = ({ date, view }) => {
-        if (view === 'month') {
-            const dateString = date.toISOString().split('T')[0];
-            return !getAllRecurrentDates().includes(dateString);
-        }
-        return false;
+    const tilesDisabled = ({ date, view }) => {
+        const recurrentDates = getAllRecurrentDates();
+        const dateToCompare = date.toISOString().split('T')[0];
+        return view === 'month' && !getAllDates().includes(dateToCompare);
     };
 
     useEffect(() => {
@@ -51,7 +51,7 @@ export const AgendaProfesional = () => {
                 <div className="col-sm-12 col-md-6 d-flex justify-content-center p-5">
                     {
                         professional && (
-                            <Calendar tileDisabled={tileDisabled} />
+                            <Calendar tileDisabled={tilesDisabled} />
                         )
                     }
                 </div>
