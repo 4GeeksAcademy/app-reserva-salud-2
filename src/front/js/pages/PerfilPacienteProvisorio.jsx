@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -6,6 +6,7 @@ import { TarjetaProximaCita } from "../component/TarjetaCitasProximas.jsx";
 import { TarjetaCitasUsuario } from "../component/TarjetaCitas.jsx";
 import "swiper/css/autoplay";
 import { Link } from "react-router-dom";
+import { Context } from "../store/appContext.js";
 
 const citas = [
 
@@ -40,6 +41,20 @@ const citas = [
 ]
 
 export const VistaPerfilPaciente = () => {
+  const { store, actions } = useContext(Context);
+  const [userAppointments, setUserAppointments] = useState([]);
+
+  const id = store?.currentUser?.id;
+
+  useEffect(() => {
+    const getUserAppointments = async () => {
+      const response = await actions.getUserAppointments(id);
+      setUserAppointments(response);
+    }
+    getUserAppointments();
+  }, []);
+
+  console.log(userAppointments);
 
   return (
     <div className="contenido">
@@ -67,7 +82,7 @@ export const VistaPerfilPaciente = () => {
         >
           {citas.map((citas) => (
             <SwiperSlide key={citas.id}>
-              <TarjetaProximaCita citas={citas} />
+              {/* <TarjetaProximaCita citas={citas} /> */}
             </SwiperSlide>))}
         </Swiper>
         <div className="d-flex justify-content-center m-4">
@@ -78,9 +93,14 @@ export const VistaPerfilPaciente = () => {
         <div className="d-flex justify-content-center">
           <h3 className="text-subtitle mx-3 w-75">Todas las citas</h3>
         </div>
-        {citas.map((citas) => (
-          <TarjetaCitasUsuario key={citas.id} citas={citas} />))}
+        {/* {citas.map((citas) => (
+          <TarjetaCitasUsuario key={citas.id} citas={citas} />))} */}
 
+        {
+          userAppointments?.map((appointment) => (
+            <TarjetaCitasUsuario key={appointment.id} appointment={appointment} />
+          ))
+        }
       </div>
     </div>
   )

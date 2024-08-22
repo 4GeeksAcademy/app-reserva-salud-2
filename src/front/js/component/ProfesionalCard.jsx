@@ -64,7 +64,7 @@ export const ProfesionalCard = ({ profesional }) => {
           <h2 className='text-label'>Título:</h2>
           <p className='text-body text-white'>{profesional?.title}</p>
           <h2 className='text-label'>Ubicación:</h2>
-          <p className='text-body text-white'><i className="fa-solid fa-location-dot"></i> {departamentos[profesional?.state.toUpperCase()]}</p>
+          <p className='text-body text-white'><i className="fa-solid fa-location-dot"></i> {departamentos[profesional?.state?.toUpperCase()]}</p>
         </div>
       </div>
     </div>

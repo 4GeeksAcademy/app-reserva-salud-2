@@ -11,7 +11,7 @@ import { VistaContacto } from "./pages/Contacto.jsx";
 import { AgendaProfesional } from "./pages/AgendaProfesional.jsx";
 
 import { VistaNuevoRegistroUnificado } from "./pages/NuevoRegistroUnificado.jsx";
-import { VistaNuevoRegistroPaciente} from "./pages/NuevoRegistroPaciente.jsx";
+import { VistaNuevoRegistroPaciente } from "./pages/NuevoRegistroPaciente.jsx";
 import { VistaPerfilPaciente } from "./pages/PerfilPacienteProvisorio.jsx";
 import { VistaNuevoRegistroProfesional } from "./pages/NuevoRegistroProfesional.jsx";
 import { VistaPerfilProfesional } from "./pages/PerfilProfesionalProvisorio.jsx";
@@ -26,7 +26,6 @@ import { Login } from "./pages/Login.jsx";
 import { Profesionales } from "./pages/Profesionales.jsx";
 import { ProtectedRoute } from "./component/ProtectedRoute.jsx";
 import { Toaster } from "react-hot-toast";
-import { AccessCode } from "./pages/AccessCode.jsx";
 import { PerfilProfesional } from "./pages/PerfilProfesional.jsx";
 
 //create your first component
@@ -47,19 +46,19 @@ const Layout = () => {
           <Route element={<VistaRegistroProfesional />} path="/registro-profesional" />
           <Route element={<VistaPoliticaPrivacidad />} path="/politica-privacidad" />
           <Route element={<VistaContacto />} path="/contacto" />
-          <Route element={<VistaNuevoRegistroUnificado />} path="nuevo-registro" />
-          <Route element={<VistaNuevoRegistroPaciente />} path="nuevo-registro-paciente" />
-          <Route element={<VistaPerfilPaciente />} path="perfil-paciente" />
-          <Route element={<VistaNuevoRegistroProfesional />} path="nuevo-registro-profesional" />
-          <Route element={<VistaPerfilProfesional />} path="perfil-profesional" />
-          <Route element={<DisponibilidadProfesional />} path="disponibilidad" />
-          <Route element={<AgendaProfesional />} path="agenda" />
-      
 
-          <Route element={<Paciente />} path="datos-paciente" />
+          <Route element={<VistaPerfilPaciente />} path="/perfil-paciente" />
 
+          <Route element={<VistaPerfilProfesional />} path="/perfil-profesional" />
+          <Route element={<DisponibilidadProfesional />} path="/disponibilidad" />
+          <Route element={<ProtectedRoute element={<AgendaProfesional />} />} path="/agenda/:id" />
 
-         
+          {/* Pruebas */}
+          <Route element={<VistaNuevoRegistroUnificado />} path="/nuevo-registro" />
+          <Route element={<VistaNuevoRegistroPaciente />} path="/nuevo-registro-paciente" />
+          <Route element={<VistaNuevoRegistroProfesional />} path="/nuevo-registro-profesional" />
+
+          <Route element={<Paciente />} path="/datos-paciente" />
           <Route element={<Login />} path="/login" />
           <Route
             path="/perfil"
@@ -70,7 +69,6 @@ const Layout = () => {
           <Route element={<VistaInfoProfesional />} path="/profesionales/:id" />
           <Route element={<VistaTerminosYCondiciones />} path="/terminos-y-condiciones" />
           <Route element={<Profesionales />} path="/profesionales" />
-          <Route element={<AccessCode />} path="/access-code" />
           <Route element={<PerfilProfesional />} path="/profesional/perfil" />
           <Route element={<h1>Not found!</h1>} />
         </Routes>

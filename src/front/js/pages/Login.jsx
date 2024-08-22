@@ -32,7 +32,7 @@ export const Login = () => {
               password: Yup.string().required('Campo requerido').min(6, 'La contraseña debe tener al menos 6 caracteres')
             })}
             onSubmit={async ({ email, password }) => {
-              const response = await actions.loginUser(email, password);
+              const response = await actions.login(email, password);
 
               if (response) {
                 return <Navigate to='/perfil' replace />
@@ -63,7 +63,7 @@ export const Login = () => {
 
                 <button type='submit' className='btn btn-primary w-100 text-btn'>Iniciar sesión</button>
 
-                <p className='mt-3 text-label text-center'>¿Aún no tienes cuenta? <Link to={"/registro-usuario"} className='text-primary'>Registrate</Link></p>
+                <p className='mt-3 text-label text-center'>¿Aún no tienes cuenta? <Link to={"/nuevo-registro"} className='text-primary'>Registrate</Link></p>
               </Form>
             )}
           </Formik>

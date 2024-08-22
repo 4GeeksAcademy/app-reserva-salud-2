@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom';
 export const ProtectedRoute = ({ element, ...rest }) => {
   const { store } = useContext(Context);
 
-  if (!store.isAuthenticated) {
+  if (!store.currentUser) {
     return <Navigate to='/login' replace />
   }
 

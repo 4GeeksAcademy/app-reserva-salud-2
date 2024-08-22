@@ -1,15 +1,16 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 
 export function Navbar() {
   const { store, actions } = useContext(Context);
+  const navigate = useNavigate();
 
   return (
     <nav className="navbar fixed-top navbar-expand-lg bg-primary">
       <div className="container-fluid">
         <Link className="navbar-title text-white text-decoration-none" to={"/"}>
-        <i className="fa-regular fa-calendar-plus"></i> Reserva Salud
+          <i className="fa-regular fa-calendar-plus"></i> Reserva Salud
         </Link>
         <button
           className="navbar-toggler text-white bg-secondary"
@@ -26,7 +27,7 @@ export function Navbar() {
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
             <li className="nav-item">
               <Link
-                className= {`text-white text-normal nav-link ${({ isActive }) =>
+                className={`text-white text-normal nav-link ${({ isActive }) =>
                   isActive ? "active" : ""}`}
                 to={"/"}
               >
@@ -51,26 +52,37 @@ export function Navbar() {
                 Contacto
               </Link>
             </li>
-            {store.isAuthenticated && (
+            {store.currentUser ? (
               <li className="nav-item">
                 <Link
                   className={`nav-link text-white text-normal ${({ isActive }) =>
                     isActive ? "active" : ""}`}
-                  to={"/perfil"}
+                  to={"/perfil-paciente"}
                 >
                   Perfil
                 </Link>
               </li>
-            )}
+            ) : store.currentProfessional ? (
+              <li className="nav-item">
+                <Link
+                  className={`nav-link text-white text-normal ${({ isActive }) =>
+                    isActive ? "active" : ""}`}
+                  to={"/perfil-profesional"}
+                >
+                  Perfil
+                </Link>
+              </li>
+            ) : null
+            }
 
             {
-              store.isAuthenticated
+              store.currentUser || store.currentProfessional
                 ? (
                   <button
                     className="btn text-primary text-btn bg-tertiary"
                     onClick={() => {
                       actions.logout();
-                      return <Navigate to="/" replace />;
+                      navigate("/");
                     }}
                   >
                     <i className="fa-solid fa-arrow-right-to-bracket"></i> Salir
