@@ -1,12 +1,29 @@
-import React, { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { Context } from "../store/appContext";
 
 export const VistaNuevoRegistroProfesional = () => {
-    // const { actions } = useContext(Context);
-    // const navigate = useNavigate();
+    const { actions } = useContext(Context);
+    const [states, setStates] = useState([]);
+    const [specialities, setSpecialities] = useState([]);
+    const navigate = useNavigate();
+    const { state: { id } } = useLocation();
+
+    useEffect(() => {
+        const getStates = async () => {
+            const response = await actions.getStates();
+            setStates(response);
+        }
+        const getSpecialities = async () => {
+            const response = await actions.getSpecialities();
+            setSpecialities(response);
+        }
+
+        getStates();
+        getSpecialities();
+    }, []);
 
     return (
         <>
@@ -24,6 +41,7 @@ export const VistaNuevoRegistroProfesional = () => {
                     telephone: "",
                     appointment_type: ""
                 }}
+
                 validationSchema={Yup.object({
                     first_name: Yup.string().required("Este campo es obligatorio"),
                     last_name: Yup.string().required("Este campo es obligatorio"),
@@ -35,52 +53,24 @@ export const VistaNuevoRegistroProfesional = () => {
                             "OTHER"
                         ])
                         .required("Este campo es obligatorio"),
-                    state: Yup.string()
-                        .oneOf([
-                            "ARTIGAS",
-                            "CANELONES",
-                            "COLONIA",
-                            "DURAZNO",
-                            "FLORES",
-                            "FLORIDA",
-                            "LAVALLEJA",
-                            "MALDONADO",
-                            "MONTEVIDEO",
-                            "PAYSANDU",
-                            "RIO_NEGRO",
-                            "RIVERA",
-                            "ROCHA",
-                            "SALTO",
-                            "SAN_JOSE",
-                            "SORIANO",
-                            "TACUAREMBO",
-                            "TREINTA_Y_TRES",
-                        ])
-                        .required("Este campo es obligatorio"),
+                    state: Yup.string().required("Este campo es obligatorio"),
                     city: Yup.string().required("Este campo es obligatorio"),
-                    speciality: Yup.string()
-                        .oneOf([
-                            "PSICOLOGIA",
-                            "NUTRICION",
-                            "FONOAUDIOLOGIA",
-                            "ODONTOLOGIA"
-                        ])
-                        .required("Este campo es obligatorio"),
+                    speciality: Yup.string().required("Este campo es obligatorio"),
                     telephone: Yup.string().required("Este campo es obligatorio"),
-                    appointment_type: Yup.array().min(
-                        1,
-                        "Debe seleccionar una modalidad"
-                    )
+                    appointment_type: Yup.string().required("Este campo es obligatorio")
                 })}
+
                 onSubmit={async (values) => {
-                    console.log(values)
-                    // const response = await actions.createUser(values);
-                    // if (response.status === 201) {
-                    //     navigate("/login");
-                    // }
+                    const response = await actions.updateProfessional(id, { city: parseInt(values.city), state: parseInt(values.state), speciality: parseInt(values.speciality), ...values });
+                    if (response.status === 200) {
+                        navigate("/login");
+                    } else {
+                        console.error("Error al actualizar el profesional");
+                    }
+                    console.log(professional_id)
                 }}
             >
-                {({ handleSubmit }) => (
+                {({ handleSubmit, values }) => (
                     <Form onSubmit={handleSubmit} className="container contenido" style={{ maxWidth: "700px" }}>
                         <div className="row p-3 justify-content-between align-items-center bg-tertiary rounded-top text-primary">
                             <div className="col-auto">
@@ -146,38 +136,33 @@ export const VistaNuevoRegistroProfesional = () => {
                                     </label>
                                     <Field as="select" className="form-select" id="state" name="state">
                                         <option value="">Seleccione un departamento</option>
-                                        <option value="ARTIGAS">Artigas</option>
-                                        <option value="CANELONES">Canelones</option>
-                                        <option value="COLONIA">Colonia</option>
-                                        <option value="DURAZNO">Durazno</option>
-                                        <option value="FLORES">Flores</option>
-                                        <option value="FLORIDA">Florida</option>
-                                        <option value="LAVALLEJA">Lavalleja</option>
-                                        <option value="MALDONADO">Maldonado</option>
-                                        <option value="MONTEVIDEO">Montevideo</option>
-                                        <option value="PAYSANDU">Paysandú</option>
-                                        <option value="RIO_NEGRO">Río Negro</option>
-                                        <option value="RIVERA">Rivera</option>
-                                        <option value="ROCHA">Rocha</option>
-                                        <option value="SALTO">Salto</option>
-                                        <option value="SAN_JOSE">San José</option>
-                                        <option value="SORIANO">Soriano</option>
-                                        <option value="TACUAREMBO">Tacuarembó</option>
-                                        <option value="TREINTA_Y_TRES">Treinta y Tres</option>
+                                        {
+                                            states?.map((state) => {
+                                                return (
+                                                    <option key={state.id} value={state.id}>{state.name}</option>
+                                                )
+                                            })
+                                        }
                                     </Field>
                                 </div>
 
                                 <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="state" className="text-label form-label">
+                                    <label htmlFor="city" className="text-label form-label">
                                         Ciudad
                                     </label>
-                                    <Field as="select" className="form-select" id="state" name="state">
+                                    <Field as="select" className="form-select" id="city" name="city">
                                         <option value="">Seleccione una ciudad</option>
-                                        <option value="ARTIGAS">Ciudad</option>
-                                        <option value="CANELONES">Ciudad</option>
-                                        <option value="COLONIA">Ciudad</option>
+                                        {
+                                            states
+                                                .find((state) => state.id == values.state)
+                                                ?.cities.map((city) => (
+                                                    <option key={city.id} value={city.id}>
+                                                        {city.name}
+                                                    </option>
+                                                ))
+                                        }
                                     </Field>
-                                    <ErrorMessage name="state" />
+                                    <ErrorMessage name="city" />
                                 </div>
 
                                 <div className="mb-3 col-md-12 col-sm-12">
@@ -186,10 +171,13 @@ export const VistaNuevoRegistroProfesional = () => {
                                     </label>
                                     <Field as="select" className="form-select" id="speciality" name="speciality"> {/* Cambiado a 'speciality' */}
                                         <option value="">Seleccione una especialidad</option>
-                                        <option value="PSICOLOGIA">Psicología</option>
-                                        <option value="NUTRICION">Nutrición</option>
-                                        <option value="FONOAUDIOLOGIA">Fonoaudiología</option>
-                                        <option value="ODONTOLOGIA">Odontología</option>
+                                        {
+                                            specialities?.map((speciality) => {
+                                                return (
+                                                    <option key={speciality.id} value={speciality.id}>{speciality.name}</option>
+                                                )
+                                            })
+                                        }
                                     </Field>
                                 </div>
 

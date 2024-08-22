@@ -3,22 +3,35 @@ from flask_bcrypt import generate_password_hash, check_password_hash
 from sqlalchemy import event
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
+import enum
 
 from api.utils import generate_recurrent_dates
 
 db = SQLAlchemy()
 
+professional_speciality = db.Table('professional_speciality', db.Model.metadata,
+    db.Column('professional_id', db.Integer, db.ForeignKey('professional.id'), primary_key=True),
+    db.Column('speciality_id', db.Integer, db.ForeignKey('speciality.id'), primary_key=True)
+)
+
+class GenderEnum(enum.Enum):
+    MALE = "male"
+    FEMALE = "female"
+    OTHER = "other"
+
 class User(db.Model):
     __tablename__ = 'user'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
+    first_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100))
     email = db.Column(db.String(200), unique=True, nullable=False, index=True)
     password = db.Column(db.String(200), nullable=False)
     birth_date = db.Column(db.Date)
     is_active = db.Column(db.Boolean, default=False)
     state_id = db.Column(db.Integer, db.ForeignKey('state.id'))
     
+    availability = db.relationship('Appointment', back_populates='user', cascade='all, delete-orphan')
     state = db.relationship('State', back_populates='users', uselist=False)
     comments = db.relationship("Comment", back_populates="user", cascade='all, delete-orphan')
     
@@ -28,11 +41,12 @@ class User(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.name,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
             "email": self.email,
             "birth_date": self.birth_date,
             "state_id": self.state_id,
-            "is_active": self.is_active
+            "is_active": self.is_active,
         }
         
 class Professional(db.Model):
@@ -44,7 +58,7 @@ class Professional(db.Model):
     email = db.Column(db.String(200), unique=True, nullable=False, index=True)
     password = db.Column(db.String(200), nullable=False)
     birth_date = db.Column(db.Date)
-    gender = db.Column(db.Enum('female', 'man', 'other', name='gender'))
+    gender = db.Column(db.Enum(GenderEnum))
     speciality = db.Column(db.String(200))
     certificate = db.Column(db.String(200))
     profile_picture = db.Column(db.String(200), default='https://avatar.iran.liara.run/public')
@@ -57,6 +71,7 @@ class Professional(db.Model):
     state = db.relationship('State', back_populates='professionals', uselist=False)
     comments = db.relationship('Comment', back_populates='professional', cascade='all, delete-orphan')
     availabilities = db.relationship('Availability', back_populates='professional', cascade='all, delete-orphan')
+    specialities = db.relationship('Speciality', secondary=professional_speciality, back_populates='professionals')
     
     def __repr__(self):
         return f'<Professional {self.email} {self.speciality}>'
@@ -68,7 +83,7 @@ class Professional(db.Model):
             "last_name": self.last_name,
             "email": self.email,
             "birth_date": self.birth_date,
-            "gender": self.gender,
+            "gender": self.gender.value,
             "speciality": self.speciality,
             "certificate": self.certificate,
             "profile_picture": self.profile_picture,
@@ -77,7 +92,8 @@ class Professional(db.Model):
             "is_active": self.is_active,
             "is_validated": self.is_validated,
             "comments": [comment.serialize() for comment in self.comments],
-            "state_id": self.state_id
+            "state_id": self.state_id,
+            "specialities": [speciality.serialize() for speciality in self.specialities]
         }
     
     def serialize_availabilities(self):
@@ -199,10 +215,10 @@ class Appointment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     availability_id = db.Column(db.Integer, db.ForeignKey('availability.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    is_confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    is_confirmed = db.Column(db.Boolean, default=False)
     is_done = db.Column(db.Boolean, default=None)
-    created_at = db.Column(db.DateTime, default=datetime.now())
     type = db.Column(db.Enum('remote', 'presential', name='appointment_type'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now())
     
     availability = db.relationship(Availability, uselist=False)
     user = db.relationship(User)
@@ -210,11 +226,38 @@ class Appointment(db.Model):
     def __repr__(self):
         return f'<Appointment {self.user.email} {self.availability.professional.email} {self.date}>'
     
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user": self.user.serialize(),
+            "availability": self.availability.serialize(),
+            "date": self.date,
+            "is_confirmed": self.is_confirmed,
+            "is_done": self.is_done,
+            "type": self.type,
+            "created_at": self.created_at
+        }
+        
+class Speciality(db.Model):
+    __tablename__ = 'speciality'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False, unique=True)
+    
+    professionals = db.relationship('Professional', secondary=professional_speciality, back_populates='specialities')
+    
+    def __repr__(self):
+        return f'<Speciality {self.name}>'
+    
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+        }
+    
 def hash_password(mapper, connection, target):
     if target.password:
         target.password = generate_password_hash(target.password, 10).decode('utf-8')
         
 event.listen(User, 'before_insert', hash_password)
-event.listen(User, 'before_update', hash_password)
 event.listen(Professional, 'before_insert', hash_password)
-event.listen(Professional, 'before_update', hash_password)

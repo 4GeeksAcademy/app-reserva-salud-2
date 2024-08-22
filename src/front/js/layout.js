@@ -46,16 +46,19 @@ const Layout = () => {
           <Route element={<VistaRegistroProfesional />} path="/registro-profesional" />
           <Route element={<VistaPoliticaPrivacidad />} path="/politica-privacidad" />
           <Route element={<VistaContacto />} path="/contacto" />
-          <Route element={<VistaNuevoRegistroUnificado />} path="nuevo-registro" />
-          <Route element={<VistaNuevoRegistroPaciente />} path="nuevo-registro-paciente" />
-          <Route element={<VistaPerfilPaciente />} path="perfil-paciente" />
-          <Route element={<VistaNuevoRegistroProfesional />} path="nuevo-registro-profesional" />
-          <Route element={<VistaPerfilProfesional />} path="perfil-profesional" />
-          <Route element={<DisponibilidadProfesional />} path="disponibilidad" />
-          <Route element={<AgendaProfesional />} path="/agenda/:id" />
 
+          <Route element={<VistaPerfilPaciente />} path="/perfil-paciente" />
 
-          <Route element={<Paciente />} path="datos-paciente" />
+          <Route element={<VistaPerfilProfesional />} path="/perfil-profesional" />
+          <Route element={<DisponibilidadProfesional />} path="/disponibilidad" />
+          <Route element={<ProtectedRoute element={<AgendaProfesional />} />} path="/agenda/:id" />
+
+          {/* Pruebas */}
+          <Route element={<VistaNuevoRegistroUnificado />} path="/nuevo-registro" />
+          <Route element={<VistaNuevoRegistroPaciente />} path="/nuevo-registro-paciente" />
+          <Route element={<VistaNuevoRegistroProfesional />} path="/nuevo-registro-profesional" />
+
+          <Route element={<Paciente />} path="/datos-paciente" />
           <Route element={<Login />} path="/login" />
           <Route
             path="/perfil"

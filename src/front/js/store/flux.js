@@ -8,10 +8,10 @@ export const backendApi = axios.create({
 const getState = ({ getStore, getActions, setStore }) => {
   return {
     store: {
-      isAuthenticated: false,
-      userUri: "",
+      currentUser: null,
     },
     actions: {
+      // Register new user
       createUser: async (user) => {
         try {
           toast.loading("Creando usuario...");
@@ -21,14 +21,40 @@ const getState = ({ getStore, getActions, setStore }) => {
           return response;
         } catch (error) {
           toast.dismiss();
-          toast.error("Error al crear usuario");
+          toast.error(error.response.data.message);
           console.error(error);
           return null;
         }
       },
 
+      // Register new professional
+      createProfessional: async (data) => {
+        try {
+          toast.loading("Registrando profesional...");
+          const response = await backendApi.post("/professionals", data);
+          toast.dismiss();
+          toast.success("Profesional registrado exitosamente", { icon: "🚀" });
+          return response;
+        } catch (error) {
+          toast.dismiss();
+          toast.error(error.response.data.message);
+          console.error(error);
+          return null
+        }
+      },
+
+      // Update user
+      updateUser: async (id, data) => {
+        try {
+          const response = await backendApi.put(`/users/${id}`, data);
+          return response;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
       // login user
-      loginUser: async (email, password) => {
+      login: async (email, password) => {
         try {
           toast.loading("Iniciando sesión...");
           const response = await backendApi.post("/login", {
@@ -37,23 +63,28 @@ const getState = ({ getStore, getActions, setStore }) => {
           });
 
           localStorage.setItem("token", response.data.token);
-          setStore({ isAuthenticated: true });
+          setStore({ currentUser: response.data.user || response.data.professional });
           toast.dismiss();
           toast.success("Inicio de sesión exitoso", { icon: "🚀" });
           return true;
         } catch (error) {
+          console.log(error)
           if (error.response.status === 400) {
-            setStore({ isAuthenticated: false });
+            setStore({ currentUser: null });
           }
           toast.dismiss();
           toast.error("Credenciales inválidas");
+          return false;
         }
       },
+
+
+
       verifyToken: async () => {
         const token = localStorage.getItem("token");
 
         if (!token) {
-          setStore({ isAuthenticated: false });
+          setStore({ currentUser: null });
           return false;
         }
 
@@ -64,17 +95,17 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
           });
 
-          setStore({ isAuthenticated: true });
+          setStore({ currentUser: response.data.user || response.data.professional });
           return true;
         } catch (error) {
           localStorage.removeItem("token");
-          setStore({ isAuthenticated: false });
+          setStore({ currentUser: null });
           return false;
         }
       },
       logout: () => {
         localStorage.removeItem("token");
-        setStore({ isAuthenticated: false });
+        setStore({ currentUser: null });
         toast.success("Cierre de sesión exitoso", { icon: "👋" });
       },
       getCalendlyAccessToken: (code) => {
@@ -104,25 +135,27 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      // Register new professional
-      createProfessional: async (data) => {
+      updateProfessional: async (id, data) => {
         try {
-          toast.loading("Registrando profesional...");
-          const response = await backendApi.post("/professionals", data);
-          toast.dismiss();
-          toast.success("Profesional registrado exitosamente", { icon: "🚀" });
-          return response.data;
+          const response = await backendApi.put(`/professionals/${id}`, data);
+          return response;
         } catch (error) {
-          toast.dismiss();
-          toast.error("Error al registrar profesional");
           console.error(error);
-          return null
         }
       },
 
       getStates: async () => {
         try {
           const response = await backendApi.get("/states");
+          return response.data;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
+      getSpecialities: async () => {
+        try {
+          const response = await backendApi.get("/specialities");
           return response.data;
         } catch (error) {
           console.error(error);

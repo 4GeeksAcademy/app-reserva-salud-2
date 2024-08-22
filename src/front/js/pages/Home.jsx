@@ -17,7 +17,7 @@ export const Home = () => {
             Encuentra al profesional que necesitas y agenda tu consulta en
             cuestión de minutos
           </p>
-          <Link to={"/registro-usuario"} className="text-btn text-white bg-primary btn">
+          <Link to={"/nuevo-registro"} className="text-btn text-white bg-primary btn">
             <i className="fa-solid fa-user-plus"></i> Registrarse
           </Link>
           <img

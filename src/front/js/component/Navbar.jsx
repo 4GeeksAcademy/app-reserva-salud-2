@@ -52,7 +52,7 @@ export function Navbar() {
                 Contacto
               </Link>
             </li>
-            {store.isAuthenticated && (
+            {store.currentUser && (
               <li className="nav-item">
                 <Link
                   className={`nav-link text-white text-normal ${({ isActive }) =>
@@ -65,7 +65,7 @@ export function Navbar() {
             )}
 
             {
-              store.isAuthenticated
+              store.currentUser
                 ? (
                   <button
                     className="btn text-primary text-btn bg-tertiary"
