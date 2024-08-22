@@ -1,6 +1,13 @@
 import React from 'react'
+import { backendApi } from '../store/flux'
 
 export const TarjetaCitasUsuario = ({ appointment }) => {
+
+  const cancelAppointment = async () => {
+    const response = await backendApi.delete(`/users/${appointment.user.id}/appointments/${appointment.id}`);
+    console.log(response);
+  }
+
   return (
     <div className="d-flex justify-content-center">
       <div className='card bg-tertiary text-primary mb-3 w-75'>
@@ -19,7 +26,7 @@ export const TarjetaCitasUsuario = ({ appointment }) => {
           </div>
           <div className="col-md-3 col-sm-12 d-flex flex-column justify-content-center align-items-center">
             <button className='btn bg-secondary w-75 text-white text-label text-btn d-flex justify-content-between m-1'>Reprogramar</button>
-            <button className='btn bg-secondary w-75 text-white text-label text-btn d-flex justify-content-between m-1'>Cancelar </button>
+            <button onClick={cancelAppointment} className='btn bg-secondary w-75 text-white text-label text-btn d-flex justify-content-between m-1'>Cancelar </button>
           </div>
         </div>
       </div>

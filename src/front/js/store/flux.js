@@ -9,6 +9,7 @@ const getState = ({ getStore, getActions, setStore }) => {
   return {
     store: {
       currentUser: null,
+      currentProfessional: null,
     },
     actions: {
       // Register new user
@@ -119,14 +120,20 @@ const getState = ({ getStore, getActions, setStore }) => {
           });
 
           localStorage.setItem("token", response.data.token);
-          setStore({ currentUser: response.data.user || response.data.professional });
+
+          if (response.data.user) {
+            setStore({ currentUser: response.data.user });
+          } else {
+            setStore({ currentProfessional: response.data.professional });
+          }
+
           toast.dismiss();
           toast.success("Inicio de sesión exitoso", { icon: "🚀" });
           return true;
         } catch (error) {
           console.log(error)
           if (error.response.status === 400) {
-            setStore({ currentUser: null });
+            setStore({ currentUser: null, currentProfessional: null });
           }
           toast.dismiss();
           toast.error("Credenciales inválidas");
@@ -138,7 +145,7 @@ const getState = ({ getStore, getActions, setStore }) => {
         const token = localStorage.getItem("token");
 
         if (!token) {
-          setStore({ currentUser: null });
+          setStore({ currentUser: null, currentProfessional: null });
           return false;
         }
 
@@ -149,18 +156,22 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
           });
 
-          setStore({ currentUser: response.data.user || response.data.professional });
+          if (response.data.user) {
+            setStore({ currentUser: response.data.user });
+          } else {
+            setStore({ currentProfessional: response.data.professional });
+          }
           return true;
         } catch (error) {
           localStorage.removeItem("token");
-          setStore({ currentUser: null });
+          setStore({ currentUser: null, currentProfessional: null });
           return false;
         }
       },
 
       logout: () => {
         localStorage.removeItem("token");
-        setStore({ currentUser: null });
+        setStore({ currentUser: null, currentProfessional: null });
         toast.success("Cierre de sesión exitoso", { icon: "👋" });
       },
     },

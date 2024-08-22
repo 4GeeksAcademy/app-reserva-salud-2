@@ -52,20 +52,31 @@ export function Navbar() {
                 Contacto
               </Link>
             </li>
-            {store.currentUser && (
+            {store.currentUser ? (
               <li className="nav-item">
                 <Link
                   className={`nav-link text-white text-normal ${({ isActive }) =>
                     isActive ? "active" : ""}`}
-                  to={"/perfil"}
+                  to={"/perfil-paciente"}
                 >
                   Perfil
                 </Link>
               </li>
-            )}
+            ) : store.currentProfessional ? (
+              <li className="nav-item">
+                <Link
+                  className={`nav-link text-white text-normal ${({ isActive }) =>
+                    isActive ? "active" : ""}`}
+                  to={"/perfil-profesional"}
+                >
+                  Perfil
+                </Link>
+              </li>
+            ) : null
+            }
 
             {
-              store.currentUser
+              store.currentUser || store.currentProfessional
                 ? (
                   <button
                     className="btn text-primary text-btn bg-tertiary"

@@ -135,6 +135,24 @@ def handle_user_appointments(user_id):
     user = User.query.get(user_id)
     return jsonify(user.get_appointments()), 200
 
+@api.route('/users/<int:user_id>/appointments/<int:appointment_id>', methods=['GET', 'DELETE'])
+def handle_user_appointment(user_id, appointment_id):
+  if request.method == 'GET':
+    appointment = Appointment.query.filter_by(user_id=user_id, id=appointment_id).first()
+    if appointment is None:
+      raise APIException("User appointment not found", status_code=404)
+    return jsonify(appointment.serialize()), 200
+  elif request.method == 'DELETE':
+    appointment = Appointment.query.filter_by(user_id=user_id, id=appointment_id).first()
+    
+    if appointment is None:
+      raise APIException("User appointment not found", status_code=404)
+    
+    db.session.delete(appointment)
+    db.session.commit()
+    
+    return jsonify({ "message": "Appointment deleted successfully" }), 200
+
 @api.route('/professionals', methods=['GET', 'POST'])
 def handle_professionals():
     if request.method == 'POST':
