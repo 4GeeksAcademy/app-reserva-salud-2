@@ -132,9 +132,8 @@ def handle_user_appointments(user_id):
     
     return jsonify({ "message": "Appointment created successfully" }), 201
   elif request.method == 'GET':
-    user_appointments = Appointment.query.filter_by(user_id=user_id).all()
-    user_appointments = list(map(lambda x: x.serialize(), user_appointments))
-    return jsonify(user_appointments), 200
+    user = User.query.get(user_id)
+    return jsonify(user.get_appointments()), 200
 
 @api.route('/professionals', methods=['GET', 'POST'])
 def handle_professionals():

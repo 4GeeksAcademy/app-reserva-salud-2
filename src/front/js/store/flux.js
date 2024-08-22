@@ -27,6 +27,45 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
+      getUserAppointments: async (id) => {
+        try {
+          const response = await backendApi.get(`/users/${id}/appointments`);
+          return response.data;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
+      // Update user
+      updateUser: async (id, data) => {
+        try {
+          const response = await backendApi.put(`/users/${id}`, data);
+          return response;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
+      // Get all the professionals
+      getProfessionals: async () => {
+        try {
+          const response = await backendApi.get("/professionals");
+          return response.data;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
+      // Get a single professional
+      getProfessional: async (id) => {
+        try {
+          const response = await backendApi.get(`/professionals/${id}`);
+          return response.data;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
       // Register new professional
       createProfessional: async (data) => {
         try {
@@ -43,11 +82,28 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      // Update user
-      updateUser: async (id, data) => {
+      updateProfessional: async (id, data) => {
         try {
-          const response = await backendApi.put(`/users/${id}`, data);
+          const response = await backendApi.put(`/professionals/${id}`, data);
           return response;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
+      getStates: async () => {
+        try {
+          const response = await backendApi.get("/states");
+          return response.data;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
+      getSpecialities: async () => {
+        try {
+          const response = await backendApi.get("/specialities");
+          return response.data;
         } catch (error) {
           console.error(error);
         }
@@ -78,8 +134,6 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-
-
       verifyToken: async () => {
         const token = localStorage.getItem("token");
 
@@ -103,64 +157,12 @@ const getState = ({ getStore, getActions, setStore }) => {
           return false;
         }
       },
+
       logout: () => {
         localStorage.removeItem("token");
         setStore({ currentUser: null });
         toast.success("Cierre de sesión exitoso", { icon: "👋" });
       },
-      getCalendlyAccessToken: (code) => {
-        backendApi.post("/calendly/token", { code })
-          .then((response) => {
-            localStorage.setItem("calendlyResponse", JSON.stringify(response.data));
-          });
-      },
-
-      // Get all the professionals
-      getProfessionals: async () => {
-        try {
-          const response = await backendApi.get("/professionals");
-          return response.data;
-        } catch (error) {
-          console.error(error);
-        }
-      },
-
-      // Get a single professional
-      getProfessional: async (id) => {
-        try {
-          const response = await backendApi.get(`/professionals/${id}`);
-          return response.data;
-        } catch (error) {
-          console.error(error);
-        }
-      },
-
-      updateProfessional: async (id, data) => {
-        try {
-          const response = await backendApi.put(`/professionals/${id}`, data);
-          return response;
-        } catch (error) {
-          console.error(error);
-        }
-      },
-
-      getStates: async () => {
-        try {
-          const response = await backendApi.get("/states");
-          return response.data;
-        } catch (error) {
-          console.error(error);
-        }
-      },
-
-      getSpecialities: async () => {
-        try {
-          const response = await backendApi.get("/specialities");
-          return response.data;
-        } catch (error) {
-          console.error(error);
-        }
-      }
     },
   };
 };

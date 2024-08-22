@@ -35,6 +35,9 @@ class User(db.Model):
     state = db.relationship('State', back_populates='users', uselist=False)
     comments = db.relationship("Comment", back_populates="user", cascade='all, delete-orphan')
     
+    def get_appointments(self):
+        return [appointment.serialize() for appointment in self.availability]
+    
     def __repr__(self):
         return f'<User {self.email}>'
     
@@ -214,7 +217,9 @@ class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     availability_id = db.Column(db.Integer, db.ForeignKey('availability.id'), nullable=False)
-    date = db.Column(db.Date, nullable=False)
+    date = db.Column(db.Date)
+    hour = db.Column(db.Time)
+    duration = db.Column(db.Integer)
     is_confirmed = db.Column(db.Boolean, default=False)
     is_done = db.Column(db.Boolean, default=None)
     type = db.Column(db.Enum('remote', 'presential', name='appointment_type'), nullable=False)
