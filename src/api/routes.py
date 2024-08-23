@@ -3,7 +3,6 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from datetime import datetime
 from flask import Flask, request, jsonify, url_for, Blueprint
-
 from api.models import Appointment, GenderEnum, Speciality, db, User, Professional, Comment, Availability, State, City
 from api.utils import generate_sitemap, APIException, generate_recurrent_dates
 from flask_cors import CORS
@@ -86,9 +85,12 @@ def handle_user(user_id):
     db.session.commit()
     
     return jsonify({ "message": "User deleted successfully" }), 200
-      
-@api.route('/users/<int:user_id>/appointments', methods=['GET', 'POST'])
-def handle_user_appointments(user_id):
+
+# Create a new user appointment
+@api.route('/users/appointments', methods=['GET', 'POST'])
+@jwt_required()
+def handle_user_appointments():
+  current_user_id = get_jwt_identity()
   if request.method == 'POST':
     request_body = request.json
     
@@ -100,25 +102,23 @@ def handle_user_appointments(user_id):
     
     if not availability_id or not date:
       raise APIException("Missing required fields", status_code=400)
+   
+    if type and type not in ['remote', 'presential']:
+      raise APIException("Invalid type value", status_code=400)
     
-    # Check if type is valid
-    if type not in ['remote', 'presential']:
-      raise APIException("Invalid appointment type", status_code=400)
+    # Validate if availability exists
+    availability = Availability.query.get(availability_id)
+    if not availability:
+      raise APIException("Availability not found", status_code=404)
     
-    # Check if appointment already exists
-    exist_appointment = Appointment.query.filter_by(user_id=user_id, availability_id=availability_id, date=date).first()
-    
-    if not exist_appointment:
-      raise APIException("Appointment not found", status_code=404)
-    
-    # Check if appointment is available
-    if not exist_appointment.is_available:
-      raise APIException("Appointment not available", status_code=400)
+    # Verify if availability is already booked
+    if not availability.is_available:
+        raise APIException("This availability is already booked", status_code=400)
     
     # Create appointment in the database
     try:
       new_appointment = Appointment(
-        user_id=user_id,
+        user_id=current_user_id,
         availability_id=availability_id,
         date=date,
         is_confirmed=is_confirmed,
@@ -128,13 +128,16 @@ def handle_user_appointments(user_id):
       db.session.add(new_appointment)
       db.session.commit()
     except Exception as e:
-      raise APIException("An error ocurred while creating the appointment", status_code=400)
+      raise APIException(f"An error ocurred while creating the appointment {e}", status_code=400)
+    
+    availability.is_available = False
+    db.session.commit()
     
     return jsonify({ "message": "Appointment created successfully" }), 201
   elif request.method == 'GET':
-    user = User.query.get(user_id)
+    user = User.query.get(current_user_id)
     return jsonify(user.get_appointments()), 200
-
+ 
 @api.route('/users/<int:user_id>/appointments/<int:appointment_id>', methods=['GET', 'DELETE'])
 def handle_user_appointment(user_id, appointment_id):
   if request.method == 'GET':
@@ -258,9 +261,16 @@ def handle_professional(professional_id):
     db.session.commit()
     
     return jsonify({ "message": "Professional deleted successfully" }), 200
-    
-@api.route('/professionals/<int:professional_id>/availabilities', methods=['GET', 'POST'])
-def handle_professional_availabilities(professional_id):
+
+@api.route('/professionals/<int:professional_id>/availabilities', methods=['GET'])
+def get_professional_appointments(professional_id):
+  professional = Professional.query.get(professional_id)
+  return jsonify(professional.serialize_availabilities()), 200
+
+@api.route('/professionals/availabilities', methods=['GET', 'POST'])
+@jwt_required()
+def handle_professional_availabilities():
+  current_professional_id = get_jwt_identity()
   if request.method == 'POST':
     request_body = request.json
     
@@ -291,7 +301,7 @@ def handle_professional_availabilities(professional_id):
       raise APIException("End time must be greater than start time", status_code=400)
     
     # Check if availability already exists
-    exist_availability = Availability.query.filter_by(professional_id=professional_id, date=date, start_time=start_time, end_time=end_time).first()
+    exist_availability = Availability.query.filter_by(professional_id=current_professional_id, date=date, start_time=start_time, end_time=end_time).first()
     
     if exist_availability:
       raise APIException("Availability already exists", status_code=400)
@@ -299,7 +309,7 @@ def handle_professional_availabilities(professional_id):
     # Check if availability overlaps with an existing one
     overlapping_availability = Availability.query.filter(
       Availability.date == date,
-      Availability.professional_id == professional_id,
+      Availability.professional_id == current_professional_id,
       ((Availability.start_time <= start_time) & (Availability.end_time > start_time)) |
       ((Availability.start_time < end_time) & (Availability.end_time >= end_time)) |
       ((Availability.start_time >= start_time) & (Availability.end_time <= end_time))
@@ -311,7 +321,7 @@ def handle_professional_availabilities(professional_id):
     # Create availability in the database
     try:
       new_availability = Availability(
-        professional_id=professional_id,
+        professional_id=current_professional_id,
         date=date,
         start_time=start_time,
         end_time=end_time,
@@ -320,6 +330,12 @@ def handle_professional_availabilities(professional_id):
         is_presential=is_presential
       )
       
+      print(new_availability.weekly)
+      
+      if new_availability.weekly:
+        print("Generating recurrent availability")
+        new_availability.generate_recurrent_availability()
+      
       db.session.add(new_availability)
       db.session.commit()
     except Exception as e:
@@ -327,8 +343,8 @@ def handle_professional_availabilities(professional_id):
     
     return jsonify({ "message": "Availability created successfully" }), 201
   elif request.method == 'GET':
-    professional = Professional.query.get(professional_id)
-    return jsonify(professional.serialize_availabilities()), 200
+    professional = Professional.query.get(current_professional_id)
+    return jsonify(professional.get_availabilities()), 200
   
 @api.route('/professionals/<int:professional_id>/availabilities/<int:availability_id>', methods=['GET', 'DELETE'])
 def handle_professional_availability(professional_id, availability_id):
