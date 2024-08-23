@@ -182,8 +182,9 @@ class Availability(db.Model):
     date = db.Column(db.Date, nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
-    weekly = db.Column(db.Boolean, nullable=False, default=True)
+    weekly = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.now())
+    is_available = db.Column(db.Boolean, nullable=False, default=True)
     is_remote = db.Column(db.Boolean, nullable=False, default=False)
     is_presential = db.Column(db.Boolean, nullable=False, default=False)
     
@@ -193,6 +194,21 @@ class Availability(db.Model):
     def __repr__(self):
         return f'<Availability {self.professional.email} {self.date} {self.start_time} {self.end_time}>'
     
+    def generate_recurrent_availability(self):
+        dates = generate_recurrent_dates(self.date)
+        availabilities = []
+        for date in dates:
+            availability = Availability(
+                professional_id=self.professional_id,
+                date=date,
+                start_time=self.start_time,
+                end_time=self.end_time,
+                is_remote=self.is_remote,
+                is_presential=self.is_presential
+            )
+            availabilities.append(availability)
+        db.session.add_all(availabilities)
+        db.session.commit()
     def serialize(self):
         availability = {
             "id": self.id,
@@ -204,10 +220,8 @@ class Availability(db.Model):
             "created_at": self.created_at,
             "is_remote": self.is_remote,
             "is_presential": self.is_presential,
+            "is_available": self.is_available,
         }
-        
-        if self.weekly:
-            availability['recurrent_dates'] = generate_recurrent_dates(self.date.isoformat())
         
         return availability
         
@@ -222,7 +236,7 @@ class Appointment(db.Model):
     duration = db.Column(db.Integer)
     is_confirmed = db.Column(db.Boolean, default=False)
     is_done = db.Column(db.Boolean, default=None)
-    type = db.Column(db.Enum('remote', 'presential', name='appointment_type'), nullable=False)
+    type = db.Column(db.Enum('remote', 'presential', name='appointment_type'), default='remote')
     created_at = db.Column(db.DateTime, default=datetime.now())
     
     availability = db.relationship(Availability, uselist=False)
@@ -236,7 +250,7 @@ class Appointment(db.Model):
             "id": self.id,
             "user": self.user.serialize(),
             "availability": self.availability.serialize(),
-            "date": self.date,
+            "date": self.date.isoformat(),
             "is_confirmed": self.is_confirmed,
             "is_done": self.is_done,
             "type": self.type,
