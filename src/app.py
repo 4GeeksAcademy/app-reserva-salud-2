@@ -10,8 +10,10 @@ from flask_jwt_extended import JWTManager
 from api.utils import APIException, generate_sitemap
 from api.models import db
 from api.routes import api
+from api.route.auth import auth
 from api.admin import setup_admin
 from api.commands import setup_commands
+from datetime import timedelta
 
 # from models import Person
 
@@ -20,6 +22,7 @@ static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
@@ -46,6 +49,7 @@ setup_commands(app)
 
 # Add all endpoints form the API with a "api" prefix
 app.register_blueprint(api, url_prefix='/api')
+app.register_blueprint(auth, url_prefix='/api/auth')
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
