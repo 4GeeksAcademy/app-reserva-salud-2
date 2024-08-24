@@ -17,8 +17,14 @@ export const AgendaProfesional = () => {
     const getProfessional = async () => {
       try {
         const response = await backendApi.get(
-          `/professionals/${id}/availabilities`
+          '/professionals/availabilities',
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
+        console.log(response)
         setProfessional(response.data);
       } catch (error) {
         console.log(error);
@@ -121,16 +127,14 @@ export const AgendaProfesional = () => {
                   <button
                     data-bs-toggle="modal"
                     data-bs-target={"#modalAppointmentType" + index}
-                    className={`list-group-item list-group-item-action ${
-                      appointment === interval ? "active" : ""
-                    }`}
+                    className={`list-group-item list-group-item-action ${appointment === interval ? "active" : ""
+                      }`}
                     onClick={() => setAppointment(interval)}
                     disabled={!interval.is_available}
                   >
                     <p
-                      className={`${
-                        !interval.is_available && "text-decoration-line-through"
-                      }`}
+                      className={`${!interval.is_available && "text-decoration-line-through"
+                        }`}
                     >
                       {interval.start} - {interval.end} |{" "}
                     </p>
@@ -172,7 +176,7 @@ export const AgendaProfesional = () => {
                           <h2>Selecciona el tipo de reserva</h2>
 
                           {appointment?.is_remote &&
-                          appointment?.is_presential ? (
+                            appointment?.is_presential ? (
                             <div>
                               <div className="form-check">
                                 <input
