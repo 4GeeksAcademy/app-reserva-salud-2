@@ -291,8 +291,8 @@ def handle_professional_availabilities():
     
     # Check if date is in the correct format
     try:
-      start_time = datetime.strptime(start_time, "%H:%M").time()
-      end_time = datetime.strptime(end_time, "%H:%M").time()
+      start_time = datetime.strptime(start_time, "%H:%M:%S").time()
+      end_time = datetime.strptime(end_time, "%H:%M:%S").time()
     except Exception as e:
       raise APIException("Invalid time format", status_code=400)
     
@@ -344,7 +344,7 @@ def handle_professional_availabilities():
     return jsonify({ "message": "Availability created successfully" }), 201
   elif request.method == 'GET':
     professional = Professional.query.get(current_professional_id)
-    return jsonify(professional.get_availabilities()), 200
+    return jsonify(professional.serialize_availabilities()), 200
   
 @api.route('/professionals/<int:professional_id>/availabilities/<int:availability_id>', methods=['GET', 'DELETE'])
 def handle_professional_availability(professional_id, availability_id):
