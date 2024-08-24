@@ -8,94 +8,71 @@ import "swiper/css/autoplay";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext.js";
 
-const citas = [
-
-  {
-    id: "3",
-    fotoprofesional: "https://avatar.iran.liara.run/public/boy",
-    dia: "5 de setiembre",
-    hora: "10:30",
-    modalidad: "Virtual",
-    profesional: "Carlos Villar",
-    especialidad: "odontólogo"
-  },
-  {
-    id: "1",
-    fotoprofesional: "https://avatar.iran.liara.run/public/girl",
-    dia: "10 de agosto",
-    hora: "9:30",
-    modalidad: "Presencial",
-    profesional: "Juana Pérez",
-    especialidad: "nutricionista"
-  },
-  {
-    id: "2",
-    fotoprofesional: "https://avatar.iran.liara.run/public/boy",
-    dia: "30 de agosto",
-    hora: "9:30",
-    modalidad: "Virtual",
-    profesional: "Pedro Fuentes",
-    especialidad: "nutricionista"
-  },
-
-]
-
 export const VistaPerfilPaciente = () => {
   const { store, actions } = useContext(Context);
   const [userAppointments, setUserAppointments] = useState([]);
 
-  const id = store?.currentUser?.id;
-
   useEffect(() => {
     const getUserAppointments = async () => {
-      const response = await actions.getUserAppointments(id);
+      const response = await actions.getUserAppointments();
       setUserAppointments(response);
     }
+
     getUserAppointments();
   }, []);
 
   console.log(userAppointments);
 
   return (
-    <div className="contenido">
-      <h1 className="text-title text-secondary text-center p-4 m-4">Bienvenido, Nombre Paciente</h1>
-      <div>
-        <div className="d-flex justify-content-center">
-          <h3 className="text-subtitle mx-3 w-75">Próximas citas</h3>
+    <div className="contenido container">
+      <div className="row">
+        <div className="col">
+          <h1 className="text-title text-secondary text-center">Bienvenido, {store?.currentUser?.first_name} {store?.currentUser?.last_name}</h1>
         </div>
-        <Swiper
-          modules={[Autoplay]}
-          slidesPerView={1}
-          spaceBetween={10}
-          loop={true}
-          autoplay={{ delay: 2500, disableOnInteraction: true }}
-          breakpoints={{
-            1024: {
-              slidesPerView: 1,
-              spaceBetween: 20,
-            },
-            1440: {
-              slidesPerView: 3,
-              spaceBetween: 20,
-            },
-          }}
-        >
-          {citas.map((citas) => (
-            <SwiperSlide key={citas.id}>
-              {/* <TarjetaProximaCita citas={citas} /> */}
-            </SwiperSlide>))}
-        </Swiper>
-        <div className="d-flex justify-content-center m-4">
+      </div>
+      <div className="row">
+        <div className="col">
+          <h3 className="text-subtitle text-center">Próximas citas</h3>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          <Swiper
+            modules={[Autoplay]}
+            slidesPerView={1}
+            spaceBetween={10}
+            loop={true}
+            autoplay={{ delay: 2500, disableOnInteraction: true }}
+            breakpoints={{
+              1024: {
+                slidesPerView: 1,
+                spaceBetween: 20,
+              },
+              1440: {
+                slidesPerView: 3,
+                spaceBetween: 20,
+              },
+            }}
+          >
+            <SwiperSlide>
+              Slider1
+            </SwiperSlide>
+          </Swiper>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col text-center">
           <Link to={"/profesionales"} className="btn text-btn text-white bg-primary">
             <i className="fa-solid fa-user-plus"></i> Agendar nueva cita
           </Link>
         </div>
-        <div className="d-flex justify-content-center">
-          <h3 className="text-subtitle mx-3 w-75">Todas las citas</h3>
+      </div>
+      <div className="row">
+        <div className="col">
+          <h3 className="text-subtitle">Todas las citas</h3>
         </div>
-        {/* {citas.map((citas) => (
-          <TarjetaCitasUsuario key={citas.id} citas={citas} />))} */}
-
+      </div>
+      <div className="row row-cols-1 row-cols-md-3">
         {
           userAppointments?.map((appointment) => (
             <TarjetaCitasUsuario key={appointment.id} appointment={appointment} />
