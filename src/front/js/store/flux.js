@@ -28,9 +28,45 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      getUserAppointments: async (id) => {
+      getCurrentUser: async () => {
         try {
-          const response = await backendApi.get(`/users/${id}/appointments`);
+          const response = await backendApi.get("/users/me", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+          return response.data;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
+      createUserAppointment: async (appointment) => {
+        try {
+          toast.loading("Creando cita...");
+          const response = await backendApi.post("/users/appointments", appointment, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+          toast.dismiss();
+          toast.success("Cita creada exitosamente", { icon: "🚀" })
+          return response;
+        } catch (error) {
+          toast.dismiss();
+          toast.error(error.response.data.message);
+          console.error(error);
+          return null;
+        }
+      },
+
+      getUserAppointments: async () => {
+        try {
+          const response = await backendApi.get('/users/appointments', {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
           return response.data;
         } catch (error) {
           console.error(error);
