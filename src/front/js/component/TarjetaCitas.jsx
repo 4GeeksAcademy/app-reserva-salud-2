@@ -23,7 +23,7 @@ export const TarjetaCitasUsuario = ({ appointment }) => {
           <div className="row justify-content-center">
             <div className="col">
               <p className="card-text text-body"><i className="fa-regular fa-user"></i> {appointment?.availability?.professional?.first_name} {appointment?.availability?.professional?.last_name}</p>
-              <p className="card-text text-body"><i className="fa-regular fa-calendar"></i> {appointment?.availability?.date}</p>
+              <p className="card-text text-body"><i className="fa-regular fa-calendar"></i> {new Date(appointment?.availability?.date).toLocaleDateString('es-UY', { timeZone: 'UTC' })}</p>
               <p className="card-text text-body"><i className="fa-regular fa-clock"></i> {appointment?.availability?.start_time}</p>
             </div>
             <div className="col-auto">
