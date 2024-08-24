@@ -47,8 +47,8 @@ export const ProfesionalCard = ({ profesional }) => {
 
     <div className='card bg-primary text-white' onClick={() => navigate(`${profesional.id}`)} style={{ cursor: "pointer" }}>
       <div className="row align-items-center justify-content-center p-3">
-        <div className="col-5 text-center">
-          <img src={profesional.profile_picture} className='img-fluid rounded-circle' height={100} width={100} alt="" />
+        <div className="col-md-4 text-center">
+          <img src={profesional.profile_picture} className='img-fluid profile-picture' alt="" />
           <h2 className='text-subtitle text-truncate'>{profesional?.first_name} {profesional?.last_name}</h2>
           <div className="row gap-2">
             <div className="col">
@@ -60,7 +60,7 @@ export const ProfesionalCard = ({ profesional }) => {
           </div>
           <p>{renderStars()}</p>
         </div>
-        <div className="col-7">
+        <div className="col-md-8">
           <h2 className='text-label'>Título:</h2>
           <p className='text-body text-white'>{profesional?.title}</p>
           <h2 className='text-label'>Ubicación:</h2>
