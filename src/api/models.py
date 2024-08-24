@@ -209,10 +209,12 @@ class Availability(db.Model):
             availabilities.append(availability)
         db.session.add_all(availabilities)
         db.session.commit()
+        
     def serialize(self):
-        availability = {
+        return {
             "id": self.id,
             "professional_id": self.professional_id,
+            "professional": self.professional.serialize(),
             "date": self.date.isoformat(),
             "start_time": self.start_time.strftime('%H:%M'),
             "end_time": self.end_time.strftime('%H:%M'),
@@ -222,8 +224,6 @@ class Availability(db.Model):
             "is_presential": self.is_presential,
             "is_available": self.is_available,
         }
-        
-        return availability
         
 class Appointment(db.Model):
     __tablename__ = 'appointment'
@@ -248,7 +248,7 @@ class Appointment(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "user": self.user.serialize(),
+            "user_id": self.user_id,
             "availability": self.availability.serialize(),
             "date": self.date.isoformat(),
             "is_confirmed": self.is_confirmed,
