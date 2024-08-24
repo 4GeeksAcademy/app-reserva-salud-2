@@ -8,11 +8,40 @@ from api.utils import generate_sitemap, APIException, generate_recurrent_dates
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+import os
+
+# Cloudinary configuration      
+cloudinary.config( 
+    cloud_name = os.getenv("CLOUDINARY_NAME"),
+    api_key = os.getenv("CLOUDINARY_API_KEY"),
+    api_secret = os.getenv("CLOUDINARY_SECRET"),
+    secure=True
+)
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
+
+@api.route('/upload', methods=['POST'])
+def upload_file():
+  if 'file' not in request.files:
+      raise APIException("No file part", status_code=400)
+  
+  file = request.files['file']
+  
+  if file:
+    try:
+      result = cloudinary.uploader.upload(file)
+      return jsonify({ 'url': result['secure_url'] }), 200
+    except Exception as e:
+      print(e)
+      raise APIException("An error ocurred while uploading the file", status_code=400)
+  else:
+      raise APIException("No selected file", status_code=400)
 
 @api.route('/users', methods=['GET', 'POST'])
 def handle_users():

@@ -15,6 +15,8 @@ from api.admin import setup_admin
 from api.commands import setup_commands
 from datetime import timedelta
 
+# Import the cloudinary configuration
+from api import config
 # from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
