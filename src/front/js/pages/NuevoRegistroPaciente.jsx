@@ -50,7 +50,7 @@ export const VistaNuevoRegistroPaciente = () => {
         >
             {
                 ({ values, errors, touched }) => (
-                    <Form className="container contenido" style={{ maxWidth: "700px" }}>
+                    <Form className="container contenido mb-5" style={{ paddingTop: "40px", maxWidth: "700px" }}>
                         <div className="row p-3 justify-content-between align-items-center bg-tertiary rounded-top text-primary">
                             <div className="col-auto">
                                 <h3 className="text-subtitle">Ingresa tus datos</h3>

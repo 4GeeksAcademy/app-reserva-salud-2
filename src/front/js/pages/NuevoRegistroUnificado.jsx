@@ -60,7 +60,7 @@ export const VistaNuevoRegistroUnificado = () => {
         }
       }}
     >
-      <div className="container contenido" style={{ paddingTop: "30px", maxWidth: "700px" }}>
+      <div className="container contenido mb-5" style={{ paddingTop: "40px", maxWidth: "700px" }}>
         <div className="row p-3 justify-content-between align-items-center bg-tertiary rounded-top text-primary">
           <div className="col-auto">
             <h1 className="text-subtitle">Registro de usuario</h1>

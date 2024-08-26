@@ -2,13 +2,16 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from datetime import datetime
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import Flask, request, jsonify, url_for, Blueprint, current_app
 
 from api.models import Appointment, GenderEnum, Speciality, db, User, Professional, Comment, Availability, State, City
 from api.utils import generate_sitemap, APIException, generate_recurrent_dates
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+
+from flask_mail import Mail, Message
+
 
 api = Blueprint('api', __name__)
 
@@ -530,3 +533,39 @@ def verify_token():
       return jsonify({ "status": 200, "message": "Token is valid", "user": user.serialize() }), 200
     elif professional:
       return jsonify({ "status": 200, "message": "Token is valid", "professional": professional.serialize() }), 200
+    
+
+# Recuperar contraseña
+@api.route('/reset-password', methods=['POST'])
+def reset_password():
+    request_body = request.get_json()
+    email = request_body.get("email")
+
+    # Verificar si el correo electrónico existe en la bd
+    user = User.query.filter_by(email=email).first()
+    if not user:
+      return jsonify({'message': 'El correo no está registrado'}), 404
+
+    # Crear mensaje (doc)
+    msg = Message(
+      'Restablecimiento de Contraseña',
+      sender='reservasaluduy@gmail.com',
+      recipients=[email])
+
+    msg.html = (
+        '<html>'
+        '<body>'
+        '<p>Recibimos una solicitud para restablecer tu contraseña.</p>'
+        '<p>Haz clic en el siguiente enlace para proceder con el restablecimiento de tu contraseña:</p>'
+        '<p><a href="https://zany-space-garbanzo-69r9j7g4xxvgf5xgv-3000.app.github.dev/">Restablecer mi contraseña</a></p>'
+        '<p>Si no realizaste esta solicitud, ignora este mensaje.</p>'
+        '</body>'
+        '</html>'
+      )
+
+    try:
+      current_app.mail.send(msg)
+      return jsonify({'message': 'Correo de restablecimiento enviado con éxito'}), 200
+    except Exception as e:
+      print(e)
+      return jsonify({'error': 'Error al enviar el correo de recuperación'}), 500

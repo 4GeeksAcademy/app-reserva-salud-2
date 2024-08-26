@@ -10,6 +10,7 @@ const getState = ({ getStore, getActions, setStore }) => {
     store: {
       currentUser: null,
       currentProfessional: null,
+      // mensajeRecuperacion: '',
     },
     actions: {
       // Register new user
@@ -174,8 +175,40 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ currentUser: null, currentProfessional: null });
         toast.success("Cierre de sesión exitoso", { icon: "👋" });
       },
+      
+            // Register new professional
+            // createProfessional: async (data) => {
+            //   try {
+            //     toast.loading("Registrando profesional...");
+            //     const response = await backendApi.post("/professionals", data);
+            //     toast.dismiss();
+            //     toast.success("Profesional registrado exitosamente", { icon: "🚀" });
+            //     return response;
+            //   } catch (error) {
+            //     toast.dismiss();
+            //     toast.error(error.response.data.message);
+            //     console.error(error);
+            //     return null
+            //   }
+            // },
+      resetPassword: async (email) => {
+        try {
+            const response = await backendApi.post("/reset-password", { email: email });
+            toast.dismiss();
+    
+            toast.success("Correo de restablecimiento enviado con éxito", { icon: "🚀" });
+            return response;
+
+              } catch (error) {
+                toast.dismiss();
+                toast.error(error.response.data.message);
+                console.error(error);
+                return null
+            
+        }
     },
+}}
   };
-};
+
 
 export default getState;

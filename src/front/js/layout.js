@@ -17,7 +17,6 @@ import { VistaNuevoRegistroProfesional } from "./pages/NuevoRegistroProfesional.
 import { VistaPerfilProfesional } from "./pages/PerfilProfesionalProvisorio.jsx";
 import { Paciente } from "./pages/DatosPaciente.jsx";
 import { DisponibilidadProfesional } from "./pages/DisponibilidadProfesional.jsx";
-
 import injectContext, { Context } from "./store/appContext";
 
 import { Navbar } from "./component/Navbar.jsx";
