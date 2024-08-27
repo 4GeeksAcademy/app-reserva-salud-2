@@ -10,6 +10,8 @@ import { VistaPoliticaPrivacidad } from "./pages/PoliticaDePrivacidad.jsx";
 import { VistaContacto } from "./pages/Contacto.jsx";
 import { AgendaProfesional } from "./pages/AgendaProfesional.jsx";
 
+import { VistaRestablecerClave } from "./pages/RestablecerClave.jsx";
+
 import { VistaNuevoRegistroUnificado } from "./pages/NuevoRegistroUnificado.jsx";
 import { VistaNuevoRegistroPaciente } from "./pages/NuevoRegistroPaciente.jsx";
 import { VistaPerfilPaciente } from "./pages/PerfilPacienteProvisorio.jsx";
@@ -69,6 +71,7 @@ const Layout = () => {
           <Route element={<VistaTerminosYCondiciones />} path="/terminos-y-condiciones" />
           <Route element={<Profesionales />} path="/profesionales" />
           <Route element={<PerfilProfesional />} path="/profesional/perfil" />
+          <Route element={<VistaRestablecerClave />} path="/restablecer" />
           <Route element={<h1>Not found!</h1>} />
         </Routes>
         <Footer />

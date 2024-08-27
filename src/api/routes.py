@@ -555,9 +555,9 @@ def reset_password():
     msg.html = (
         '<html>'
         '<body>'
-        '<p>Recibimos una solicitud para restablecer tu contraseña.</p>'
+        '<p>Recibimos la solicitud para restablecer tu contraseña en Reserva Salud.</p>'
         '<p>Haz clic en el siguiente enlace para proceder con el restablecimiento de tu contraseña:</p>'
-        '<p><a href="https://zany-space-garbanzo-69r9j7g4xxvgf5xgv-3000.app.github.dev/">Restablecer mi contraseña</a></p>'
+        f'<p><a href="https://zany-space-garbanzo-69r9j7g4xxvgf5xgv-3000.app.github.dev/restablecer?email={email}">Restablecer mi contraseña</a></p>'
         '<p>Si no realizaste esta solicitud, ignora este mensaje.</p>'
         '</body>'
         '</html>'
