@@ -2,18 +2,90 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from datetime import datetime
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify, url_for, Blueprint
-
 from api.models import Appointment, GenderEnum, Speciality, db, User, Professional, Comment, Availability, State, City
 from api.utils import generate_sitemap, APIException, generate_recurrent_dates
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
-
+import mercadopago
 api = Blueprint('api', __name__)
+###library para generar un uuid v4 ###
+import uuid
+import os
+
 
 # Allow CORS requests to this API
 CORS(api)
+### genero String unico para el  ###
+idempotency_key = str(uuid.uuid4())
+##endpoint prueba pago mp###
+access_token = os.getenv("ACCESS_TOKEN_MP")
+sdk = mercadopago.SDK(access_token)
+
+@api.route('/create_preference', methods=['POST'])
+def create_preference():
+    preference_data = {
+        "items": [
+            {
+                "title": request.json.get("title"),
+                "quantity": int(request.json.get("quantity")),
+                "unit_price": float(request.json.get("unit_price"))
+                  
+            }
+        ]
+    }
+
+    preference_response = sdk.preference().create(preference_data)
+    print("Preference Response:", preference_response)
+    preference = preference_response["response"]
+    print("Preference:", preference)
+    
+    return jsonify({
+        "id": preference["id"],
+        "init_point": preference["init_point"]
+    })
+
+@api.route('/process_payment', methods=['POST'])
+def create_payment():
+    print(request.json)
+  # Generar una clave del tipo string única para x-idempotency-key
+    idempotency_key = str(uuid.uuid4())
+
+   
+    request_options = mercadopago.config.RequestOptions()
+    request_options.custom_headers = {
+        'x-idempotency-key': idempotency_key
+    }
+
+    # Extraer los datos de la solicitud
+    payer=request.json.get("payer")
+    payment_data = {
+        "transaction_amount": float(request.json.get("transaction_amount")),
+        "token": request.json.get("token"),
+        "description": request.json.get("description"),
+        "installments": int(request.json.get("installments")),
+        "payment_method_id": request.json.get("payment_method_id"),
+        "payer": {
+            "email": payer["email"],
+            "identification": {
+                "type": payer["identification"]["type"], 
+                "number": payer["identification"]["number"]
+            },
+            "first_name": request.json.get("name")
+        }
+    }
+    print("mostrando datos a enviar a mp:",payment_data)
+    try:
+        # Procesar el pago con Mercado Pago
+        payment_response = sdk.payment().create(payment_data, request_options)
+        payment = payment_response.get("response")
+        print(payment)
+        return jsonify(payment), 200
+    except Exception as e:
+        print(f"Error al procesar el pago: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @api.route('/users', methods=['GET', 'POST'])
 def handle_users():

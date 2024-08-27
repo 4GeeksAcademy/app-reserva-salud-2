@@ -3,6 +3,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { useParams } from 'react-router-dom';
 import { backendApi } from '../store/flux';
+import PaymentBrick from '../component/PaymentBrick.jsx';
 
 
 export const AgendaProfesional = () => {
@@ -11,7 +12,11 @@ export const AgendaProfesional = () => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [availableIntervals, setAvailableIntervals] = useState([]);
     const [selectedInterval, setSelectedInterval] = useState(null);
+    const [showCheckout, setShowCheckout] = useState(false);
 
+    const handleCheckoutClick = () => {
+        setShowCheckout(true);
+    };
 
     useEffect(() => {
         const getProfessional = async () => {
@@ -78,6 +83,10 @@ export const AgendaProfesional = () => {
                         )
                     }
                 </div>
+                <div><button className="btn btn-primary w-25" onClick={handleCheckoutClick}> </button>
+                    {showCheckout && <PaymentBrick />}
+                </div>
+
             </div>
             {selectedDate && (
                 <div className="mt-4">
