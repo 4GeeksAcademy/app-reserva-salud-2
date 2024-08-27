@@ -10,5 +10,5 @@
   "[javascript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features"
   },
-  "python.analysis.extraPaths": ["./src", "./src"]
+  "python.analysis.extraPaths": ["./src", "./src", "./src/api"]
 }

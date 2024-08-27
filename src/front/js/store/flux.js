@@ -13,6 +13,29 @@ const getState = ({ getStore, getActions, setStore }) => {
     },
     actions: {
       // Register new user
+
+      uploadImage: async (image) => {
+        try {
+          toast.loading("Subiendo imagen...");
+          const formData = new FormData();
+          formData.append("file", image);
+
+          const response = await backendApi.post("/upload", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+
+          toast.dismiss();
+          toast.success("Imagen subida exitosamente", { icon: "🚀" })
+          return response.data.url;
+        } catch (error) {
+          toast.dismiss();
+          toast.error("Error subiendo imagen");
+          console.error(error);
+        }
+      },
+
       createUser: async (user) => {
         try {
           toast.loading("Creando usuario...");
@@ -131,6 +154,15 @@ const getState = ({ getStore, getActions, setStore }) => {
       getStates: async () => {
         try {
           const response = await backendApi.get("/states");
+          return response.data;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
+      getCitiesByState: async (stateId) => {
+        try {
+          const response = await backendApi.get(`/states/${stateId}/cities`);
           return response.data;
         } catch (error) {
           console.error(error);

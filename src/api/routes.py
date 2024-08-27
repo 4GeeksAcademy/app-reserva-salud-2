@@ -100,6 +100,7 @@ def handle_user(user_id):
     user.birth_date = request_body.get("birth_date", user.birth_date)
     user.state_id = request_body.get("state_id", user.state_id)
     user.is_active = request_body.get("is_active", user.is_active)
+    user.profile_picture = request_body.get("profile_picture", user.profile_picture)
     
     db.session.commit()
     
@@ -196,14 +197,12 @@ def handle_professionals():
       password = request_body.get("password")
       birth_date = request_body.get("birth_date")
       gender = request_body.get("gender")
-      speciality = request_body.get("speciality")
       certificate = request_body.get("certificate")
       profile_picture = request_body.get("profile_picture")
       telephone = request_body.get("telephone")
-      appointment_type = request_body.get("appointment_type")
       is_active = request_body.get("is_active")
       is_validated = request_body.get("is_validated")
-      state_id = request_body.get("state")
+      city_id = request_body.get("state")
       
       # Check if required fields are not empty
       if not email or not password:
@@ -221,14 +220,12 @@ def handle_professionals():
           password=password,
           birth_date=birth_date,
           gender=gender,
-          speciality=speciality,
           certificate=certificate,
           profile_picture=profile_picture,
           telephone=telephone,
-          appointment_type=appointment_type,
           is_active=is_active,
           is_validated=is_validated,
-          state_id=state_id
+          city_id=city_id
         )
         
         db.session.add(new_professional)
@@ -257,6 +254,11 @@ def handle_professional(professional_id):
     if professional is None:
       raise APIException("Professional not found", status_code=404)
     
+    speciality = Speciality.query.get(request_body.get("speciality_id"))
+    if speciality is None:
+      raise APIException("Speciality not found", status_code=404)
+    professional.specialities.append(speciality)
+    
     professional.first_name = request_body.get("first_name", professional.first_name)
     professional.last_name = request_body.get("last_name", professional.last_name)
     professional.email = request_body.get("email", professional.email)
@@ -270,12 +272,11 @@ def handle_professional(professional_id):
     professional.gender = GenderEnum[gender] if gender else professional.gender
     
     professional.gender = request_body.get("gender", professional.gender)
-    professional.speciality = request_body.get("speciality", professional.speciality)
     professional.telephone = request_body.get("telephone", professional.telephone)
-    professional.appointment_type = request_body.get("appointment_type", professional.appointment_type)
     professional.is_active = request_body.get("is_active", professional.is_active)
     professional.is_validated = request_body.get("is_validated", professional.is_validated)
-    professional.state_id = request_body.get("state_id", professional.state_id)
+    professional.city_id = request_body.get("city_id", professional.city_id)
+    professional.profile_picture = request_body.get("profile_picture", professional.profile_picture)
     
     db.session.commit()
     
@@ -473,6 +474,11 @@ def handle_states():
     states = State.query.all()
     states = list(map(lambda x: x.serialize(), states))
     return jsonify(states), 200
+  
+@api.route('/states/<int:state_id>/cities', methods=['GET'])
+def handle_state_cities(state_id):
+  state = State.query.get(state_id)
+  return jsonify(state.get_cities()), 200
   
 @api.route('/specialities', methods=['GET', 'POST'])
 def handle_specialities():

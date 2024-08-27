@@ -62,22 +62,20 @@ class Professional(db.Model):
     password = db.Column(db.String(200), nullable=False)
     birth_date = db.Column(db.Date)
     gender = db.Column(db.Enum(GenderEnum))
-    speciality = db.Column(db.String(200))
     certificate = db.Column(db.String(200))
     profile_picture = db.Column(db.String(200), default='https://avatar.iran.liara.run/public')
     telephone = db.Column(db.String(200))
-    appointment_type = db.Column(db.String(200))
     is_active = db.Column(db.Boolean, default=False)
     is_validated = db.Column(db.Boolean, default=False)
-    state_id = db.Column(db.Integer, db.ForeignKey('state.id'))
+    city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
     
-    state = db.relationship('State', back_populates='professionals', uselist=False)
+    city = db.relationship('City', back_populates='professionals', uselist=False)
     comments = db.relationship('Comment', back_populates='professional', cascade='all, delete-orphan')
     availabilities = db.relationship('Availability', back_populates='professional', cascade='all, delete-orphan')
     specialities = db.relationship('Speciality', secondary=professional_speciality, back_populates='professionals')
     
     def __repr__(self):
-        return f'<Professional {self.email} {self.speciality}>'
+        return f'<Professional {self.email}>'
     
     def serialize(self):
         return {
@@ -87,16 +85,14 @@ class Professional(db.Model):
             "email": self.email,
             "birth_date": self.birth_date,
             "gender": self.gender.value,
-            "speciality": self.speciality,
+            "telephone": self.telephone,
             "certificate": self.certificate,
             "profile_picture": self.profile_picture,
-            "telephone": self.telephone,
-            "appointment_type": self.appointment_type,
             "is_active": self.is_active,
             "is_validated": self.is_validated,
+            "city": self.city.serialize(),
             "comments": [comment.serialize() for comment in self.comments],
-            "state_id": self.state_id,
-            "specialities": [speciality.serialize() for speciality in self.specialities]
+            "specialities": [speciality.serialize() for speciality in self.specialities],
         }
     
     def serialize_availabilities(self):
@@ -144,7 +140,6 @@ class State(db.Model):
     
     cities = db.relationship('City')
     users = db.relationship('User', back_populates='state')
-    professionals = db.relationship('Professional', back_populates='state')
     
     def __repr__(self):
         return f'<State {self.name}>'
@@ -153,8 +148,10 @@ class State(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "cities": [city.serialize() for city in self.cities]
         }
+        
+    def get_cities(self):
+        return [city.serialize() for city in self.cities]
     
 class City(db.Model):
     __tablename__ = 'city'
@@ -164,6 +161,7 @@ class City(db.Model):
     state_id = db.Column(db.Integer, db.ForeignKey('state.id'))
     
     state = db.relationship('State', back_populates='cities')
+    professionals = db.relationship('Professional', back_populates='city')
     
     def __repr__(self):
         return f'<City {self.name}>'
@@ -172,6 +170,7 @@ class City(db.Model):
         return {
             "id": self.id,
             "name": self.name,
+            "state": self.state.serialize()
         }
         
 class Availability(db.Model):

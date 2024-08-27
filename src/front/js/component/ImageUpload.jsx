@@ -1,16 +1,34 @@
 import React, { useState } from 'react';
 import { backendApi } from '../store/flux';
 
-const ImageUpload = ({ setFieldValue }) => {
-  const [image, setImage] = useState(null);
+const ImageUpload = ({ form, field }) => {
+  const [uploading, setUploading] = useState(false);
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      await handleImageUpload(file);
+    }
   };
 
-  const handleImageUpload = async () => {
+  const handleImageUpload = async (image) => {
+    setUploading(true);
     const formData = new FormData();
     formData.append('file', image);
+
+    console.log(formData)
+
+    if (formData.get('file').size > 1024 * 1024) {
+      form.setFieldError(field.name, 'La imagen no puede pesar más de 1MB');
+      setUploading(false);
+      return;
+    }
+
+    if (!['image/jpeg', 'image/png'].includes(formData.get('file').type)) {
+      form.setFieldError(field.name, 'La imagen debe ser de tipo JPG o PNG');
+      setUploading(false);
+      return;
+    }
 
     try {
       const response = await backendApi.post('/upload', formData, {
@@ -18,20 +36,22 @@ const ImageUpload = ({ setFieldValue }) => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setFieldValue('image_url', response.data.url);
+
+      form.setFieldValue(field.name, response.data.url);
     } catch (error) {
+      form.setFieldError(field.name, 'Error subiendo la imagen');
       console.error('Error uploading image:', error);
+    } finally {
+      setUploading(false);
     }
   };
 
   return (
     <div className="container">
       <div className="row">
-        <div className="col-md-6">
+        <div className="col">
           <input className="form-control" type="file" onChange={handleImageChange} />
-        </div>
-        <div className="col-md-6">
-          <button className="btn btn-primary" type="button" onClick={handleImageUpload}>Subir Imagen</button>
+          {uploading && <p>Subiendo imagen...</p>}
         </div>
       </div>
     </div>
