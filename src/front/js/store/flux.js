@@ -77,7 +77,7 @@ const getState = ({ getStore, getActions, setStore }) => {
           return response;
         } catch (error) {
           toast.dismiss();
-          toast.error(error.response.data.message);
+          toast.error(error?.response?.data?.message);
           console.error(error);
           return null;
         }
@@ -145,6 +145,19 @@ const getState = ({ getStore, getActions, setStore }) => {
       updateProfessional: async (id, data) => {
         try {
           const response = await backendApi.put(`/professionals/${id}`, data);
+          return response;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
+      getProfessionalAppointments: async () => {
+        try {
+          const response = await backendApi.get(`/professionals/appointments`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
           return response;
         } catch (error) {
           console.error(error);
