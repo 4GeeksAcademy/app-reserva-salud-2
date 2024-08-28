@@ -33,7 +33,6 @@ app.config['MAIL_PASSWORD'] = 'hxeb iqeq tolx nlfe'
 app.config['MAIL_DEFAULT_SENDER'] = 'reservasaluduy@gmail.com'
 
 mail = Mail(app)
-#agregan mail a la app y se va llamar en routes.py como current_app
 app.mail= mail
 
 

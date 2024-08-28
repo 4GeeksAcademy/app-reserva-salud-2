@@ -8,7 +8,7 @@ export const VistaRestablecerClave = () => {
     const location = useLocation();
     const { actions } = useContext(Context);
 
-    // Obtén el correo de la URL
+    // Extraer correo de la URL
     const searchParams = new URLSearchParams(location.search);
     const email = searchParams.get('email');
 
@@ -58,6 +58,7 @@ export const VistaRestablecerClave = () => {
     );
 };
 
+// ANTES DE IMPLEMENTAR FORMIK
 // import React, { useState, useContext } from 'react';
 // import { useLocation } from 'react-router-dom';
 // import { Context } from '../store/appContext';

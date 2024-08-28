@@ -172,7 +172,6 @@ export const VistaNuevoRegistroUnificado = () => {
         </div>
       </Formik>
       
-      {/* Solo una instancia de PoliticaPriv */}
       {mostrarModal && (
         <ModalTerminosyCondiciones mostrarModal={mostrarModal} cerrarModal={cerrarModal} />
       )}
