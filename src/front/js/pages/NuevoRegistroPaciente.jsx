@@ -9,6 +9,8 @@ import "../../styles/home.css";
 export const VistaNuevoRegistroPaciente = () => {
     const { actions } = useContext(Context);
     const [states, setStates] = useState([]);
+    const [selectedState, setSelectedState] = useState("")
+    const [cities, setCities] = useState([]);
     const navigate = useNavigate();
     const { state: { id } } = useLocation();
 
@@ -20,26 +22,40 @@ export const VistaNuevoRegistroPaciente = () => {
         getStates();
     }, []);
 
+    useEffect(() => {
+        const getCitiesByState = async () => {
+            if (selectedState) {
+                const cities = await actions.getCitiesByState(selectedState);
+                console.log(cities)
+                setCities(cities);
+            };
+        };
+
+        getCitiesByState();
+    }, [selectedState]);
+
     return (
         <Formik
             initialValues={{
                 first_name: "",
                 last_name: "",
                 birth_date: "",
-                city: "",
-                state: "",
+                city_id: "",
+                state_id: "",
             }}
 
             validationSchema={Yup.object({
                 first_name: Yup.string().required("Este campo es obligatorio"),
                 last_name: Yup.string().required("Este campo es obligatorio"),
                 birth_date: Yup.date(),
-                state: Yup.string().required("Este campo es obligatorio"),
+                state_id: Yup.number().required("Este campo es obligatorio"),
+                city_id: Yup.number().required("Este campo es obligatorio"),
             })}
 
             onSubmit={async (values) => {
+                console.log(values)
                 try {
-                    const response = await actions.updateUser(id, { state: parseInt(values.state), city: parseInt(values.city), ...values })
+                    const response = await actions.updateUser(id, { state_id: parseInt(values.state_id), city_id: parseInt(values.city_id), ...values })
                     if (response.status === 200) {
                         navigate("/perfil");
                     }
@@ -49,7 +65,7 @@ export const VistaNuevoRegistroPaciente = () => {
             }}
         >
             {
-                ({ values, errors, touched }) => (
+                ({ values, errors, touched, handleChange }) => (
                     <Form className="container contenido" style={{ maxWidth: "700px" }}>
                         <div className="row p-3 justify-content-between align-items-center bg-tertiary rounded-top text-primary">
                             <div className="col-auto">
@@ -100,35 +116,42 @@ export const VistaNuevoRegistroPaciente = () => {
                                     <ErrorMessage name="birth_date" />
                                 </div>
                                 <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="state" className="text-label form-label">
+                                    <label htmlFor="state_id" className="text-label form-label">
                                         Departamento
                                     </label>
-                                    <Field as="select" className="form-select" id="state" name="state">
+                                    <Field as="select" className="form-select" id="state_id" name="state_id" onChange={(e) => {
+                                        setSelectedState(e.target.value)
+                                        handleChange(e)
+                                    }}>
                                         <option value="">Seleccione un departamento</option>
-                                        {states.map((state) => (
-                                            <option key={state.id} value={state.id}>
-                                                {state.name}
-                                            </option>
-                                        ))}
+                                        {
+                                            states?.map((state) => {
+                                                return (
+                                                    <option key={state.id} value={state.id}>
+                                                        {state.name}
+                                                    </option>
+                                                )
+                                            })
+                                        }
                                     </Field>
-                                    <ErrorMessage name="state" />
+                                    <ErrorMessage name="state_id" />
                                 </div>
 
                                 <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="city" className="text-label form-label">
+                                    <label htmlFor="city_id" className="text-label form-label">
                                         Ciudad
                                     </label>
-                                    <Field as="select" className="form-select" id="city" name="city">
+                                    <Field as="select" className="form-select" id="city_id" name="city_id">
                                         <option value="">Seleccione una ciudad</option>
                                         {
-                                            states.find((state) => state.id == values.state)?.cities.map((city) => (
+                                            cities.map((city) => (
                                                 <option key={city.id} value={city.id}>
                                                     {city.name}
                                                 </option>
                                             ))
                                         }
                                     </Field>
-                                    <ErrorMessage name="city" />
+                                    <ErrorMessage name="city_id" />
                                 </div>
 
                             </div>
