@@ -164,6 +164,20 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
+      deleteProfessionalAppointment: async (appointmentId, cancellationReason) => {
+        try {
+          const response = await backendApi.delete(`/professionals/appointments/${appointmentId}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            data: { cancellation_reason: cancellationReason },
+          });
+          return response;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+
       getStates: async () => {
         try {
           const response = await backendApi.get("/states");
@@ -210,14 +224,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 
           toast.dismiss();
           toast.success("Inicio de sesión exitoso", { icon: "🚀" });
-          return true;
+          return response;
         } catch (error) {
           console.log(error)
+          toast.dismiss();
+          toast.error(error.response.data?.message);
           if (error.response.status === 400) {
             setStore({ currentUser: null, currentProfessional: null });
           }
-          toast.dismiss();
-          toast.error("Credenciales inválidas");
           return false;
         }
       },
