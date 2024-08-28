@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 09eca02da643
+Revision ID: 9ba95d2cab95
 Revises: 
-Create Date: 2024-08-22 17:32:57.940204
+Create Date: 2024-08-28 14:16:21.736852
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '09eca02da643'
+revision = '9ba95d2cab95'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -44,15 +44,13 @@ def upgrade():
     sa.Column('password', sa.String(length=200), nullable=False),
     sa.Column('birth_date', sa.Date(), nullable=True),
     sa.Column('gender', sa.Enum('MALE', 'FEMALE', 'OTHER', name='genderenum'), nullable=True),
-    sa.Column('speciality', sa.String(length=200), nullable=True),
     sa.Column('certificate', sa.String(length=200), nullable=True),
     sa.Column('profile_picture', sa.String(length=200), nullable=True),
     sa.Column('telephone', sa.String(length=200), nullable=True),
-    sa.Column('appointment_type', sa.String(length=200), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('is_validated', sa.Boolean(), nullable=True),
-    sa.Column('state_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['state_id'], ['state.id'], ),
+    sa.Column('city_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['city_id'], ['city.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('professional', schema=None) as batch_op:
@@ -67,6 +65,8 @@ def upgrade():
     sa.Column('birth_date', sa.Date(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('state_id', sa.Integer(), nullable=True),
+    sa.Column('city_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['city_id'], ['city.id'], ),
     sa.ForeignKeyConstraint(['state_id'], ['state.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -79,8 +79,9 @@ def upgrade():
     sa.Column('date', sa.Date(), nullable=False),
     sa.Column('start_time', sa.Time(), nullable=False),
     sa.Column('end_time', sa.Time(), nullable=False),
-    sa.Column('weekly', sa.Boolean(), nullable=False),
+    sa.Column('weekly', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('is_available', sa.Boolean(), nullable=False),
     sa.Column('is_remote', sa.Boolean(), nullable=False),
     sa.Column('is_presential', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['professional_id'], ['professional.id'], ),
@@ -107,15 +108,18 @@ def upgrade():
     op.create_table('appointment',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('professional_id', sa.Integer(), nullable=False),
     sa.Column('availability_id', sa.Integer(), nullable=False),
+    sa.Column('cancellation_reason', sa.Text(), nullable=True),
     sa.Column('date', sa.Date(), nullable=True),
     sa.Column('hour', sa.Time(), nullable=True),
     sa.Column('duration', sa.Integer(), nullable=True),
     sa.Column('is_confirmed', sa.Boolean(), nullable=True),
     sa.Column('is_done', sa.Boolean(), nullable=True),
-    sa.Column('type', sa.Enum('remote', 'presential', name='appointment_type'), nullable=False),
+    sa.Column('type', sa.Enum('remote', 'presential', name='appointment_type'), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['availability_id'], ['availability.id'], ),
+    sa.ForeignKeyConstraint(['professional_id'], ['professional.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
