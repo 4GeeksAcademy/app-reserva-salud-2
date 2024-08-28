@@ -396,10 +396,11 @@ def handle_professional_availability(professional_id, availability_id):
     
     return jsonify({ "message": "Availability deleted successfully" }), 200
   
-@api.route('/professionals/appointments', methods=['GET'])
+@api.route('/professionals/appointments', methods=['GET', 'DELETE'])
 @jwt_required()
-def get_professional_appointment():
+def handle_professional_appointments():
   current_professional_id = get_jwt_identity()
+
   professional = Professional.query.get(current_professional_id)
   if professional is None:
     raise APIException("Professional not found", status_code=404)
@@ -410,6 +411,26 @@ def get_professional_appointment():
   
   appointments = list(map(lambda x: x.serialize(), appointments))
   return jsonify(appointments), 200
+    
+    
+@api.route('/professionals/appointments/<int:appointment_id>', methods=['DELETE'])
+@jwt_required()
+def delete_professional_appointment(appointment_id):
+  current_professional_id = get_jwt_identity()
+  
+  appointment = Appointment.query.filter_by(professional_id=current_professional_id, id=appointment_id).first()
+  
+  if appointment is None:
+    raise APIException("Professional appointment not found", status_code=404)
+  
+  availability = Availability.query.get(appointment.availability_id)
+  
+  availability.is_available = True
+  
+  db.session.delete(appointment)
+  db.session.commit()
+  
+  return jsonify({ "message": "Appointment deleted successfully" }), 200
 
 @api.route('/comments', methods=['GET', 'POST'])
 def handle_comments():
@@ -572,6 +593,11 @@ def login():
     # Si existe el usuario, chequear si la contraseña es correcta
     if not check_password_hash(user.password, password):
       raise APIException("User credentials incorrect", status_code=400)
+    
+    # Chequear si el usuario está activo
+    if not user.is_active:
+      raise APIException("User is not active", status_code=400)
+    
     # Devolver un token de acceso
     access_token = create_access_token(identity=user.id)
     return jsonify({ "message": "Login successful", "token": access_token, "user": user.serialize() }), 200
@@ -580,6 +606,11 @@ def login():
     print(check_password_hash(professional.password, password))
     if not check_password_hash(professional.password, password):
       raise APIException("Professional credentials incorrect", status_code=400)
+    
+    # Chequear si el profesional está activo
+    if not professional.is_active:
+      raise APIException("Professional is not active, please contact with administrator", status_code=400)
+    
     # Devolver un token de acceso
     access_token = create_access_token(identity=professional.id)
     return jsonify({ "message": "Login successful", "token": access_token, "professional": professional.serialize() }), 200
