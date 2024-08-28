@@ -2,13 +2,17 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from datetime import datetime
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import Flask, request, jsonify, url_for, Blueprint, current_app
 
 from api.models import Appointment, GenderEnum, Speciality, db, User, Professional, Comment, Availability, State, City
 from api.utils import generate_sitemap, APIException, generate_recurrent_dates
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+import os
+
+from flask_mail import Mail, Message
+
 
 api = Blueprint('api', __name__)
 
@@ -530,3 +534,63 @@ def verify_token():
       return jsonify({ "status": 200, "message": "Token is valid", "user": user.serialize() }), 200
     elif professional:
       return jsonify({ "status": 200, "message": "Token is valid", "professional": professional.serialize() }), 200
+    
+
+# Recuperar contraseña
+@api.route('/reset-password', methods=['POST'])
+def reset_password():
+    request_body = request.get_json()
+    email = request_body.get("email")
+
+    # Verificar si el correo electrónico existe en la bd
+    user = User.query.filter_by(email=email).first()
+    if not user:
+      return jsonify({'message': 'El correo no está registrado'}), 404
+
+    # Crear mensaje (doc)
+    msg = Message(
+      'Restablecimiento de Contraseña',
+      sender='reservasaluduy@gmail.com',
+      recipients=[email])
+
+    msg.html = (
+        '<html>'
+        '<body>'
+        '<p>Recibimos la solicitud para restablecer tu contraseña en Reserva Salud.</p>'
+        '<p>Haz clic en el siguiente enlace para proceder con el restablecimiento de tu contraseña:</p>'
+        f'<p><a href="{os.getenv("FRONTEND_URL")}/restablecer?email={email}">Restablecer mi contraseña</a></p>'
+        '<p>Si no realizaste esta solicitud, ignora este mensaje.</p>'
+        '</body>'
+        '</html>'
+      )
+
+    try:
+      current_app.mail.send(msg)
+      return jsonify({'message': 'Correo de restablecimiento enviado con éxito'}), 200
+    except Exception as e:
+      print(e)
+      return jsonify({'error': 'Error al enviar el correo de recuperación'}), 500
+    
+
+@api.route('/new-password', methods=['POST'])
+def update_password():
+    email = request.json.get('email')
+    new_password = request.json.get('new_password')
+
+    if not new_password:
+        return jsonify({'message': 'La contraseña no puede estar vacía.'}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'message': 'El correo no está registrado'}), 404
+
+    try:
+      hashed_password = generate_password_hash(new_password).decode('utf-8')
+
+      user.password = hashed_password
+      db.session.commit()
+
+      return jsonify({'message': 'Contraseña actualizada exitosamente'}), 200
+    except Exception as e:
+        return jsonify({'message': 'Error al actualizar la contraseña: {}'.format(str(e))}), 500
+

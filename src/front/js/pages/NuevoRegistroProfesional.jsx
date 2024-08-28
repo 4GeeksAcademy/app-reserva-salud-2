@@ -71,7 +71,7 @@ export const VistaNuevoRegistroProfesional = () => {
                 }}
             >
                 {({ handleSubmit, values }) => (
-                    <Form onSubmit={handleSubmit} className="container contenido" style={{ maxWidth: "700px" }}>
+                    <Form onSubmit={handleSubmit} className="container contenido mb-5" style={{ paddingTop: "40px", maxWidth: "700px" }}>
                         <div className="row p-3 justify-content-between align-items-center bg-tertiary rounded-top text-primary">
                             <div className="col-auto">
                                 <h3 className="text-subtitle">Ingresa tus datos</h3>
@@ -92,7 +92,7 @@ export const VistaNuevoRegistroProfesional = () => {
                                         id="first_name"
                                         name="first_name"
                                     />
-                                    <ErrorMessage name="first_name" />
+                                    <ErrorMessage className="text-normal text-primary" component="div" name="first_name" />
                                 </div>
                                 <div className="mb-3 col-md-6 col-sm-12">
                                     <label htmlFor="last_name" className="text-label form-label">
@@ -104,7 +104,7 @@ export const VistaNuevoRegistroProfesional = () => {
                                         id="last_name"
                                         name="last_name"
                                     />
-                                    <ErrorMessage name="last_name" />
+                                    <ErrorMessage className="text-normal text-primary" component="div" name="last_name" />
                                 </div>
                                 <div className="mb-3 col-md-6 col-sm-12">
                                     <label htmlFor="birth_date" className="text-label form-label">
@@ -116,7 +116,7 @@ export const VistaNuevoRegistroProfesional = () => {
                                         id="birth_date"
                                         name="birth_date"
                                     />
-                                    <ErrorMessage name="birth_date" />
+                                    <ErrorMessage className="text-normal text-primary" component="div" name="birth_date" />
                                 </div>
                                 <div className="mb-3 col-md-6 col-sm-12">
                                     <label htmlFor="gender" className="text-label form-label">
@@ -162,7 +162,7 @@ export const VistaNuevoRegistroProfesional = () => {
                                                 ))
                                         }
                                     </Field>
-                                    <ErrorMessage name="city" />
+                                    <ErrorMessage className="text-normal text-primary" component="div" name="city" />
                                 </div>
 
                                 <div className="mb-3 col-md-12 col-sm-12">
@@ -191,7 +191,7 @@ export const VistaNuevoRegistroProfesional = () => {
                                         id="certificate"
                                         name="certificate"
                                     />
-                                    <ErrorMessage name="certificate" />
+                                    <ErrorMessage className="text-normal text-primary" component="div" name="certificate" />
                                 </div>
 
                                 <div className="mb-3 col-md-6 col-sm-12">
@@ -204,7 +204,7 @@ export const VistaNuevoRegistroProfesional = () => {
                                         id="profile_picture"
                                         name="profile_picture"
                                     />
-                                    <ErrorMessage name="profile_picture" />
+                                    <ErrorMessage className="text-normal text-primary" component="div" name="profile_picture" />
                                 </div>
 
                                 <div className="mb-3 col-md-6 col-sm-12">
@@ -217,7 +217,7 @@ export const VistaNuevoRegistroProfesional = () => {
                                         id="telephone"
                                         name="telephone"
                                     />
-                                    <ErrorMessage name="telephone" />
+                                    <ErrorMessage className="text-normal text-primary" component="div" name="telephone" />
                                 </div>
 
                                 <div className="mb-3 col-md-6 col-sm-12">
