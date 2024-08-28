@@ -235,6 +235,7 @@ class Appointment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     professional_id = db.Column(db.Integer, db.ForeignKey('professional.id'), nullable=False)
     availability_id = db.Column(db.Integer, db.ForeignKey('availability.id'), nullable=False)
+    cancellation_reason = db.Column(db.Text)
     date = db.Column(db.Date)
     hour = db.Column(db.Time)
     duration = db.Column(db.Integer)
