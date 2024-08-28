@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 7a5fabf86c8b
+Revision ID: 5a2b269b6efa
 Revises: 
-Create Date: 2024-08-27 02:32:12.589019
+Create Date: 2024-08-28 01:17:02.584488
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7a5fabf86c8b'
+revision = '5a2b269b6efa'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -106,6 +106,7 @@ def upgrade():
     op.create_table('appointment',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('professional_id', sa.Integer(), nullable=False),
     sa.Column('availability_id', sa.Integer(), nullable=False),
     sa.Column('date', sa.Date(), nullable=True),
     sa.Column('hour', sa.Time(), nullable=True),
@@ -115,6 +116,7 @@ def upgrade():
     sa.Column('type', sa.Enum('remote', 'presential', name='appointment_type'), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['availability_id'], ['availability.id'], ),
+    sa.ForeignKeyConstraint(['professional_id'], ['professional.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
