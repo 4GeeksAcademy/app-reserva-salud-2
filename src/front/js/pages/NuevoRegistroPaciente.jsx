@@ -33,7 +33,7 @@ export const VistaNuevoRegistroPaciente = () => {
             validationSchema={Yup.object({
                 first_name: Yup.string().required("Este campo es obligatorio"),
                 last_name: Yup.string().required("Este campo es obligatorio"),
-                birth_date: Yup.date(),
+                birth_date: Yup.date().required("Este campo es obligatorio"),
                 state: Yup.string().required("Este campo es obligatorio"),
             })}
 

@@ -68,6 +68,5 @@ export const ProfesionalCard = ({ profesional }) => {
         </div>
       </div>
     </div>
-
   )
 }
