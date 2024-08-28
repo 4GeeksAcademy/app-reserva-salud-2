@@ -397,8 +397,7 @@ export const Profesionales = () => {
               >
                 <option value="">Seleccionar ciudad</option>
                 {
-                  states
-                    .find((state) => state.id == currentState)
+                  states?.find((state) => state.id == currentState)
                     ?.cities.map((city) => (
                       <option key={city.id} value={city.id}>
                         {city.name}

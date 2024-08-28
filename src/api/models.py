@@ -75,6 +75,7 @@ class Professional(db.Model):
     comments = db.relationship('Comment', back_populates='professional', cascade='all, delete-orphan')
     availabilities = db.relationship('Availability', back_populates='professional', cascade='all, delete-orphan')
     specialities = db.relationship('Speciality', secondary=professional_speciality, back_populates='professionals')
+    data_pay_mp = db.relationship('Data_Pay_Mp', back_populates='professional', cascade='all, delete-orphan')
     
     def __repr__(self):
         return f'<Professional {self.email} {self.speciality}>'
@@ -217,6 +218,7 @@ class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     availability_id = db.Column(db.Integer, db.ForeignKey('availability.id'), nullable=False)
+    data_pay_mp=db.Column(db.Integer,db.ForeignKey('data_pay_mp.id'), nullable=False)
     date = db.Column(db.Date)
     hour = db.Column(db.Time)
     duration = db.Column(db.Integer)
@@ -227,9 +229,10 @@ class Appointment(db.Model):
     
     availability = db.relationship(Availability, uselist=False)
     user = db.relationship(User)
+    data_pay = db.relationship('Data_Pay_Mp', back_populates='appointment', uselist=False)
     
     def __repr__(self):
-        return f'<Appointment {self.user.email} {self.availability.professional.email} {self.date}>'
+        return f'<Appointment {self.user.email} {self.availability.professional.email} {self.date} {self.id}>'
     
     def serialize(self):
         return {
@@ -242,7 +245,39 @@ class Appointment(db.Model):
             "type": self.type,
             "created_at": self.created_at
         }
-        
+
+class Data_Pay_Mp(db.Model):
+    __tablename__ = 'data_pay_mp'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    professional_id = db.Column(db.Integer, db.ForeignKey('professional.id'), nullable=False)
+    authorization_code = db.Column(db.Integer,nullable=False)
+    date_approved = db.Column(db.DateTime, nullable=False)
+    date_created = db.Column(db.DateTime, nullable=False)
+    id_payment = db.Column(db.Integer, nullable=False)
+    transaction_amount = db.Column(db.Float, nullable=False)
+    installments = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String,nullable=False)
+    email_client=db.Column(db.String,nullable=False)
+    
+    appointment = db.relationship('Appointment', back_populates='data_pay', uselist=False)
+    professional = db.relationship('Professional', back_populates='data_pay_mp')
+   
+    def __repr__(self):
+        return f'<Data_Pay_Mp {self.email_client} {self.professional.email}{self.status} {self.transaction_amount}>'
+    
+    def serialize(self):
+        return {
+            "id": self.id,
+            "professional": self.professional.serialize(),
+            "appointment": self.appointment.serialize(),
+            "date_approved": self.date_approved,
+            "date_created": self.date_created,
+            "is_payment": self.id_payment,
+            "status": self.status,
+            "email_client": self.email_client
+        }        
+
 class Speciality(db.Model):
     __tablename__ = 'speciality'
     

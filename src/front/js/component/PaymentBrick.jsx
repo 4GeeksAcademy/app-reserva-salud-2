@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Payment} from '@mercadopago/sdk-react';
 import { initMercadoPago } from '@mercadopago/sdk-react'
 
-const PaymentBrick = () => {
+const PaymentBrick = ({amount,id_profesional}) => {
     const [preferenceId, setPreferenceId] = useState('');
 
     useEffect(() => {
@@ -36,7 +36,7 @@ const PaymentBrick = () => {
     }, []);
 
     const initialization = {
-        amount: 100.0,
+        amount: amount,
         preferenceId: preferenceId,
     };
 
@@ -75,9 +75,25 @@ const PaymentBrick = () => {
                 
                 if(data){
                     console.log('pago procesado correctamente:',data)
-                resolve();
-               }
-               
+                    const bodyWithProfessionalId = {
+                        data: data, 
+                        professional_id: id_profesional    
+                    };    
+                    fetch('https://verbose-space-orbit-q5wjv57g6gvh965-3001.app.github.dev/api/data_pay_mp', {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(bodyWithProfessionalId),  
+                    })
+                    .then((response) => {
+                        if(response.ok){
+                            console.log('Datos almacenados correctamente en la base de datos');
+                            resolve();
+                        } 
+                    })
+                    .catch((error) => reject('Error al intentar conectar con el servidor: ' + error));               
+               } 
             })
             .catch((error) => {
                 reject();

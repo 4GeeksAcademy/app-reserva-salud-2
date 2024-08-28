@@ -4,7 +4,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from datetime import datetime
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import Appointment, GenderEnum, Speciality, db, User, Professional, Comment, Availability, State, City
+from api.models import Appointment, GenderEnum, Speciality, db, User, Professional, Comment, Availability, State, City,Data_Pay_Mp
 from api.utils import generate_sitemap, APIException, generate_recurrent_dates
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -14,7 +14,7 @@ api = Blueprint('api', __name__)
 ###library para generar un uuid v4 ###
 import uuid
 import os
-
+import requests
 
 # Allow CORS requests to this API
 CORS(api)
@@ -49,7 +49,7 @@ def create_preference():
 
 @api.route('/process_payment', methods=['POST'])
 def create_payment():
-    print(request.json)
+    # print(request.json)
   # Generar una clave del tipo string única para x-idempotency-key
     idempotency_key = str(uuid.uuid4())
 
@@ -85,6 +85,113 @@ def create_payment():
         return jsonify(payment), 200
     except Exception as e:
         print(f"Error al procesar el pago: {e}")
+        return jsonify({"error": str(e)}), 500
+#enviar pago procesado correctamenta a bd
+@api.route('/data_pay_mp', methods=['POST'])
+def save_payment_mp():
+    try:
+        print(request.json)
+        # Obtener los datos del cuerpo de la solicitud http
+        data = request.json.get('data', {})
+
+        id_profesional = request.json.get('professional_id')
+        authorization_code = data.get('authorization_code')
+        date_approved = data.get('date_approved')
+        date_created = data.get('date_created')
+        id_payment = data.get('id')
+        transaction_amount = data.get('transaction_amount')
+        installments = data.get('installments')
+        status = data.get('status')
+
+        # Accede al email dentro de 'payer'
+        email_client = data.get('payer', {}).get('email')
+
+        print(id_profesional, email_client)
+        
+        print(id_profesional,email_client)
+        # Crear una nueva instancia del modelo Data_Pay_Mp con los datos recibidos desde el front
+        # print("mostrando:", professional_id)
+        payment = Data_Pay_Mp(
+            professional_id=id_profesional,
+            authorization_code=authorization_code,
+            date_approved=date_approved,
+            date_created=date_created,
+            id_payment=id_payment,
+            transaction_amount=transaction_amount,
+            installments=installments,
+            status=status,
+            email_client=email_client
+        )
+
+        # Guardar los datos en la base de datos
+        db.session.add(payment)
+        db.session.commit()
+        
+        return jsonify({"message": "Payment data saved successfully"}), 201
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# reembolsar pago al cliente
+@api.route('/refund_payment', methods=['POST'])
+def refund_payment_client():
+    try:
+        # Obtener los datos de la solicitud
+        appointment_id=request.json.get('appointment_id')
+        ##estan para prueba con postman
+        # id_payment= request.json.get('id_payment')
+        # amount=request.json.get('amount')
+
+        # Verificar si el appointment es válido en la base de datos
+       
+        payment=Data_Pay_Mp.query.join(Data_Pay_Mp.appointment, aliased=True).filter_by(id=appointment_id).first()
+        if not payment:
+            return jsonify({"error": "No se encontró un pago aprobado con ese ID."}), 404
+
+        id_payment=payment.id_payment
+        amount=payment.transaction_amount
+
+        # print(id_payment,amount)
+        #objeto de reembolso,doc mp
+        refund_object = {'amount': amount} 
+
+        # Genero un X-Idempotency-Key único para evitar solicitudes por duplicado, lo utilizo solo si hago una consulta directa http   
+        # idempotency_key = str(uuid.uuid4())
+        # sdk.headers['X-Idempotency-Key'] = idempotency_key
+        
+        # Creando el reembolso
+        refund_response = sdk.refund().create(id_payment, refund_object)
+
+        print(refund_response)
+  
+        if refund_response['status']:
+            if refund_response['status'] == 201:
+                print("hola")
+                payment.status = "refund"
+                db.session.commit()
+                return jsonify({"message": "Reserva cancelada y reembolso procesado exitosamente."}), 201
+            else:
+                return jsonify({"error": "Error al procesar el reembolso en Mercado Pago."}), 500
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)}), 500
+       
+@api.route('/payments/<id_payment>', methods=['GET'])
+def get_payment_client(id_payment):
+    try:
+        # Utiliza el SDK para obtener la información del pago
+        payment_response = sdk.payment().get(id_payment)
+        
+        # Verifica si la respuesta contiene el pago
+        if payment_response["status"] == 200:
+            payment_data = payment_response["response"]
+            return jsonify(payment_data), 200
+        else:
+            return jsonify({"error": "No se pudo obtener el pago"}), payment_response["status"]
+
+    except Exception as e:
+        print(str(e))
         return jsonify({"error": str(e)}), 500
 
 @api.route('/users', methods=['GET', 'POST'])

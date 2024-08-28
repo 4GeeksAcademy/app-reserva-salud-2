@@ -13,6 +13,7 @@ export const AgendaProfesional = () => {
     const [availableIntervals, setAvailableIntervals] = useState([]);
     const [selectedInterval, setSelectedInterval] = useState(null);
     const [showCheckout, setShowCheckout] = useState(false);
+    const [amount, setAmount]= useState('');
 
     const handleCheckoutClick = () => {
         setShowCheckout(true);
@@ -69,6 +70,30 @@ export const AgendaProfesional = () => {
 
     console.log(professional);
 
+    const handleRefundReservation = async () => {
+        try {
+            const response = await fetch('https://verbose-space-orbit-q5wjv57g6gvh965-3001.app.github.dev/api/refund_payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    professional_id: 'id' // envío id profesional,falta id cita
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Reserva cancelada y reembolso procesado exitosamente.');
+            } else {
+                alert('Error al cancelar la reserva: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error al cancelar la reserva:', error);
+        }
+    };
+    
     return (
         <div className="contenido">
             <h1 className="text-center text-title text-secondary">Agenda de {(professional?.first_name + " " + professional?.last_name) || professional?.email}</h1>
@@ -83,9 +108,27 @@ export const AgendaProfesional = () => {
                         )
                     }
                 </div>
-                <div><button className="btn btn-primary w-25" onClick={handleCheckoutClick}> </button>
-                    {showCheckout && <PaymentBrick />}
+                <div className="row">
+                <div className="col-md-5">
                 </div>
+                <div className="col-md-7">
+                <input type="number" step="0.01"value={amount} onChange={(event) => setAmount(event.target.value)} 
+                placeholder="Ingrese el monto" className="form-control mb-2 w-50"
+                 />
+                </div>
+                
+                </div>    
+                    <div className="d-flex justify-content-center ">
+                    <button className="btn btn-primary w-25 text-white" onClick={handleCheckoutClick}> Reservar 
+                    </button>
+                    <button className="btn btn-primary w-25 text-white" onClick={handleCheckoutClick}> Cancelar Reserva 
+                    </button>
+                    </div>
+                    {showCheckout && <PaymentBrick 
+                                        amount={amount}
+                                        id_profesional={id}                
+                                    />}
+                    
 
             </div>
             {selectedDate && (
