@@ -9,6 +9,7 @@ from api.utils import generate_sitemap, APIException, generate_recurrent_dates
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+import os
 
 from flask_mail import Mail, Message
 
@@ -557,7 +558,7 @@ def reset_password():
         '<body>'
         '<p>Recibimos la solicitud para restablecer tu contraseña en Reserva Salud.</p>'
         '<p>Haz clic en el siguiente enlace para proceder con el restablecimiento de tu contraseña:</p>'
-        f'<p><a href="https://zany-space-garbanzo-69r9j7g4xxvgf5xgv-3000.app.github.dev/restablecer?email={email}">Restablecer mi contraseña</a></p>'
+        f'<p><a href="{os.getenv("FRONTEND_URL")}/restablecer?email={email}">Restablecer mi contraseña</a></p>'
         '<p>Si no realizaste esta solicitud, ignora este mensaje.</p>'
         '</body>'
         '</html>'
