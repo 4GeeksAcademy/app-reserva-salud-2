@@ -52,6 +52,5 @@ export const ProfesionalCard = ({ professional }) => {
         </div>
       </div>
     </div>
-
   )
 }

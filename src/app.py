@@ -3,6 +3,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 import os
 from flask import Flask, request, jsonify, url_for, send_from_directory
+# from flask_mail import Mail
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from flask_swagger import swagger
@@ -25,6 +26,20 @@ static_file_dir = os.path.join(os.path.dirname(
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
+
+from flask_mail import Mail #IMPORTAR LA FUNCION Mail() de flask_mail
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'reservasaluduy@gmail.com'
+app.config['MAIL_PASSWORD'] = 'hxeb iqeq tolx nlfe'
+app.config['MAIL_DEFAULT_SENDER'] = 'reservasaluduy@gmail.com'
+
+mail = Mail(app)
+app.mail= mail
+
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)

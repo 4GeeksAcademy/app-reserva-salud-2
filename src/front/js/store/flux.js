@@ -10,6 +10,7 @@ const getState = ({ getStore, getActions, setStore }) => {
     store: {
       currentUser: null,
       currentProfessional: null,
+      // mensajeRecuperacion: '',
     },
     actions: {
       // Register new user
@@ -269,8 +270,43 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ currentUser: null, currentProfessional: null });
         toast.success("Cierre de sesión exitoso", { icon: "👋" });
       },
+      
+      resetPassword: async (email) => {
+        try {
+            const response = await backendApi.post("/reset-password", { email: email });
+            toast.dismiss();
+    
+            toast.success("Correo de restablecimiento enviado con éxito", { icon: "🚀" });
+            return response;
+
+              } catch (error) {
+                toast.dismiss();
+                toast.error(error.response.data.message);
+                console.error(error);
+                return null
+            
+        }
     },
+
+  updatePassword: async (email, new_password) => {
+    try {
+        const response = await backendApi.post('/new-password', {
+            email: email,
+            new_password: new_password
+        });
+
+        if (response.status === 200) {
+            toast.success("Contraseña actualizada con éxito", { icon: "🚀" });
+            return response.data;
+        }
+    } catch (error) {
+        toast.error("Hubo un error al actualizar la contraseña.");
+        console.error("Error al actualizar la contraseña:", error);
+        return null;
+    }
+}
+}}
   };
-};
+
 
 export default getState;
