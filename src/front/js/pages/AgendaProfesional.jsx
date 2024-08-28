@@ -17,12 +17,7 @@ export const AgendaProfesional = () => {
     const getProfessional = async () => {
       try {
         const response = await backendApi.get(
-          '/professionals/availabilities',
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
+          `/professionals/${id}/availabilities`,
         );
         console.log(response)
         setProfessional(response.data);
@@ -43,7 +38,7 @@ export const AgendaProfesional = () => {
     );
 
     // Obtener todos los horarios disponibles para una misma fecha
-    const startAndEndTimes = availabilities.map((availability) => {
+    const startAndEndTimes = availabilities?.map((availability) => {
       const appointment = {
         start: availability.start_time,
         end: availability.end_time,
