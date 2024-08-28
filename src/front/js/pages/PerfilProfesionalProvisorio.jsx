@@ -47,8 +47,8 @@ export const VistaPerfilProfesional = () => {
                 <h3 className="text-subtitle mx-3 w-75">Pacientes agendados</h3>
             </div>
             <div>
-                {citas.map((citas) => (
-                    <TarjetaCitasProfesional key={citas.id} citas={citas} />))}
+                {professionalAppointments.map((appointment) => (
+                    <TarjetaCitasProfesional key={appointment.id} appointment={appointment} />))}
             </div>
         </div>
     )
