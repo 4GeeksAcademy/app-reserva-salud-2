@@ -30,9 +30,11 @@ class User(db.Model):
     birth_date = db.Column(db.Date)
     is_active = db.Column(db.Boolean, default=False)
     state_id = db.Column(db.Integer, db.ForeignKey('state.id'))
+    city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
     
     availability = db.relationship('Appointment', back_populates='user', cascade='all, delete-orphan')
     state = db.relationship('State', back_populates='users', uselist=False)
+    city = db.relationship('City', back_populates='users', uselist=False)
     comments = db.relationship("Comment", back_populates="user", cascade='all, delete-orphan')
     
     def get_appointments(self):
@@ -73,6 +75,7 @@ class Professional(db.Model):
     comments = db.relationship('Comment', back_populates='professional', cascade='all, delete-orphan')
     availabilities = db.relationship('Availability', back_populates='professional', cascade='all, delete-orphan')
     specialities = db.relationship('Speciality', secondary=professional_speciality, back_populates='professionals')
+    appointments = db.relationship('Appointment', back_populates='professional', cascade='all, delete-orphan')
     
     def __repr__(self):
         return f'<Professional {self.email}>'
@@ -101,9 +104,9 @@ class Professional(db.Model):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
-            "speciality": self.speciality,
+            "specialities": [speciality.serialize() for speciality in self.specialities],
             "profile_picture": self.profile_picture,
-            "availabilities": [availability.serialize() for availability in self.availabilities]
+            "availabilities": [availability.serialize() for availability in self.availabilities],
         }
         
 class Comment(db.Model):
@@ -162,6 +165,7 @@ class City(db.Model):
     
     state = db.relationship('State', back_populates='cities')
     professionals = db.relationship('Professional', back_populates='city')
+    users = db.relationship('User', back_populates='city')
     
     def __repr__(self):
         return f'<City {self.name}>'
@@ -229,6 +233,7 @@ class Appointment(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    professional_id = db.Column(db.Integer, db.ForeignKey('professional.id'), nullable=False)
     availability_id = db.Column(db.Integer, db.ForeignKey('availability.id'), nullable=False)
     date = db.Column(db.Date)
     hour = db.Column(db.Time)
@@ -240,6 +245,7 @@ class Appointment(db.Model):
     
     availability = db.relationship(Availability, uselist=False)
     user = db.relationship(User)
+    professional = db.relationship(Professional, back_populates='appointments')
     
     def __repr__(self):
         return f'<Appointment {self.user.email} {self.availability.professional.email} {self.date}>'
@@ -247,7 +253,8 @@ class Appointment(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "user_id": self.user_id,
+            "user": self.user.serialize(),
+            "professional": self.professional.serialize(),
             "availability": self.availability.serialize(),
             "date": self.date.isoformat(),
             "is_confirmed": self.is_confirmed,
