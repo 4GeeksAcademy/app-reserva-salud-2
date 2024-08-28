@@ -594,3 +594,53 @@ def update_password():
     except Exception as e:
         return jsonify({'message': 'Error al actualizar la contraseña: {}'.format(str(e))}), 500
 
+# Enviar correo de verificación de usuario
+@api.route('/verify-email', methods=['POST'])
+def verify_email():
+    request_body = request.get_json()
+    email = request_body.get("email")
+
+    # Verificar si el correo electrónico existe en la bd
+    user = User.query.filter_by(email=email).first()
+    if not user:
+      return jsonify({'message': 'El correo no está registrado'}), 404
+
+    # Crear mensaje (doc)
+    msg = Message(
+      'Validación de correo',
+      sender='reservasaluduy@gmail.com',
+      recipients=[email])
+
+    msg.html = (
+        '<html>'
+        '<body>'
+        '<p>¡Hola! Gracias por registrarte en Reserva Salud.</p>'
+        '<p>Haz clic en el siguiente enlace para verificar tu correo electrónico:</p>'
+        f'<p><a href="{os.getenv("FRONTEND_URL")}/activate-user?email={email}">Activar mi cuenta</a></p>'
+        '<p>Si no realizaste esta solicitud, ignora este mensaje.</p>'
+        '</body>'
+        '</html>'
+      )
+
+    try:
+      current_app.mail.send(msg)
+      return jsonify({'message': 'Correo de verificación enviado con éxito'}), 200
+    except Exception as e:
+      print(e)
+      return jsonify({'error': 'Error al enviar el correo de verificación'}), 500
+
+# Activar usuario
+@api.route('/activate-user', methods=['POST'])
+def activate_user():
+    email = request.json.get('email')
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+      return jsonify({'message': 'El correo no está registrado'}), 404
+
+    try:
+      user.is_active = True
+      db.session.commit()
+      return jsonify({'message': 'Cuenta activada con éxito'}), 200
+    except Exception as e:
+      return jsonify({'message': 'Error al activar la cuenta: {}'.format(str(e))}), 500

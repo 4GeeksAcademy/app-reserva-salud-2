@@ -27,7 +27,7 @@ import { Profesionales } from "./pages/Profesionales.jsx";
 import { ProtectedRoute } from "./component/ProtectedRoute.jsx";
 import { Toaster } from "react-hot-toast";
 import { PerfilProfesional } from "./pages/PerfilProfesional.jsx";
-import { EditarPerfilProfesional } from "./pages/EditarPerfilProfesional.jsx";
+import { VistaActivarUsuario } from "./pages/ActivarUsuario.jsx";
 
 //create your first component
 const Layout = () => {
@@ -57,8 +57,7 @@ const Layout = () => {
           <Route element={<VistaNuevoRegistroUnificado />} path="/nuevo-registro" />
           <Route element={<VistaNuevoRegistroPaciente />} path="/nuevo-registro-paciente" />
           <Route element={<VistaNuevoRegistroProfesional />} path="/nuevo-registro-profesional" />
-          <Route element={<EditarPerfilProfesional />} path="/editar-perfil" />
-
+          <Route element={<VistaActivarUsuario />} path="/activate-user" />
           <Route element={<Paciente />} path="/datos-paciente" />
           <Route element={<Login />} path="/login" />
           <Route
