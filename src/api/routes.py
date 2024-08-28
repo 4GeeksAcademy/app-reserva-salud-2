@@ -99,8 +99,8 @@ def handle_user(user_id):
       user.password = generate_password_hash(request_body.get("password")).decode('utf-8')
     user.birth_date = request_body.get("birth_date", user.birth_date)
     user.state_id = request_body.get("state_id", user.state_id)
+    user.city_id = request_body.get("city_id", user.city_id)
     user.is_active = request_body.get("is_active", user.is_active)
-    user.profile_picture = request_body.get("profile_picture", user.profile_picture)
     
     db.session.commit()
     
@@ -149,6 +149,7 @@ def handle_user_appointments():
     try:
       new_appointment = Appointment(
         user_id=current_user_id,
+        professional_id=availability.professional_id,
         availability_id=availability_id,
         date=date,
         is_confirmed=is_confirmed,
@@ -373,8 +374,9 @@ def handle_professional_availabilities():
     
     return jsonify({ "message": "Availability created successfully" }), 201
   elif request.method == 'GET':
-    professional = Professional.query.get(current_professional_id)
-    return jsonify(professional.serialize_availabilities()), 200
+    availabilities = Availability.query.filter_by(professional_id=current_professional_id).all()
+    availabilities = list(map(lambda x: x.serialize(), availabilities))
+    return jsonify({ "availabilities": availabilities }), 200
   
 @api.route('/professionals/<int:professional_id>/availabilities/<int:availability_id>', methods=['GET', 'DELETE'])
 def handle_professional_availability(professional_id, availability_id):
@@ -393,6 +395,21 @@ def handle_professional_availability(professional_id, availability_id):
     db.session.commit()
     
     return jsonify({ "message": "Availability deleted successfully" }), 200
+  
+@api.route('/professionals/appointments', methods=['GET'])
+@jwt_required()
+def get_professional_appointment():
+  current_professional_id = get_jwt_identity()
+  professional = Professional.query.get(current_professional_id)
+  if professional is None:
+    raise APIException("Professional not found", status_code=404)
+  
+  appointments = Appointment.query.filter_by(professional_id=current_professional_id).all()
+  if appointments is None:
+    raise APIException("Professional appointments not found", status_code=404)
+  
+  appointments = list(map(lambda x: x.serialize(), appointments))
+  return jsonify(appointments), 200
 
 @api.route('/comments', methods=['GET', 'POST'])
 def handle_comments():
