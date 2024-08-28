@@ -71,7 +71,7 @@ export const VistaNuevoRegistroPaciente = () => {
                                         id="first_name"
                                         name="first_name"
                                     />
-                                    <ErrorMessage name="first_name" />
+                                    <ErrorMessage className="text-normal text-primary" component="div" name="first_name" />
                                 </div>
                                 <div className="mb-3 col-md-6 col-sm-12">
                                     <label htmlFor="last_name" className="text-label form-label">
@@ -83,7 +83,7 @@ export const VistaNuevoRegistroPaciente = () => {
                                         id="last_name"
                                         name="last_name"
                                     />
-                                    <ErrorMessage name="last_name" />
+                                    <ErrorMessage className="text-normal text-primary" component="div"  name="last_name" />
                                 </div>
                             </div>
                             <div className="row">
@@ -97,7 +97,7 @@ export const VistaNuevoRegistroPaciente = () => {
                                         id="birth_date"
                                         name="birth_date"
                                     />
-                                    <ErrorMessage name="birth_date" />
+                                    <ErrorMessage className="text-normal text-primary" component="div" name="birth_date" />
                                 </div>
                                 <div className="mb-3 col-md-6 col-sm-12">
                                     <label htmlFor="state" className="text-label form-label">
@@ -111,7 +111,7 @@ export const VistaNuevoRegistroPaciente = () => {
                                             </option>
                                         ))}
                                     </Field>
-                                    <ErrorMessage name="state" />
+                                    <ErrorMessage className="text-normal text-primary" component="div" name="state" />
                                 </div>
 
                                 <div className="mb-3 col-md-6 col-sm-12">
@@ -128,7 +128,7 @@ export const VistaNuevoRegistroPaciente = () => {
                                             ))
                                         }
                                     </Field>
-                                    <ErrorMessage name="city" />
+                                    <ErrorMessage className="text-normal text-primary" component="div" name="city" />
                                 </div>
 
                             </div>

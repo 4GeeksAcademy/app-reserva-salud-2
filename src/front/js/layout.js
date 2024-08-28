@@ -4,7 +4,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home.jsx";
 import { VistaRegistro } from "./pages/RegistroUsuario.jsx";
 import { VistaTerminosYCondiciones } from "./pages/TerminosYCondiciones.jsx";
-import { VistaRegistroProfesional } from "./pages/RegistroProfesional.jsx";
 import { VistaInfoProfesional } from "./pages/InfoProfesional.jsx";
 import { VistaPoliticaPrivacidad } from "./pages/PoliticaDePrivacidad.jsx";
 import { VistaContacto } from "./pages/Contacto.jsx";
@@ -44,7 +43,6 @@ const Layout = () => {
         <Routes>
           <Route element={<Home />} path="/" />
           <Route element={<VistaRegistro />} path="/registro-usuario" />
-          <Route element={<VistaRegistroProfesional />} path="/registro-profesional" />
           <Route element={<VistaPoliticaPrivacidad />} path="/politica-privacidad" />
           <Route element={<VistaContacto />} path="/contacto" />
 

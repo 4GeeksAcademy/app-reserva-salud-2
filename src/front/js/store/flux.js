@@ -176,21 +176,6 @@ const getState = ({ getStore, getActions, setStore }) => {
         toast.success("Cierre de sesión exitoso", { icon: "👋" });
       },
       
-            // Register new professional
-            // createProfessional: async (data) => {
-            //   try {
-            //     toast.loading("Registrando profesional...");
-            //     const response = await backendApi.post("/professionals", data);
-            //     toast.dismiss();
-            //     toast.success("Profesional registrado exitosamente", { icon: "🚀" });
-            //     return response;
-            //   } catch (error) {
-            //     toast.dismiss();
-            //     toast.error(error.response.data.message);
-            //     console.error(error);
-            //     return null
-            //   }
-            // },
       resetPassword: async (email) => {
         try {
             const response = await backendApi.post("/reset-password", { email: email });
@@ -207,6 +192,24 @@ const getState = ({ getStore, getActions, setStore }) => {
             
         }
     },
+
+  updatePassword: async (email, new_password) => {
+    try {
+        const response = await backendApi.post('/new-password', {
+            email: email,
+            new_password: new_password
+        });
+
+        if (response.status === 200) {
+            toast.success("Contraseña actualizada con éxito", { icon: "🚀" });
+            return response.data;
+        }
+    } catch (error) {
+        toast.error("Hubo un error al actualizar la contraseña.");
+        console.error("Error al actualizar la contraseña:", error);
+        return null;
+    }
+}
 }}
   };
 

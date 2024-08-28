@@ -569,3 +569,27 @@ def reset_password():
     except Exception as e:
       print(e)
       return jsonify({'error': 'Error al enviar el correo de recuperación'}), 500
+    
+
+@api.route('/new-password', methods=['POST'])
+def update_password():
+    email = request.json.get('email')
+    new_password = request.json.get('new_password')
+
+    if not new_password:
+        return jsonify({'message': 'La contraseña no puede estar vacía.'}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'message': 'El correo no está registrado'}), 404
+
+    try:
+      hashed_password = generate_password_hash(new_password).decode('utf-8')
+
+      user.password = hashed_password
+      db.session.commit()
+
+      return jsonify({'message': 'Contraseña actualizada exitosamente'}), 200
+    except Exception as e:
+        return jsonify({'message': 'Error al actualizar la contraseña: {}'.format(str(e))}), 500
+
