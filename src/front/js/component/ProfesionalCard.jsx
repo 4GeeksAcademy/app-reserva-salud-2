@@ -44,8 +44,7 @@ export const ProfesionalCard = ({ profesional }) => {
   }
 
   return (
-
-    <div className='card bg-primary text-white' onClick={() => navigate(`${profesional.id}`)} style={{ cursor: "pointer" }}>
+    <div className='card bg-secondary text-white' onClick={() => navigate(`${profesional.id}`)} style={{ cursor: "pointer" }}>
       <div className="row align-items-center justify-content-center p-3">
         <div className="col-5 text-center">
           <img src={profesional.profile_picture} className='img-fluid rounded-circle' height={100} width={100} alt="" />
