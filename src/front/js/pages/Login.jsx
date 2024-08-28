@@ -7,8 +7,10 @@ import { Context } from "../store/appContext";
 export const Login = () => {
   const { store, actions } = useContext(Context);
 
-  if (store.isAuthenticated) {
-    return <Navigate to='/perfil' replace />
+  if (store.currentUser) {
+    return <Navigate to='/perfil-paciente' replace />
+  } else if (store.currentProfessional) {
+    return <Navigate to='/perfil-profesional' replace />
   }
 
   return (
@@ -34,8 +36,12 @@ export const Login = () => {
             onSubmit={async ({ email, password }) => {
               const response = await actions.login(email, password);
 
-              if (response) {
-                return <Navigate to='/perfil' replace />
+              if (response.status === 200) {
+                if (response.data.user) {
+                  return <Navigate to='/perfil-paciente' replace />
+                } else if (response.data.professional) {
+                  return <Navigate to='/perfil-profesional' replace />
+                }
               }
             }}
           >
