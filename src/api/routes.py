@@ -42,111 +42,109 @@ sdk = mercadopago.SDK(access_token)
 
 @api.route('/create_preference', methods=['POST'])
 def create_preference():
-    preference_data = {
-        "items": [
-            {
-                "title": request.json.get("title"),
-                "quantity": int(request.json.get("quantity")),
-                "unit_price": float(request.json.get("unit_price"))
-                  
-            }
-        ]
-    }
+  preference_data = {
+    "items": [
+      {
+        "title": request.json.get("title"),
+        "quantity": int(request.json.get("quantity")),
+        "unit_price": float(request.json.get("unit_price"))    
+      }
+    ]
+  }
 
-    preference_response = sdk.preference().create(preference_data)
-    print("Preference Response:", preference_response)
-    preference = preference_response["response"]
-    print("Preference:", preference)
-    
-    return jsonify({
-        "id": preference["id"],
-        "init_point": preference["init_point"]
-    })
+  preference_response = sdk.preference().create(preference_data)
+  print("Preference Response:", preference_response)
+  preference = preference_response["response"]
+  print("Preference:", preference)
+  
+  return jsonify({
+    "id": preference["id"],
+    "init_point": preference["init_point"]
+  })
 
 @api.route('/process_payment', methods=['POST'])
 def create_payment():
     # print(request.json)
-  # Generar una clave del tipo string única para x-idempotency-key
+    # Generar una clave del tipo string única para x-idempotency-key
     idempotency_key = str(uuid.uuid4())
-
    
     request_options = mercadopago.config.RequestOptions()
     request_options.custom_headers = {
-        'x-idempotency-key': idempotency_key
+      'x-idempotency-key': idempotency_key
     }
 
     # Extraer los datos de la solicitud
     payer=request.json.get("payer")
     payment_data = {
-        "transaction_amount": float(request.json.get("transaction_amount")),
-        "token": request.json.get("token"),
-        "description": request.json.get("description"),
-        "installments": int(request.json.get("installments")),
-        "payment_method_id": request.json.get("payment_method_id"),
-        "payer": {
-            "email": payer["email"],
-            "identification": {
-                "type": payer["identification"]["type"], 
-                "number": payer["identification"]["number"]
-            },
-            "first_name": request.json.get("name")
-        }
+      "transaction_amount": float(request.json.get("transaction_amount")),
+      "token": request.json.get("token"),
+      "description": request.json.get("description"),
+      "installments": int(request.json.get("installments")),
+      "payment_method_id": request.json.get("payment_method_id"),
+      "payer": {
+        "email": payer["email"],
+        "identification": {
+          "type": payer["identification"]["type"], 
+          "number": payer["identification"]["number"]
+        },
+        "first_name": request.json.get("name")
+      }
     }
     print("mostrando datos a enviar a mp:",payment_data)
     try:
-        # Procesar el pago con Mercado Pago
-        payment_response = sdk.payment().create(payment_data, request_options)
-        payment = payment_response.get("response")
-        print(payment)
-        return jsonify(payment), 200
+      # Procesar el pago con Mercado Pago
+      payment_response = sdk.payment().create(payment_data, request_options)
+      payment = payment_response.get("response")
+      print(payment)
+      return jsonify(payment), 200
     except Exception as e:
-        print(f"Error al procesar el pago: {e}")
-        return jsonify({"error": str(e)}), 500
+      print(f"Error al procesar el pago: {e}")
+      return jsonify({"error": str(e)}), 500
 #enviar pago procesado correctamenta a bd
 @api.route('/data_pay_mp', methods=['POST'])
 def save_payment_mp():
-    try:
-        print(request.json)
-        # Obtener los datos del cuerpo de la solicitud http
-        data = request.json.get('data', {})
+  try:
+    print(request.json)
+    # Obtener los datos del cuerpo de la solicitud http
+    data = request.json.get('data', {})
 
-        id_profesional = request.json.get('professional_id')
-        authorization_code = data.get('authorization_code')
-        date_approved = data.get('date_approved')
-        date_created = data.get('date_created')
-        id_payment = data.get('id')
-        transaction_amount = data.get('transaction_amount')
-        installments = data.get('installments')
-        status = data.get('status')
+    id_profesional = request.json.get('professional_id')
+    authorization_code = data.get('authorization_code')
+    date_approved = data.get('date_approved')
+    date_created = data.get('date_created')
+    id_payment = data.get('id')
+    transaction_amount = data.get('transaction_amount')
+    installments = data.get('installments')
+    status = data.get('status')
 
-        # Accede al email dentro de 'payer'
-        email_client = data.get('payer', {}).get('email')
+    # Accede al email dentro de 'payer'
+    email_client = data.get('payer', {}).get('email')
 
-        print(id_profesional, email_client)
-        
-        print(id_profesional,email_client)
-        # Crear una nueva instancia del modelo Data_Pay_Mp con los datos recibidos desde el front
-        # print("mostrando:", professional_id)
-        payment = Data_Pay_Mp(
-            professional_id=id_profesional,
-            authorization_code=authorization_code,
-            date_approved=date_approved,
-            date_created=date_created,
-            id_payment=id_payment,
-            transaction_amount=transaction_amount,
-            installments=installments,
-            status=status,
-            email_client=email_client
-        )
-
-        # Guardar los datos en la base de datos
-        db.session.add(payment)
-        db.session.commit()
-        
-        return jsonify({"message": "Payment data saved successfully"}), 201
+    print(id_profesional, email_client)
     
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    print(id_profesional,email_client)
+    # Crear una nueva instancia del modelo Data_Pay_Mp con los datos recibidos desde el front
+    # print("mostrando:", professional_id)
+    payment = Data_Pay_Mp(
+      professional_id=id_profesional,
+      authorization_code=authorization_code,
+      date_approved=date_approved,
+      date_created=date_created,
+      id_payment=id_payment,
+      transaction_amount=transaction_amount,
+      installments=installments,
+      status=status,
+      email_client=email_client
+    )
+
+    # Guardar los datos en la base de datos
+    db.session.add(payment)
+    db.session.commit()
+    
+    return jsonify({"message": "Payment data saved successfully"}), 201
+  
+  except Exception as e:
+      return jsonify({"error": str(e)}), 500
 
 # reembolsar pago al cliente
 @api.route('/refund_payment', methods=['POST'])
