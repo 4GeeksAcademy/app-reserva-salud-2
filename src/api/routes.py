@@ -647,7 +647,9 @@ def reset_password():
 
     # Verificar si el correo electrónico existe en la bd
     user = User.query.filter_by(email=email).first()
-    if not user:
+    professional = Professional.query.filter_by(email=email).first()
+
+    if not user and not professional:
       return jsonify({'message': 'El correo no está registrado'}), 404
 
     # Crear mensaje (doc)
@@ -673,7 +675,107 @@ def reset_password():
     except Exception as e:
       print(e)
       return jsonify({'error': 'Error al enviar el correo de recuperación'}), 500
+
+# # Enviar notificación de que una cita fue agendada
+# @api.route('/notify-new-appointment', methods=['POST'])
+# def notify_new_appointment_professional():
+#     request_body = request.get_json()
+#     email = request_body.get("email")
+#     date = Appointment.query.filter_by(date=date).first()
+
+#     # # Verificar si el correo electrónico existe en la bd
+#     professional = Professional.query.filter_by(email=email).first()
+#     if not professional:
+#       return jsonify({'message': 'El correo no está registrado'}), 404
+
+#     # Crear mensaje (doc)
+#     msg = Message(
+#       'Nueva cita agendada',
+#       sender='reservasaluduy@gmail.com',
+#       recipients=[email])
+
+#     msg.html = (
+#         '<html>'
+#         '<body>'
+#         '<p>¡Hola!</p>'
+#         '<p>Desde Reserva Salud, te notificamos de un nuevo paciente que ha agendado una cita contigo:</p>'
+#         '<p>Día de la cita: {date}</p>'
+#         '<p>Hora:</p>'
+#         '<p>Modalidad de la cita:</p>'
+#         '<p>Nombre del paciente:</p>'
+#         '<p>Email del paciente:</p>'
+#         '<p>Desde Reserva Salud, te notificamos de un nuevo paciente que ha agendado una cita contigo:</p>'
+#         '<p>Inicia sesión en Reserva Salud para verificar los datos de esta cita o cancelarla.</p>'
+#         '<p> </p>'
+#         '<p>Si no eres el destinatario de esta comunicación, ignora este mensaje.</p>'
+#         '</body>'
+#         '</html>'
+#       )
+
+#     try:
+#       current_app.mail.send(msg)
+#       return jsonify({'message': 'Notificación enviada con éxito'}), 200
+#     except Exception as e:
+#       print(e)
+#       return jsonify({'error': 'Error al enviar la notificación'}), 500    
+
+from flask import request, jsonify, current_app
+from flask_mail import Message
+from your_app.models import Appointment, Professional
+
+@api.route('/notify-new-appointment', methods=['POST'])
+def notify_new_appointment_professional():
+    request_body = request.get_json()
+    email = request_body.get("email")
+    appointment_id = request_body.get("appointment_id")
     
+    # Verificar si el correo electrónico existe en la base de datos de profesionales
+    professional = Professional.query.filter_by(email=email).first()
+    if not professional:
+        return jsonify({'message': 'El correo no está registrado'}), 404
+
+    appointment = Appointment.query.filter_by(id=appointment_id).first()
+    if not appointment:
+        return jsonify({'message': 'No se encontró la cita especificada'}), 404
+
+
+    appointment_date = appointment.date  # Supongamos que el modelo tiene un campo 'date'
+    # appointment_time = appointment.time  # Y un campo 'time'
+    # patient_name = appointment.patient_name  # Y un campo 'patient_name'
+    # patient_email = appointment.patient_email  # Y un campo 'patient_email'
+    # appointment_type = appointment.type  # Y un campo 'type' para modalidad de la cita
+
+    # Crear mensaje de correo electrónico con los detalles de la cita
+    msg = Message(
+        'Nueva cita agendada',
+        sender='reservasaluduy@gmail.com',
+        recipients=[email]
+    )
+
+    msg.html = f"""
+    <html>
+    <body>
+    <p>¡Hola!</p>
+    <p>Desde Reserva Salud, te notificamos de un nuevo paciente que ha agendado una cita contigo:</p>
+    <p><strong>Día de la cita:</strong> {appointment_date}</p>
+    <p><strong>Hora:</strong> </p>
+    <p><strong>Modalidad de la cita:</strong> </p>
+    <p><strong>Nombre del paciente:</strong> </p>
+    <p><strong>Email del paciente:</strong> </p>
+    <p>Inicia sesión en Reserva Salud para verificar los datos de esta cita o cancelarla.</p>
+    <p> </p>
+    <p>Si no eres el destinatario de esta comunicación, ignora este mensaje.</p>
+    </body>
+    </html>
+    """
+
+    try:
+        current_app.mail.send(msg)
+        return jsonify({'message': 'Notificación enviada con éxito'}), 200
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Error al enviar la notificación'}), 500
+
 
 @api.route('/new-password', methods=['POST'])
 def update_password():
@@ -684,7 +786,9 @@ def update_password():
         return jsonify({'message': 'La contraseña no puede estar vacía.'}), 400
 
     user = User.query.filter_by(email=email).first()
-    if not user:
+    professional = Professional.query.filter_by(email=email).first()
+
+    if not user and not professional:
         return jsonify({'message': 'El correo no está registrado'}), 404
 
     try:
@@ -697,53 +801,53 @@ def update_password():
     except Exception as e:
         return jsonify({'message': 'Error al actualizar la contraseña: {}'.format(str(e))}), 500
 
-# Enviar correo de verificación de usuario
-@api.route('/verify-email', methods=['POST'])
-def verify_email():
-    request_body = request.get_json()
-    email = request_body.get("email")
+# # Enviar correo de activación de usuario
+# @api.route('/verify-email', methods=['POST'])
+# def verify_email():
+#     request_body = request.get_json()
+#     email = request_body.get("email")
 
-    # Verificar si el correo electrónico existe en la bd
-    user = User.query.filter_by(email=email).first()
-    if not user:
-      return jsonify({'message': 'El correo no está registrado'}), 404
+#     # Verificar si el correo electrónico existe en la bd
+#     user = User.query.filter_by(email=email).first()
+#     if not user:
+#       return jsonify({'message': 'El correo no está registrado'}), 404
 
-    # Crear mensaje (doc)
-    msg = Message(
-      'Validación de correo',
-      sender='reservasaluduy@gmail.com',
-      recipients=[email])
+#     # Crear mensaje (doc)
+#     msg = Message(
+#       'Validación de correo',
+#       sender='reservasaluduy@gmail.com',
+#       recipients=[email])
 
-    msg.html = (
-        '<html>'
-        '<body>'
-        '<p>¡Hola! Gracias por registrarte en Reserva Salud.</p>'
-        '<p>Haz clic en el siguiente enlace para verificar tu correo electrónico:</p>'
-        f'<p><a href="{os.getenv("FRONTEND_URL")}/activate-user?email={email}">Activar mi cuenta</a></p>'
-        '<p>Si no realizaste esta solicitud, ignora este mensaje.</p>'
-        '</body>'
-        '</html>'
-      )
+#     msg.html = (
+#         '<html>'
+#         '<body>'
+#         '<p>¡Hola! Gracias por registrarte en Reserva Salud.</p>'
+#         '<p>Haz clic en el siguiente enlace para verificar tu correo electrónico:</p>'
+#         f'<p><a href="{os.getenv("FRONTEND_URL")}/activate-user?email={email}">Activar mi cuenta</a></p>'
+#         '<p>Si no realizaste esta solicitud, ignora este mensaje.</p>'
+#         '</body>'
+#         '</html>'
+#       )
 
-    try:
-      current_app.mail.send(msg)
-      return jsonify({'message': 'Correo de verificación enviado con éxito'}), 200
-    except Exception as e:
-      print(e)
-      return jsonify({'error': 'Error al enviar el correo de verificación'}), 500
+#     try:
+#       current_app.mail.send(msg)
+#       return jsonify({'message': 'Correo de verificación enviado con éxito'}), 200
+#     except Exception as e:
+#       print(e)
+#       return jsonify({'error': 'Error al enviar el correo de verificación'}), 500
 
-# Activar usuario
-@api.route('/activate-user', methods=['POST'])
-def activate_user():
-    email = request.json.get('email')
+# # Activar usuario
+# @api.route('/activate-user', methods=['POST'])
+# def activate_user():
+#     email = request.json.get('email')
 
-    user = User.query.filter_by(email=email).first()
-    if not user:
-      return jsonify({'message': 'El correo no está registrado'}), 404
+#     user = User.query.filter_by(email=email).first()
+#     if not user:
+#       return jsonify({'message': 'El correo no está registrado'}), 404
 
-    try:
-      user.is_active = True
-      db.session.commit()
-      return jsonify({'message': 'Cuenta activada con éxito'}), 200
-    except Exception as e:
-      return jsonify({'message': 'Error al activar la cuenta: {}'.format(str(e))}), 500
+#     try:
+#       user.is_active = True
+#       db.session.commit()
+#       return jsonify({'message': 'Cuenta activada con éxito'}), 200
+#     except Exception as e:
+#       return jsonify({'message': 'Error al activar la cuenta: {}'.format(str(e))}), 500
