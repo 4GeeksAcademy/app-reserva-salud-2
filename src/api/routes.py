@@ -186,6 +186,10 @@ def handle_user_appointment(user_id, appointment_id):
     if appointment is None:
       raise APIException("User appointment not found", status_code=404)
     
+    availability = Availability.query.get(appointment.availability_id)
+    
+    availability.is_available = True
+    
     db.session.delete(appointment)
     db.session.commit()
     
