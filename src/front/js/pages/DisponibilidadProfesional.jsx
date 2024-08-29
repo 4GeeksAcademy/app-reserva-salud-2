@@ -1,227 +1,151 @@
 import React, { useState } from "react";
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import { backendApi } from "../store/flux";
 
 export const DisponibilidadProfesional = () => {
     const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
     const [horasSeleccionadas, setHorasSeleccionadas] = useState([]);
+    const [startTime, setStartTime] = useState("");
+    const [endTime, setEndTime] = useState("");
+    const [duration, setDuration] = useState(30);
 
-    const handleClicHora = (hora) => {
-        setHorasSeleccionadas((horasActuales) =>
-            horasActuales.includes(hora)
-                ? horasActuales.filter((horaSeleccionada) => horaSeleccionada !== hora)
-                : [...horasActuales, hora]
-        );
+    const minDate = new Date();
+    const maxDate = new Date(new Date().setMonth(new Date().getMonth() + 12));
+
+    const handleConfirmar = async () => {
+        const start = new Date(fechaSeleccionada);
+        const end = new Date(fechaSeleccionada);
+        const [startHour, startMinute] = startTime.split(":").map(Number);
+        const [endHour, endMinute] = endTime.split(":").map(Number);
+        start.setHours(startHour, startMinute);
+        end.setHours(endHour, endMinute);
+
+        const intervalos = [];
+        let current = new Date(start);
+
+        while (current < end) {
+            const next = new Date(current);
+            next.setMinutes(current.getMinutes() + duration);
+            console.log(current.toTimeString(), next.toTimeString());
+            if (next > end) break;
+            intervalos.push({
+                professional_id: 1, // Reemplazar con el ID del profesional real
+                date: fechaSeleccionada.toISOString().split("T")[0],
+                start_time: current.toTimeString().split(" ")[0],
+                end_time: next.toTimeString().split(" ")[0],
+                is_available: true,
+                is_remote: true, // Ajustar según sea necesario
+                is_presential: false, // Ajustar según sea necesario
+            });
+            current = next;
+        }
+
+        try {
+            const response = await Promise.all(
+                intervalos.map((intervalo) =>
+                    backendApi.post("/professionals/availabilities", intervalo, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    })
+                )
+            );
+
+            const successResponses = response.filter((res) => res.status === 201);
+
+            if (successResponses.length === intervalos.length) {
+                alert("Disponibilidades creadas exitosamente");
+            } else {
+                alert("Error al crear disponibilidades");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al crear disponibilidades");
+        }
     };
 
     return (
-        <div className="contenido">
-            <h1 className="text-center text-title text-secondary pb-4">Disponibilidad</h1>
+        <div className="contenido container">
+            <h1 className="text-center text-title text-secondary pb-4">
+                Disponibilidad
+            </h1>
             <div className="row">
-                <div className="col-sm-12 col-md-6 d-flex justify-content-end">
+                <div className="col-sm-12 col-md-6 d-flex justify-content-center">
                     <div className="mb-3">
-                        <Calendar onChange={setFechaSeleccionada} value={fechaSeleccionada} />
+                        <Calendar
+                            onClickDay={setFechaSeleccionada}
+                            value={fechaSeleccionada}
+                            minDate={minDate}
+                            maxDate={maxDate}
+                        />
                     </div>
                 </div>
-                <div className="col-sm-12 col-md-6">
-                <div className="container" style={{ height: '270px', overflowY: 'scroll' }}>
-                    <div className="flex-column" >
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('08:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('08:00')}>
-                            08:00
-                        </button>
+                <div className="col-md-6">
+                    <h2 className="text-center text-title text-secondary pb-4">
+                        Datos de disponibilidad
+                    </h2>
+                    <div className="row mb-4">
+                        <div className="col-6">
+                            <label className="form-label" htmlFor="start-time">
+                                Hora de inicio
+                            </label>
+                            <input
+                                type="time"
+                                className="form-control"
+                                id="start-time"
+                                name="start-time"
+                                min="00:00"
+                                max="23:00"
+                                value={startTime}
+                                onChange={(e) => setStartTime(e.target.value)}
+                            />
+                        </div>
+                        <div className="col-6">
+                            <label className="form-label" htmlFor="end-time">
+                                Hora de fin
+                            </label>
+                            <input
+                                type="time"
+                                className="form-control"
+                                id="end-time"
+                                name="end-time"
+                                min="00:00"
+                                max="23:00"
+                                value={endTime}
+                                onChange={(e) => setEndTime(e.target.value)}
+                            />
+                        </div>
                     </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('08:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('08:30')}>
-                            08:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('09:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('09:00')}>
-                            09:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('09:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('09:30')}>
-                            09:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('10:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('10:00')}>
-                            10:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('10:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('10:30')}>
-                            10:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('11:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('11:00')}>
-                            11:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('11:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('11:30')}>
-                            11:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('12:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('12:00')}>
-                            12:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('12:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('12:30')}>
-                            12:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('13:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('13:00')}>
-                            13:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('13:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('13:30')}>
-                            13:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('14:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('14:00')}>
-                            14:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('14:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('14:30')}>
-                            14:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('15:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('15:00')}>
-                            15:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('15:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('15:30')}>
-                            15:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('16:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('16:00')}>
-                            16:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('16:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('16:30')}>
-                            16:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('17:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('17:00')}>
-                            17:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('17:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('17:30')}>
-                            17:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('18:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('18:00')}>
-                            18:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('18:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('18:30')}>
-                            18:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('19:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('19:00')}>
-                            19:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('19:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('19:30')}>
-                            19:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('20:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('20:00')}>
-                            20:00
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('20:30') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('20:30')}>
-                            20:30
-                        </button>
-                    </div>
-                    <div className="flex-column">
-                        <button
-                            className={`btn w-50 ${horasSeleccionadas.includes('21:00') ? 'bg-primary text-white' : 'btn-outline-primary'} mb-2`}
-                            onClick={() => handleClicHora('21:00')}>
-                            21:00
-                        </button>
+                    <div className="row">
+                        <div className="col-6">
+                            <label className="form-label" htmlFor="duration">
+                                Duración de la cita en minutos
+                            </label>
+                            <input
+                                type="number"
+                                className="form-control"
+                                id="duration"
+                                name="duration"
+                                min="30"
+                                max="120"
+                                value={duration}
+                                onChange={(e) => setDuration(Number(e.target.value))}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div className="container d-flex justify-content-center">
-        <button type="submit" className="btn bg-primary text-white">
-             Confirmar
-        </button>
-        </div>
+            <div className="container d-flex justify-content-center">
+                <button
+                    type="button"
+                    className="btn bg-primary text-white"
+                    onClick={handleConfirmar}
+                >
+                    Confirmar
+                </button>
+            </div>
         </div>
     );
 };

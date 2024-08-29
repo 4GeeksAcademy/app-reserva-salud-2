@@ -3,7 +3,6 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from datetime import datetime
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
-
 from api.models import Appointment, GenderEnum, Speciality, db, User, Professional, Comment, Availability, State, City
 from api.utils import generate_sitemap, APIException, generate_recurrent_dates
 from flask_cors import CORS
@@ -13,11 +12,40 @@ import os
 
 from flask_mail import Mail, Message
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+import os
+
+# Cloudinary configuration      
+cloudinary.config( 
+    cloud_name = os.getenv("CLOUDINARY_NAME"),
+    api_key = os.getenv("CLOUDINARY_API_KEY"),
+    api_secret = os.getenv("CLOUDINARY_SECRET"),
+    secure=True
+)
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
+
+@api.route('/upload', methods=['POST'])
+def upload_file():
+  if 'file' not in request.files:
+      raise APIException("No file part", status_code=400)
+  
+  file = request.files['file']
+  
+  if file:
+    try:
+      result = cloudinary.uploader.upload(file)
+      return jsonify({ 'url': result['secure_url'] }), 200
+    except Exception as e:
+      print(e)
+      raise APIException("An error ocurred while uploading the file", status_code=400)
+  else:
+      raise APIException("No selected file", status_code=400)
 
 @api.route('/users', methods=['GET', 'POST'])
 def handle_users():
@@ -75,6 +103,7 @@ def handle_user(user_id):
       user.password = generate_password_hash(request_body.get("password")).decode('utf-8')
     user.birth_date = request_body.get("birth_date", user.birth_date)
     user.state_id = request_body.get("state_id", user.state_id)
+    user.city_id = request_body.get("city_id", user.city_id)
     user.is_active = request_body.get("is_active", user.is_active)
     
     db.session.commit()
@@ -90,9 +119,12 @@ def handle_user(user_id):
     db.session.commit()
     
     return jsonify({ "message": "User deleted successfully" }), 200
-      
-@api.route('/users/<int:user_id>/appointments', methods=['GET', 'POST'])
-def handle_user_appointments(user_id):
+
+# Create a new user appointment
+@api.route('/users/appointments', methods=['GET', 'POST'])
+@jwt_required()
+def handle_user_appointments():
+  current_user_id = get_jwt_identity()
   if request.method == 'POST':
     request_body = request.json
     
@@ -104,25 +136,24 @@ def handle_user_appointments(user_id):
     
     if not availability_id or not date:
       raise APIException("Missing required fields", status_code=400)
+   
+    if type and type not in ['remote', 'presential']:
+      raise APIException("Invalid type value", status_code=400)
     
-    # Check if type is valid
-    if type not in ['remote', 'presential']:
-      raise APIException("Invalid appointment type", status_code=400)
+    # Validate if availability exists
+    availability = Availability.query.get(availability_id)
+    if not availability:
+      raise APIException("Availability not found", status_code=404)
     
-    # Check if appointment already exists
-    exist_appointment = Appointment.query.filter_by(user_id=user_id, availability_id=availability_id, date=date).first()
-    
-    if not exist_appointment:
-      raise APIException("Appointment not found", status_code=404)
-    
-    # Check if appointment is available
-    if not exist_appointment.is_available:
-      raise APIException("Appointment not available", status_code=400)
+    # Verify if availability is already booked
+    if not availability.is_available:
+        raise APIException("This availability is already booked", status_code=400)
     
     # Create appointment in the database
     try:
       new_appointment = Appointment(
-        user_id=user_id,
+        user_id=current_user_id,
+        professional_id=availability.professional_id,
         availability_id=availability_id,
         date=date,
         is_confirmed=is_confirmed,
@@ -132,13 +163,16 @@ def handle_user_appointments(user_id):
       db.session.add(new_appointment)
       db.session.commit()
     except Exception as e:
-      raise APIException("An error ocurred while creating the appointment", status_code=400)
+      raise APIException(f"An error ocurred while creating the appointment {e}", status_code=400)
+    
+    availability.is_available = False
+    db.session.commit()
     
     return jsonify({ "message": "Appointment created successfully" }), 201
   elif request.method == 'GET':
-    user = User.query.get(user_id)
+    user = User.query.get(current_user_id)
     return jsonify(user.get_appointments()), 200
-
+ 
 @api.route('/users/<int:user_id>/appointments/<int:appointment_id>', methods=['GET', 'DELETE'])
 def handle_user_appointment(user_id, appointment_id):
   if request.method == 'GET':
@@ -151,6 +185,10 @@ def handle_user_appointment(user_id, appointment_id):
     
     if appointment is None:
       raise APIException("User appointment not found", status_code=404)
+    
+    availability = Availability.query.get(appointment.availability_id)
+    
+    availability.is_available = True
     
     db.session.delete(appointment)
     db.session.commit()
@@ -168,14 +206,12 @@ def handle_professionals():
       password = request_body.get("password")
       birth_date = request_body.get("birth_date")
       gender = request_body.get("gender")
-      speciality = request_body.get("speciality")
       certificate = request_body.get("certificate")
       profile_picture = request_body.get("profile_picture")
       telephone = request_body.get("telephone")
-      appointment_type = request_body.get("appointment_type")
       is_active = request_body.get("is_active")
       is_validated = request_body.get("is_validated")
-      state_id = request_body.get("state")
+      city_id = request_body.get("state")
       
       # Check if required fields are not empty
       if not email or not password:
@@ -193,14 +229,12 @@ def handle_professionals():
           password=password,
           birth_date=birth_date,
           gender=gender,
-          speciality=speciality,
           certificate=certificate,
           profile_picture=profile_picture,
           telephone=telephone,
-          appointment_type=appointment_type,
           is_active=is_active,
           is_validated=is_validated,
-          state_id=state_id
+          city_id=city_id
         )
         
         db.session.add(new_professional)
@@ -229,6 +263,11 @@ def handle_professional(professional_id):
     if professional is None:
       raise APIException("Professional not found", status_code=404)
     
+    speciality = Speciality.query.get(request_body.get("speciality_id"))
+    if speciality is None:
+      raise APIException("Speciality not found", status_code=404)
+    professional.specialities.append(speciality)
+    
     professional.first_name = request_body.get("first_name", professional.first_name)
     professional.last_name = request_body.get("last_name", professional.last_name)
     professional.email = request_body.get("email", professional.email)
@@ -242,12 +281,11 @@ def handle_professional(professional_id):
     professional.gender = GenderEnum[gender] if gender else professional.gender
     
     professional.gender = request_body.get("gender", professional.gender)
-    professional.speciality = request_body.get("speciality", professional.speciality)
     professional.telephone = request_body.get("telephone", professional.telephone)
-    professional.appointment_type = request_body.get("appointment_type", professional.appointment_type)
     professional.is_active = request_body.get("is_active", professional.is_active)
     professional.is_validated = request_body.get("is_validated", professional.is_validated)
-    professional.state_id = request_body.get("state_id", professional.state_id)
+    professional.city_id = request_body.get("city_id", professional.city_id)
+    professional.profile_picture = request_body.get("profile_picture", professional.profile_picture)
     
     db.session.commit()
     
@@ -262,9 +300,16 @@ def handle_professional(professional_id):
     db.session.commit()
     
     return jsonify({ "message": "Professional deleted successfully" }), 200
-    
-@api.route('/professionals/<int:professional_id>/availabilities', methods=['GET', 'POST'])
-def handle_professional_availabilities(professional_id):
+
+@api.route('/professionals/<int:professional_id>/availabilities', methods=['GET'])
+def get_professional_appointments(professional_id):
+  professional = Professional.query.get(professional_id)
+  return jsonify(professional.serialize_availabilities()), 200
+
+@api.route('/professionals/availabilities', methods=['GET', 'POST'])
+@jwt_required()
+def handle_professional_availabilities():
+  current_professional_id = get_jwt_identity()
   if request.method == 'POST':
     request_body = request.json
     
@@ -285,8 +330,8 @@ def handle_professional_availabilities(professional_id):
     
     # Check if date is in the correct format
     try:
-      start_time = datetime.strptime(start_time, "%H:%M").time()
-      end_time = datetime.strptime(end_time, "%H:%M").time()
+      start_time = datetime.strptime(start_time, "%H:%M:%S").time()
+      end_time = datetime.strptime(end_time, "%H:%M:%S").time()
     except Exception as e:
       raise APIException("Invalid time format", status_code=400)
     
@@ -295,7 +340,7 @@ def handle_professional_availabilities(professional_id):
       raise APIException("End time must be greater than start time", status_code=400)
     
     # Check if availability already exists
-    exist_availability = Availability.query.filter_by(professional_id=professional_id, date=date, start_time=start_time, end_time=end_time).first()
+    exist_availability = Availability.query.filter_by(professional_id=current_professional_id, date=date, start_time=start_time, end_time=end_time).first()
     
     if exist_availability:
       raise APIException("Availability already exists", status_code=400)
@@ -303,7 +348,7 @@ def handle_professional_availabilities(professional_id):
     # Check if availability overlaps with an existing one
     overlapping_availability = Availability.query.filter(
       Availability.date == date,
-      Availability.professional_id == professional_id,
+      Availability.professional_id == current_professional_id,
       ((Availability.start_time <= start_time) & (Availability.end_time > start_time)) |
       ((Availability.start_time < end_time) & (Availability.end_time >= end_time)) |
       ((Availability.start_time >= start_time) & (Availability.end_time <= end_time))
@@ -315,7 +360,7 @@ def handle_professional_availabilities(professional_id):
     # Create availability in the database
     try:
       new_availability = Availability(
-        professional_id=professional_id,
+        professional_id=current_professional_id,
         date=date,
         start_time=start_time,
         end_time=end_time,
@@ -324,6 +369,12 @@ def handle_professional_availabilities(professional_id):
         is_presential=is_presential
       )
       
+      print(new_availability.weekly)
+      
+      if new_availability.weekly:
+        print("Generating recurrent availability")
+        new_availability.generate_recurrent_availability()
+      
       db.session.add(new_availability)
       db.session.commit()
     except Exception as e:
@@ -331,8 +382,9 @@ def handle_professional_availabilities(professional_id):
     
     return jsonify({ "message": "Availability created successfully" }), 201
   elif request.method == 'GET':
-    professional = Professional.query.get(professional_id)
-    return jsonify(professional.serialize_availabilities()), 200
+    availabilities = Availability.query.filter_by(professional_id=current_professional_id).all()
+    availabilities = list(map(lambda x: x.serialize(), availabilities))
+    return jsonify({ "availabilities": availabilities }), 200
   
 @api.route('/professionals/<int:professional_id>/availabilities/<int:availability_id>', methods=['GET', 'DELETE'])
 def handle_professional_availability(professional_id, availability_id):
@@ -351,6 +403,42 @@ def handle_professional_availability(professional_id, availability_id):
     db.session.commit()
     
     return jsonify({ "message": "Availability deleted successfully" }), 200
+  
+@api.route('/professionals/appointments', methods=['GET', 'DELETE'])
+@jwt_required()
+def handle_professional_appointments():
+  current_professional_id = get_jwt_identity()
+
+  professional = Professional.query.get(current_professional_id)
+  if professional is None:
+    raise APIException("Professional not found", status_code=404)
+  
+  appointments = Appointment.query.filter_by(professional_id=current_professional_id).all()
+  if appointments is None:
+    raise APIException("Professional appointments not found", status_code=404)
+  
+  appointments = list(map(lambda x: x.serialize(), appointments))
+  return jsonify(appointments), 200
+    
+    
+@api.route('/professionals/appointments/<int:appointment_id>', methods=['DELETE'])
+@jwt_required()
+def delete_professional_appointment(appointment_id):
+  current_professional_id = get_jwt_identity()
+  
+  appointment = Appointment.query.filter_by(professional_id=current_professional_id, id=appointment_id).first()
+  
+  if appointment is None:
+    raise APIException("Professional appointment not found", status_code=404)
+  
+  availability = Availability.query.get(appointment.availability_id)
+  
+  availability.is_available = True
+  
+  db.session.delete(appointment)
+  db.session.commit()
+  
+  return jsonify({ "message": "Appointment deleted successfully" }), 200
 
 @api.route('/comments', methods=['GET', 'POST'])
 def handle_comments():
@@ -433,6 +521,11 @@ def handle_states():
     states = list(map(lambda x: x.serialize(), states))
     return jsonify(states), 200
   
+@api.route('/states/<int:state_id>/cities', methods=['GET'])
+def handle_state_cities(state_id):
+  state = State.query.get(state_id)
+  return jsonify(state.get_cities()), 200
+  
 @api.route('/specialities', methods=['GET', 'POST'])
 def handle_specialities():
   if request.method == 'POST':
@@ -508,6 +601,11 @@ def login():
     # Si existe el usuario, chequear si la contraseña es correcta
     if not check_password_hash(user.password, password):
       raise APIException("User credentials incorrect", status_code=400)
+    
+    # Chequear si el usuario está activo
+    if not user.is_active:
+      raise APIException("User is not active", status_code=400)
+    
     # Devolver un token de acceso
     access_token = create_access_token(identity=user.id)
     return jsonify({ "message": "Login successful", "token": access_token, "user": user.serialize() }), 200
@@ -516,6 +614,11 @@ def login():
     print(check_password_hash(professional.password, password))
     if not check_password_hash(professional.password, password):
       raise APIException("Professional credentials incorrect", status_code=400)
+    
+    # Chequear si el profesional está activo
+    if not professional.is_active:
+      raise APIException("Professional is not active, please contact with administrator", status_code=400)
+    
     # Devolver un token de acceso
     access_token = create_access_token(identity=professional.id)
     return jsonify({ "message": "Login successful", "token": access_token, "professional": professional.serialize() }), 200
