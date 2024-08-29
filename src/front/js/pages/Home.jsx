@@ -6,9 +6,27 @@ import { Link } from "react-router-dom";
 export const Home = () => {
   const { store, actions } = useContext(Context);
 
+  const handleVerifyEmail = async () => {
+    const email = store.currentUser?.email;
+    if (email) {
+      await actions.verifyEmail(email);
+    } else {
+      console.error("Email de usuario no encontrado.");
+    }
+  };
+
   return (
     <div className="contenido">
       <section className="container" style={{ paddingTop: "64px" }}>
+        {/* Lo muestra solo si el usuario está logueado y is_active=False */}
+        {store.currentUser && !store.currentUser.is_active && (
+          <div className="alert alert-info text-center text-normal" role="alert">
+            ¡Activa tu cuenta! Presiona aquí para verificar tu email:{" "}
+            <button onClick={handleVerifyEmail} className="btn btn-link">
+              Activar cuenta
+            </button>
+          </div>
+        )}
         <div className="d-flex flex-column align-items-center gap-4 py-4">
           <h2 className="text-title text-center">
             Reserva tu cita médica en línea, fácil y rápido
@@ -63,11 +81,11 @@ export const Home = () => {
           <div className="row">
             <div className="col-md-6 px-3">
               <h2 className="text-title text-primary mt-5">Misión</h2>
-              <p className="text-normal text-start">Nuestra misión es conectar a profesionales de la salud con sus 
-                pacientes de manera directa, ofreciendo una plataforma sencilla y eficiente que facilita la gestión de 
+              <p className="text-normal text-start">Nuestra misión es conectar a profesionales de la salud con sus
+                pacientes de manera directa, ofreciendo una plataforma sencilla y eficiente que facilita la gestión de
                 citas, la comunicación y el pago de servicios.</p>
-                <p className="text-normal text-start">Nos enfocamos en brindar una experiencia transparente y 
-                segura, garantizando la protección de los datos personales y asegurando la satisfacción tanto de los 
+              <p className="text-normal text-start">Nos enfocamos en brindar una experiencia transparente y
+                segura, garantizando la protección de los datos personales y asegurando la satisfacción tanto de los
                 profesionales como de los pacientes.</p>
             </div>
             <div className="col-md-6">
@@ -85,128 +103,128 @@ export const Home = () => {
                 alt="Illustration"
               />
             </div>
-          <div className="col-md-6 px-3">
-            <h2 className="text-title text-primary mt-5">Visión</h2>
-            <p className="text-normal text-start">Aspiramos a ser la plataforma líder en la gestión de citas y servicios de 
-              salud en línea en Uruguay, reconocida por su eficiencia, facilidad de uso y 
-              compromiso con la seguridad y privacidad de nuestros usuarios.</p>
-               <p className="text-normal text-start">Queremos 
-              transformar la manera en que los pacientes acceden a los servicios de salud, 
-              promoviendo un modelo más directo, accesible y personalizado, con la posibilidad
-               de acceder a consultas a distancia de forma segura.</p>
+            <div className="col-md-6 px-3">
+              <h2 className="text-title text-primary mt-5">Visión</h2>
+              <p className="text-normal text-start">Aspiramos a ser la plataforma líder en la gestión de citas y servicios de
+                salud en línea en Uruguay, reconocida por su eficiencia, facilidad de uso y
+                compromiso con la seguridad y privacidad de nuestros usuarios.</p>
+              <p className="text-normal text-start">Queremos
+                transformar la manera en que los pacientes acceden a los servicios de salud,
+                promoviendo un modelo más directo, accesible y personalizado, con la posibilidad
+                de acceder a consultas a distancia de forma segura.</p>
+            </div>
           </div>
-        </div>
         </div>
       </section >
 
 
-  <section className="container">
-    <div className="d-flex flex-column align-items-center py-4">
-      <h2 className="text-title">Preguntas Frecuentes</h2>
+      <section className="container">
+        <div className="d-flex flex-column align-items-center py-4">
+          <h2 className="text-title">Preguntas Frecuentes</h2>
 
-      <div className="accordion" id="faq">
-        <div className="accordion-item">
-          <h2 className="accordion-header">
-            <button
-              className="accordion-button text-label"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#faq-1"
-              aria-expanded="true"
-              aria-controls="faq-1"
-            >
-              ¿Puedo agendar más de una cita a la vez?
-            </button>
-          </h2>
-          <div
-            id="faq-1"
-            className="accordion-collapse collapse show"
-            data-bs-parent="#faq"
-          >
-            <div className="accordion-body text-normal">
-              Sí, es posible tener reservadas varias citas, siempre y cuando
-              no coincidan en día y horario. Podrás ver todas tus citas agendadas en tu cuenta.
+          <div className="accordion" id="faq">
+            <div className="accordion-item">
+              <h2 className="accordion-header">
+                <button
+                  className="accordion-button text-label"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#faq-1"
+                  aria-expanded="true"
+                  aria-controls="faq-1"
+                >
+                  ¿Puedo agendar más de una cita a la vez?
+                </button>
+              </h2>
+              <div
+                id="faq-1"
+                className="accordion-collapse collapse show"
+                data-bs-parent="#faq"
+              >
+                <div className="accordion-body text-normal">
+                  Sí, es posible tener reservadas varias citas, siempre y cuando
+                  no coincidan en día y horario. Podrás ver todas tus citas agendadas en tu cuenta.
+                </div>
+              </div>
+            </div>
+            <div className="accordion-item">
+              <h2 className="accordion-header">
+                <button
+                  className="accordion-button collapsed text-label"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#faq-2"
+                  aria-expanded="false"
+                  aria-controls="faq-2"
+                >
+                  ¿Puedo cancelar o reprogramar una cita?
+                </button>
+              </h2>
+              <div
+                id="faq-2"
+                className="accordion-collapse collapse"
+                data-bs-parent="#faq"
+              >
+                <div className="accordion-body text-normal">
+                  Sí, puedes cancelar o reprogramar tu cita a través de nuestro
+                  sistema de reservas en línea. Solo debes iniciar sesión con tu
+                  cuenta y buscar la cita que deseas modificar.
+                </div>
+              </div>
+            </div>
+            <div className="accordion-item">
+              <h2 className="accordion-header">
+                <button
+                  className="accordion-button collapsed text-label"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#faq-3"
+                  aria-expanded="false"
+                  aria-controls="faq-3"
+                >
+                  ¿Cómo reservo un servicio?
+                </button>
+              </h2>
+              <div
+                id="faq-3"
+                className="accordion-collapse collapse"
+                data-bs-parent="#faq"
+              >
+                <div className="accordion-body text-normal">
+                  Es muy sencillo. Solo tienes que seleccionar el o la profesional
+                  o servicio que necesitas, hacer click en reservar y
+                  seguir los pasos indicados en el formulario de reserva.
+                </div>
+              </div>
+            </div>
+            <div className="accordion-item">
+              <h2 className="accordion-header">
+                <button
+                  className="accordion-button collapsed text-label"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#faq-4"
+                  aria-expanded="false"
+                  aria-controls="faq-4"
+                >
+                  ¿Qué formas de pago aceptan?
+                </button>
+              </h2>
+              <div
+                id="faq-4"
+                className="accordion-collapse collapse"
+                data-bs-parent="#faq"
+              >
+                <div className="accordion-body text-normal">
+                  Utilizamos Mercado Pago como pasarela de pago, por lo que
+                  aceptamos una amplia variedad de tarjetas e incluso pagos por
+                  redes de cobranza.
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="accordion-item">
-          <h2 className="accordion-header">
-            <button
-              className="accordion-button collapsed text-label"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#faq-2"
-              aria-expanded="false"
-              aria-controls="faq-2"
-            >
-              ¿Puedo cancelar o reprogramar una cita?
-            </button>
-          </h2>
-          <div
-            id="faq-2"
-            className="accordion-collapse collapse"
-            data-bs-parent="#faq"
-          >
-            <div className="accordion-body text-normal">
-              Sí, puedes cancelar o reprogramar tu cita a través de nuestro
-              sistema de reservas en línea. Solo debes iniciar sesión con tu
-              cuenta y buscar la cita que deseas modificar.
-            </div>
-          </div>
-        </div>
-        <div className="accordion-item">
-          <h2 className="accordion-header">
-            <button
-              className="accordion-button collapsed text-label"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#faq-3"
-              aria-expanded="false"
-              aria-controls="faq-3"
-            >
-              ¿Cómo reservo un servicio?
-            </button>
-          </h2>
-          <div
-            id="faq-3"
-            className="accordion-collapse collapse"
-            data-bs-parent="#faq"
-          >
-            <div className="accordion-body text-normal">
-              Es muy sencillo. Solo tienes que seleccionar el o la profesional
-              o servicio que necesitas,&nbsp;&nbsp;hacer click en reservar y
-              seguir los pasos indicados en el formulario de reserva.
-            </div>
-          </div>
-        </div>
-        <div className="accordion-item">
-          <h2 className="accordion-header">
-            <button
-              className="accordion-button collapsed text-label"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#faq-4"
-              aria-expanded="false"
-              aria-controls="faq-4"
-            >
-              ¿Qué formas de pago aceptan?
-            </button>
-          </h2>
-          <div
-            id="faq-4"
-            className="accordion-collapse collapse"
-            data-bs-parent="#faq"
-          >
-            <div className="accordion-body text-normal">
-              Utilizamos Mercado Pago como pasarela de pago, por lo que
-              aceptamos una amplia variedad de tarjetas e incluso pagos por
-              redes de cobranza.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+      </section>
     </div >
   );
 };
