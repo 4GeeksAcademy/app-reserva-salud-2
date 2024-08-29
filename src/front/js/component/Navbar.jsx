@@ -74,7 +74,19 @@ export function Navbar() {
               </li>
             ) : null
             }
-
+            {
+              store.currentProfessional && (
+                <li className="nav-item">
+                  <Link
+                    className={`nav-link text-white text-normal ${({ isActive }) =>
+                      isActive ? "active" : ""}`}
+                    to={"/disponibilidad"}
+                  >
+                    Disponibilidad
+                  </Link>
+                </li>
+              )
+            }
             {
               store.currentUser || store.currentProfessional
                 ? (

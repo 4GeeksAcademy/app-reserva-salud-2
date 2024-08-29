@@ -53,9 +53,7 @@ export const VistaInfoProfesional = () => {
         <div className="col text-center">
           <img
             src={professional.profile_picture}
-            className="img-fluid"
-            width={200}
-            height={200}
+            className="profile-picture"
             alt="Profile picture"
           />
         </div>

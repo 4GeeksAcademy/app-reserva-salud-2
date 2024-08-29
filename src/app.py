@@ -13,7 +13,10 @@ from api.models import db
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from datetime import timedelta
 
+# Import the cloudinary configuration
+from api import config
 # from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
@@ -21,6 +24,7 @@ static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=24)
 
 from flask_mail import Mail #IMPORTAR LA FUNCION Mail() de flask_mail
 

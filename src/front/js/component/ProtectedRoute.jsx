@@ -5,10 +5,14 @@ import { Navigate } from 'react-router-dom';
 export const ProtectedRoute = ({ element, ...rest }) => {
   const { store } = useContext(Context);
 
-  if (!store.currentUser) {
+  if (store.currentUser === false) {
     return <Navigate to='/login' replace />
   }
 
-  return element
+  if (store.currentUser) {
+    return element;
+  }
+
+  return null;
 }
 
