@@ -4,11 +4,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home.jsx";
 import { VistaRegistro } from "./pages/RegistroUsuario.jsx";
 import { VistaTerminosYCondiciones } from "./pages/TerminosYCondiciones.jsx";
-import { VistaRegistroProfesional } from "./pages/RegistroProfesional.jsx";
 import { VistaInfoProfesional } from "./pages/InfoProfesional.jsx";
 import { VistaPoliticaPrivacidad } from "./pages/PoliticaDePrivacidad.jsx";
 import { VistaContacto } from "./pages/Contacto.jsx";
 import { AgendaProfesional } from "./pages/AgendaProfesional.jsx";
+
+import { VistaRestablecerClave } from "./pages/RestablecerClave.jsx";
 
 import { VistaNuevoRegistroUnificado } from "./pages/NuevoRegistroUnificado.jsx";
 import { VistaNuevoRegistroPaciente } from "./pages/NuevoRegistroPaciente.jsx";
@@ -17,7 +18,6 @@ import { VistaNuevoRegistroProfesional } from "./pages/NuevoRegistroProfesional.
 import { VistaPerfilProfesional } from "./pages/PerfilProfesionalProvisorio.jsx";
 import { Paciente } from "./pages/DatosPaciente.jsx";
 import { DisponibilidadProfesional } from "./pages/DisponibilidadProfesional.jsx";
-
 import injectContext, { Context } from "./store/appContext";
 
 import { Navbar } from "./component/Navbar.jsx";
@@ -27,6 +27,7 @@ import { Profesionales } from "./pages/Profesionales.jsx";
 import { ProtectedRoute } from "./component/ProtectedRoute.jsx";
 import { Toaster } from "react-hot-toast";
 import { PerfilProfesional } from "./pages/PerfilProfesional.jsx";
+import { VistaActivarUsuario } from "./pages/ActivarUsuario.jsx";
 
 //create your first component
 const Layout = () => {
@@ -43,7 +44,6 @@ const Layout = () => {
         <Routes>
           <Route element={<Home />} path="/" />
           <Route element={<VistaRegistro />} path="/registro-usuario" />
-          <Route element={<VistaRegistroProfesional />} path="/registro-profesional" />
           <Route element={<VistaPoliticaPrivacidad />} path="/politica-privacidad" />
           <Route element={<VistaContacto />} path="/contacto" />
 
@@ -57,7 +57,7 @@ const Layout = () => {
           <Route element={<VistaNuevoRegistroUnificado />} path="/nuevo-registro" />
           <Route element={<VistaNuevoRegistroPaciente />} path="/nuevo-registro-paciente" />
           <Route element={<VistaNuevoRegistroProfesional />} path="/nuevo-registro-profesional" />
-
+          <Route element={<VistaActivarUsuario />} path="/activate-user" />
           <Route element={<Paciente />} path="/datos-paciente" />
           <Route element={<Login />} path="/login" />
           <Route
@@ -70,6 +70,7 @@ const Layout = () => {
           <Route element={<VistaTerminosYCondiciones />} path="/terminos-y-condiciones" />
           <Route element={<Profesionales />} path="/profesionales" />
           <Route element={<PerfilProfesional />} path="/profesional/perfil" />
+          <Route element={<VistaRestablecerClave />} path="/restablecer" />
           <Route element={<h1>Not found!</h1>} />
         </Routes>
         <Footer />

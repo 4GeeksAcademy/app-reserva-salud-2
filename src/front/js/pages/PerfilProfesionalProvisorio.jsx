@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { TarjetaCitasProfesional } from "../component/TarjetaCitasProfesional.jsx";
+import { backendApi } from "../store/flux.js";
+import { Context } from "../store/appContext.js";
 
 const citas = [
 
@@ -25,16 +27,28 @@ const citas = [
 ]
 
 export const VistaPerfilProfesional = () => {
+    const [professionalAppointments, setProfessionalAppointments] = useState([]);
+    const { actions } = useContext(Context);
+
+    useEffect(() => {
+        const getProfessionalAppointments = async () => {
+            const response = await actions.getProfessionalAppointments()
+            setProfessionalAppointments(response.data)
+        }
+        getProfessionalAppointments();
+    }, []);
+
+    console.log(professionalAppointments);
 
     return (
         <div className="contenido">
-                <h1 className="text-title text-secondary text-center p-4 m-4">Bienvenido, Nombre Profesional</h1>
+            <h1 className="text-title text-secondary text-center p-4 m-4">Bienvenido, Nombre Profesional</h1>
             <div className="d-flex justify-content-center">
                 <h3 className="text-subtitle mx-3 w-75">Pacientes agendados</h3>
             </div>
             <div>
-                {citas.map((citas) => (
-                    <TarjetaCitasProfesional key={citas.id} citas={citas} />))}
+                {professionalAppointments.map((appointment) => (
+                    <TarjetaCitasProfesional key={appointment.id} appointment={appointment} />))}
             </div>
         </div>
     )
