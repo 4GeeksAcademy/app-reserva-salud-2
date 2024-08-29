@@ -8,6 +8,7 @@ import { VistaInfoProfesional } from "./pages/InfoProfesional.jsx";
 import { VistaPoliticaPrivacidad } from "./pages/PoliticaDePrivacidad.jsx";
 import { VistaContacto } from "./pages/Contacto.jsx";
 import { AgendaProfesional } from "./pages/AgendaProfesional.jsx";
+import { EditarPerfilProfesional } from "./pages/EditarPerfilProfesional.jsx";
 
 import { VistaRestablecerClave } from "./pages/RestablecerClave.jsx";
 
@@ -51,6 +52,7 @@ const Layout = () => {
 
           <Route element={<VistaPerfilProfesional />} path="/perfil-profesional" />
           <Route element={<DisponibilidadProfesional />} path="/disponibilidad" />
+          <Route element={<EditarPerfilProfesional />} path="/editar-perfil" />
           <Route element={<ProtectedRoute element={<AgendaProfesional />} />} path="/agenda/:id" />
 
           {/* Pruebas */}
