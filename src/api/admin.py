@@ -2,7 +2,7 @@
 import os
 from flask_admin import Admin
 
-from .models import db, User, Professional, Appointment, City, State, Availability, Comment, Speciality
+from .models import db, User, Professional, Appointment, City, State, Availability, Comment, Speciality,Data_Pay_Mp
 
 from flask_admin.contrib.sqla import ModelView
 
@@ -22,3 +22,4 @@ def setup_admin(app):
     admin.add_view(ModelView(City, db.session))
     admin.add_view(ModelView(State, db.session))
     admin.add_view(ModelView(Speciality, db.session))
+    admin.add_view(ModelView(Data_Pay_Mp, db.session))

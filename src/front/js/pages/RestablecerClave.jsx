@@ -25,7 +25,7 @@ export const VistaRestablecerClave = () => {
                 })}
                 onSubmit={async (values) => {
                     console.log(values);
-                    await actions.updatePassword(email, values.password); 
+                    await actions.updatePassword(email, values.password);
                 }}
             >
                 {({ handleSubmit }) => (

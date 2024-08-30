@@ -28,6 +28,7 @@ import { ProtectedRoute } from "./component/ProtectedRoute.jsx";
 import { Toaster } from "react-hot-toast";
 import { PerfilProfesional } from "./pages/PerfilProfesional.jsx";
 import { VistaActivarUsuario } from "./pages/ActivarUsuario.jsx";
+import { PaymentState } from "./pages/PaymentState.jsx";
 
 //create your first component
 const Layout = () => {
@@ -51,7 +52,7 @@ const Layout = () => {
 
           <Route element={<VistaPerfilProfesional />} path="/perfil-profesional" />
           <Route element={<DisponibilidadProfesional />} path="/disponibilidad" />
-          <Route element={<ProtectedRoute element={<AgendaProfesional />} />} path="/agenda/:id" />
+          <Route element={<ProtectedRoute element={<AgendaProfesional />} />} path="/agenda/:professionalId" />
 
           {/* Pruebas */}
           <Route element={<VistaNuevoRegistroUnificado />} path="/nuevo-registro" />
@@ -71,6 +72,7 @@ const Layout = () => {
           <Route element={<Profesionales />} path="/profesionales" />
           <Route element={<PerfilProfesional />} path="/profesional/perfil" />
           <Route element={<VistaRestablecerClave />} path="/restablecer" />
+          <Route element={<PaymentState />} path="/payment-state" />
           <Route element={<h1>Not found!</h1>} />
         </Routes>
         <Footer />

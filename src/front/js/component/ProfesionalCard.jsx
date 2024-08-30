@@ -33,8 +33,6 @@ export const ProfesionalCard = ({ professional }) => {
     return 0;
   };
 
-  console.log(professional)
-
   return (
 
     <div className='card bg-primary text-white' onClick={() => navigate(`${professional.id}`)} style={{ cursor: "pointer" }}>
