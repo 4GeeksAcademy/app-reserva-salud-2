@@ -36,12 +36,12 @@ export const VistaActivarUsuario = () => {
             <h6 className="text-center">Presiona en el botón Confirmar para activar tu cuenta</h6>
             <div className="mb-3 w-100 d-flex justify-content-center">
                 <div className='text-center'>
-                    <button 
-                        type="submit" 
-                        className="btn bg-primary text-white mb-4" 
+                    <button
+                        type="submit"
+                        className="btn bg-primary text-white mb-4"
                         onClick={handleActivateUser}
                     >
-                       Confirmar
+                        Confirmar
                     </button>
                 </div>
             </div>

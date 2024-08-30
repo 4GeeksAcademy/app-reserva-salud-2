@@ -21,6 +21,7 @@ typing-extensions = "*"
 flask-bcrypt = "*"
 flask-jwt-extended = "*"
 requests = "*"
+mercadopago = "*"
 flask-mail = "*"
 
 [requires]

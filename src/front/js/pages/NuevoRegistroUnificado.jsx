@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { Context } from "../store/appContext";
-import { ModalTerminosyCondiciones} from "../component/ModalTerminosYCondiciones.jsx";
+import { ModalTerminosyCondiciones } from "../component/ModalTerminosYCondiciones.jsx";
 
 export const VistaNuevoRegistroUnificado = () => {
   const { actions } = useContext(Context);
@@ -37,7 +37,6 @@ export const VistaNuevoRegistroUnificado = () => {
           ),
         })}
         onSubmit={async (values) => {
-          console.log(values);
 
           if (values.rol === "profesional") {
             try {
@@ -171,7 +170,7 @@ export const VistaNuevoRegistroUnificado = () => {
           </Form>
         </div>
       </Formik>
-      
+
       {mostrarModal && (
         <ModalTerminosyCondiciones mostrarModal={mostrarModal} cerrarModal={cerrarModal} />
       )}

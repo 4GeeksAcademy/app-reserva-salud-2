@@ -1,31 +1,43 @@
-import React,{useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { backendApi } from "../store/flux";
-import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 
 export const TarjetaCitasUsuario = ({ appointment }) => {
+  const navigate = useNavigate();
+
   const [showModal, setShowModal] = useState(false);
   const [comment, setComment] = useState("");
   const [score, setScore] = useState(0);
   const [hasCommented, setHasCommented] = useState(false);
-  
-  
+
+
   const cancelAppointment = async () => {
-    const response = await backendApi.delete(
-      `/users/${appointment.user.id}/appointments/${appointment.id}`
-    );
-    console.log(response);
+    try {
+      const response = await backendApi.post('/refund_payment', { payment_id: appointment?.data_pay?.is_payment });
+      const { data } = response;
+
+      if (data.status === 'approved') {
+        toast.success('Reserva cancelada con éxito');
+        navigate('/');
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Error cancelando la reserva');
+    }
   };
+
   useEffect(() => {
     const commented = localStorage.getItem(`commented_${appointment.id}`) === 'true';
     setHasCommented(commented);
   }, [appointment.id]);
 
-  
+
   //capturo comentario del usuario
   const handleCommentSubmit = async () => {
     try {
       // Realizar la petición para guardar el comentario en la base de datos
-        const response = await backendApi.post(`/comments`, {
+      const response = await backendApi.post(`/comments`, {
         professional_id: appointment?.availability?.professional?.id,
         user_id: appointment.user.id,
         appointment_id: appointment.id,
@@ -54,7 +66,7 @@ export const TarjetaCitasUsuario = ({ appointment }) => {
   const isPastAppointment = appointmentDate < currentDate;
   // console.log("isPastAppointment:", isPastAppointment);
   return (
-     
+
     <div className="col">
       <div className={`card shadow ${isPastAppointment ? 'bg-light opacity-50' : ''}`}>
         <div className="card-body">
@@ -72,12 +84,12 @@ export const TarjetaCitasUsuario = ({ appointment }) => {
             </div>
             <div className="col">
               <button className={`btn w-100  ${isPastAppointment ? 'btn-dark' : 'btn-danger'}`}
-              onClick={cancelAppointment}
-              disabled={isPastAppointment}
+                onClick={cancelAppointment}
+                disabled={isPastAppointment}
               >
                 Cancelar Reserva
               </button>
-              </div>
+            </div>
           </div>
           {/* Contenedor del botón "Comentar" */}
           {isPastAppointment && (
@@ -94,7 +106,7 @@ export const TarjetaCitasUsuario = ({ appointment }) => {
                   }}
                   disabled={hasCommented} // Deshabilitar si ya se ha comentado
                   style={{ opacity: hasCommented ? 0.5 : 1 }}
-                  >
+                >
                   Comentar Servicio
                 </button>
               </div>

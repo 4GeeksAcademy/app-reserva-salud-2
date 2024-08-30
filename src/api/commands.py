@@ -2,6 +2,7 @@
 import click
 from api.models import City, Speciality, State, db, User, Professional
 import random
+import json
 
 """
 In this file, you can add as many commands as you want using the @app.cli.command decorator
@@ -20,11 +21,27 @@ def setup_commands(app):
     def insert_test_users(count):
         print("Creating test users")
         for x in range(1, int(count) + 1):
-            name = f"Test User {x}"
+            first_name = "Test"
+            last_name = "User " + str(x)
             email = "test_user" + str(x) + "@test.com"
             password = "12345678"
-            
-            new_user = User(name=name, email=email, password=password, is_active=True)
+            birth_date = "1990-05-01"
+            state_id = random.randint(1, 19)
+            # Obtengo todas las ciudades del departamento pasado
+            cities = City.query.filter_by(state_id=state_id).all()
+            # Elijo una ciudad al azar, obtengo su id y la asigno al city_id
+            city_id = random.choice(cities).id
+                        
+            new_user = User(
+                first_name=first_name, 
+                last_name=last_name, 
+                email=email, 
+                password=password, 
+                birth_date=birth_date, 
+                state_id=state_id, 
+                city_id=city_id, 
+                is_active=True
+            )
 
             db.session.add(new_user)
             db.session.commit()
@@ -37,11 +54,39 @@ def setup_commands(app):
         print("Creating test professionals")
         for x in range(1, int(count) + 1):
             first_name = "Test"
-            last_name = "Professional" + str(x)
+            last_name = "Professional " + str(x)
             email = "test_professional" + str(x) + "@test.com"
-            password = "12345678"  
+            password = "12345678"
+            birth_date = "1990-05-01"
+            gender = random.choice(["MALE", "FEMALE"])
+            certificate = "https://marketplace.canva.com/EAFQNGff-B8/1/0/400w/canva-certificado-de-reconocimiento-simple-azul-y-amarillo-E3DUzxgk4yM.jpg"
+            profile_picture = f"https://avatar.iran.liara.run/public/job/doctor/{gender.lower()}"
+            state_id = random.randint(1, 19)
+            # Obtengo todas las ciudades del departamento pasado
+            cities = City.query.filter_by(state_id=state_id).all()
+            # Elijo una ciudad al azar, obtengo su id y la asigno al city_id
+            city_id = random.choice(cities).id
+            telephone = "099" + str(random.randint(100000, 999999))
             
-            new_professional = Professional(first_name=first_name, last_name=last_name, email=email, password=password, is_active=True)
+            new_professional = Professional(
+                first_name=first_name, 
+                last_name=last_name, 
+                email=email, 
+                password=password, 
+                birth_date=birth_date,
+                gender=gender,
+                certificate=certificate,
+                profile_picture=profile_picture,
+                state_id=state_id,
+                city_id=city_id,
+                telephone=telephone,
+                is_validated=True,
+                is_active=True
+            )
+            
+            # Asigno una especialidad al profesional
+            specialities = Speciality.query.all()
+            new_professional.specialities.append(random.choice(specialities))
 
             db.session.add(new_professional)
             db.session.commit()
@@ -51,227 +96,20 @@ def setup_commands(app):
     def insert_test_states():
         print("Creating test states")
 
-        artigas = State(name="Artigas")
-        bella_union = City(name="Bella Unión", state_id=artigas.id)
-        artigas.cities.append(bella_union)
-        las_piedras = City(name="Las Piedras", state_id=artigas.id)
-        artigas.cities.append(las_piedras)
-        tomass_gomensoro = City(name="Tomás Gomensoro", state_id=artigas.id)
-        artigas.cities.append(tomass_gomensoro)
-        piedra_pintada = City(name="Piedra Pintada", state_id=artigas.id)
-        artigas.cities.append(piedra_pintada)
-        la_azotea = City(name="La Azotea", state_id=artigas.id)
-        artigas.cities.append(la_azotea)
-        baltasar_brum = City(name="Baltasar Brum", state_id=artigas.id)
-        artigas.cities.append(baltasar_brum)
-        
-        db.session.add(artigas)
-        db.session.commit()
-
-        canelones = State(name="Canelones")
-        aguas_corrientes = City(name="Aguas Corrientes", state_id=canelones.id)
-        canelones.cities.append(aguas_corrientes)
-        atlantida = City(name="Atlántida", state_id=canelones.id)
-        canelones.cities.append(atlantida)
-        barra_de_carrasco = City(name="Barra de Carrasco", state_id=canelones.id)
-        canelones.cities.append(barra_de_carrasco)
-        barros_blancos = City(name="Barros Blancos", state_id=canelones.id)
-        canelones.cities.append(barros_blancos)
-        canelones_city = City(name="Canelones", state_id=canelones.id)
-        canelones.cities.append(canelones_city)
-        ciudad_de_la_costa = City(name="Ciudad de la Costa", state_id=canelones.id)
-        canelones.cities.append(ciudad_de_la_costa)
-        el_pinar = City(name="El Pinar", state_id=canelones.id)
-        canelones.cities.append(el_pinar)
-        la_floresta = City(name="La Floresta", state_id=canelones.id)
-        canelones.cities.append(la_floresta)
-        lagomar = City(name="Lagomar", state_id=canelones.id)
-        canelones.cities.append(lagomar)
-        
-        db.session.add(canelones)
-        db.session.commit()
-
-        cerro_largo = State(name="Cerro Largo")
-        acegua = City(name="Aceguá", state_id=cerro_largo.id)
-        cerro_largo.cities.append(acegua)
-        la_pedrera = City(name="La Pedrera", state_id=cerro_largo.id)
-        cerro_largo.cities.append(la_pedrera)
-        melo = City(name="Melo", state_id=cerro_largo.id)
-        cerro_largo.cities.append(melo)
-        quebracho = City(name="Quebracho", state_id=cerro_largo.id)
-        cerro_largo.cities.append(quebracho)
-        rio_branco = City(name="Río Branco", state_id=cerro_largo.id)
-        cerro_largo.cities.append(rio_branco)
-        sarandi = City(name="Sarandí", state_id=cerro_largo.id)
-        cerro_largo.cities.append(sarandi)
-        toledo = City(name="Toledo", state_id=cerro_largo.id)
-        cerro_largo.cities.append(toledo)
-        
-        db.session.add(cerro_largo)
-        db.session.commit()
-
-        colonia = State(name="Colonia")
-        carmelo = City(name="Carmelo", state_id=colonia.id)
-        colonia.cities.append(carmelo)
-        colonia_del_sacramento = City(name="Colonia del Sacramento", state_id=colonia.id)
-        colonia.cities.append(colonia_del_sacramento)
-        colonia_valdense = City(name="Colonia Valdense", state_id=colonia.id)
-        colonia.cities.append(colonia_valdense)
-        colonia_suiza = City(name="Colonia Suiza", state_id=colonia.id)
-        colonia.cities.append(colonia_suiza)
-        juan_lacaze = City(name="Juan Lacaze", state_id=colonia.id)
-        colonia.cities.append(juan_lacaze)
-        nueva_helvecia = City(name="Nueva Helvecia", state_id=colonia.id)
-        colonia.cities.append(nueva_helvecia)
-        nueva_palmira = City(name="Nueva Palmira", state_id=colonia.id)
-        colonia.cities.append(nueva_palmira)
-        ombues_de_lavalle = City(name="Ombúes de Lavalle", state_id=colonia.id)
-        colonia.cities.append(ombues_de_lavalle)
-        
-        db.session.add(colonia)
-        db.session.commit()
-        
-        durazno = State(name="Durazno")
-        durazno_city = City(name="Durazno", state_id=durazno.id)
-        durazno.cities.append(durazno_city)
-        baygorria = City(name="Baygorria", state_id=durazno.id)
-        durazno.cities.append(baygorria)
-        el_chaco = City(name="El Chaco", state_id=durazno.id)
-        durazno.cities.append(el_chaco)
-        sarandi_del_yi = City(name="Sarandí del Yi", state_id=durazno.id)
-        durazno.cities.append(sarandi_del_yi)
-        sauce = City(name="Sauce", state_id=durazno.id)
-        durazno.cities.append(sauce)
-        
-        db.session.add(durazno)
-        db.session.commit()
-        
-        flores = State(name="Flores")
-        trinidad = City(name="Trinidad", state_id=flores.id)
-        flores.cities.append(trinidad)
-        el_tala = City(name="El Tala", state_id=flores.id)
-        flores.cities.append(el_tala)
-        cerro_colorado = City(name="Cerro Colorado", state_id=flores.id)
-        flores.cities.append(cerro_colorado)
-        ismael_cortinas = City(name="Ismael Cortinas", state_id=flores.id)
-        flores.cities.append(ismael_cortinas)
-        la_casilla = City(name="La Casilla", state_id=flores.id)
-        flores.cities.append(la_casilla)
-        el_coronilla = City(name="El Coronilla", state_id=flores.id)
-        flores.cities.append(el_coronilla)
-        
-        db.session.add(flores)
-        db.session.commit()
-
-        florida = State(name="Florida")
-        casupa = City(name="Casupá", state_id=florida.id)
-        florida.cities.append(casupa)
-        capilla_del_sauce = City(name="Capilla del Sauce", state_id=florida.id)
-        florida.cities.append(capilla_del_sauce)
-        puntas_de_maciel = City(name="Puntas de Maciel", state_id=florida.id)
-        florida.cities.append(puntas_de_maciel)
-        
-        db.session.add(florida)
-        db.session.commit()
-
-        lavalleja = State(name="Lavalleja")
-        minas = City(name="Minas", state_id=lavalleja.id)
-        lavalleja.cities.append(minas)
-        mariscala = City(name="Mariscala", state_id=lavalleja.id)
-        lavalleja.cities.append(mariscala)
-        solis_de_mataojo = City(name="Solís de Mataojo", state_id=lavalleja.id)
-        lavalleja.cities.append(solis_de_mataojo)
-        villa_serrana = City(name="Villa Serrana", state_id=lavalleja.id)
-        lavalleja.cities.append(villa_serrana)
-        estacion_solis = City(name="Estación Solís", state_id=lavalleja.id)
-        lavalleja.cities.append(estacion_solis)
-        piraraja = City(name="Pirarajá", state_id=lavalleja.id)
-        lavalleja.cities.append(piraraja)
-        zapican = City(name="Zapicán", state_id=lavalleja.id)
-        lavalleja.cities.append(zapican)
-        jose_batlle_y_ordonez = City(name="José Batlle y Ordóñez", state_id=lavalleja.id)
-        lavalleja.cities.append(jose_batlle_y_ordonez)
-        jose_pedro_varela = City(name="José Pedro Varela", state_id=lavalleja.id)
-        lavalleja.cities.append(jose_pedro_varela)
-        villa_del_rosario = City(name="Villa del Rosario", state_id=lavalleja.id)
-        lavalleja.cities.append(villa_del_rosario)
-        
-        db.session.add(lavalleja)
-        db.session.commit()
-        
-        maldonado = State(name="Maldonado")
-        maldonado_city = City(name="Maldonado", state_id=maldonado.id)
-        maldonado.cities.append(maldonado_city)
-        aigua = City(name="Aiguá", state_id=maldonado.id)
-        maldonado.cities.append(aigua)
-        garzon = City(name="Garzón", state_id=maldonado.id)
-        maldonado.cities.append(garzon)
-        jose_ignacio = City(name="José Ignacio", state_id=maldonado.id)
-        maldonado.cities.append(jose_ignacio)
-        la_barra = City(name="La Barra", state_id=maldonado.id)
-        maldonado.cities.append(la_barra)
-        punta_del_este = City(name="Punta del Este", state_id=maldonado.id)
-        maldonado.cities.append(punta_del_este)
-        san_carlos = City(name="San Carlos", state_id=maldonado.id)
-        maldonado.cities.append(san_carlos)
-        piriapolis = City(name="Piriápolis", state_id=maldonado.id)
-        maldonado.cities.append(piriapolis)
-        
-        db.session.add(maldonado)
-        db.session.commit()
-
-        montevideo = State(name="Montevideo")
-        piedras_blancas = City(name="Piedras Blancas", state_id=montevideo.id)
-        montevideo.cities.append(piedras_blancas)
-        pajas_blancas = City(name="Pajas Blancas", state_id=montevideo.id)
-        montevideo.cities.append(pajas_blancas)
-        santiago_vazquez = City(name="Santiago Vázquez", state_id=montevideo.id)
-        montevideo.cities.append(santiago_vazquez)
-        abayuba = City(name="Abayubá", state_id=montevideo.id)
-        montevideo.cities.append(abayuba)
-        montevideo_city = City(name="Montevideo", state_id=montevideo.id)
-        montevideo.cities.append(montevideo_city)
-        
-        db.session.add(montevideo)
-        db.session.commit()
-
-        paysandu = State(name="Paysandú")
-        
-        
-        db.session.add(paysandu)
-        db.session.commit()
-
-        rio_negro = State(name="Río Negro")
-        db.session.add(rio_negro)
-        db.session.commit()
-        
-        rivera = State(name="Rivera")
-        db.session.add(rivera)
-        db.session.commit()
-        
-        rocha = State(name="Rocha")
-        db.session.add(rocha)
-        db.session.commit()
-
-        salto = State(name="Salto")
-        db.session.add(salto)
-        db.session.commit()
-
-        san_jose = State(name="San José")
-        db.session.add(san_jose)
-        db.session.commit()
-
-        soriano = State(name="Soriano")
-        db.session.add(soriano)
-        db.session.commit()
-        
-        tacuarembo = State(name="Tacuarembó")
-        db.session.add(tacuarembo)
-        db.session.commit()
-        
-        treinta_y_tres = State(name="Treinta y Tres")
-        db.session.add(treinta_y_tres)
-        db.session.commit()
+        with open("src/api/states_and_cities.json", 'r') as file:
+            data = json.load(file)
+            for state in data:
+                new_state = State(name=state["name"])
+                
+                for city in state["cities"]:
+                    new_city = City(name=city["name"], state_id=new_state.id)
+                    new_state.cities.append(new_city)
+                    db.session.add(new_city)
+                    
+                db.session.add(new_state)
+                db.session.commit()
+                print("State: ", new_state.name, " created.")
+            
         
         print("All states created")
 
@@ -303,7 +141,8 @@ def setup_commands(app):
         print("All specialities created")
 
     @app.cli.command("insert-test-data")
-    def insert_test_data():
-        insert_test_users(5)
-        insert_test_professionals(5)
+    @click.argument("count")
+    def insert_test_data(count):
+        insert_test_users(count)
+        insert_test_professionals(count)
         print("All test data created")

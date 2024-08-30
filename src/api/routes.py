@@ -2,9 +2,10 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from datetime import datetime
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
 from sqlalchemy import func
-from api.models import Appointment, GenderEnum, Speciality, db, User, Professional, Comment, Availability, State, City
+from api.models import Appointment, GenderEnum, Speciality, db, User, Professional, Comment, Availability, State, City,Data_Pay_Mp
 from api.utils import generate_sitemap, APIException, generate_recurrent_dates
 from flask_cors import CORS
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -25,11 +26,193 @@ cloudinary.config(
     api_secret = os.getenv("CLOUDINARY_SECRET"),
     secure=True
 )
-
+import mercadopago
 api = Blueprint('api', __name__)
+###library para generar un uuid v4 ###
+import uuid
+import os
+import requests
 
 # Allow CORS requests to this API
 CORS(api)
+### genero String unico para el  ###
+idempotency_key = str(uuid.uuid4())
+##endpoint prueba pago mp###
+access_token = os.getenv("ACCESS_TOKEN_MP")
+sdk = mercadopago.SDK(access_token)
+
+@api.route('/create_preference', methods=['POST'])
+def create_preference():
+  preference_data = request.json
+
+  preference_response = sdk.preference().create(preference_data)
+  preference = preference_response["response"]
+  print(preference)
+  
+  return jsonify(preference), preference_response["status"]
+
+@api.route('/get_preference/<preference_id>', methods=['GET'])
+def get_preference(preference_id):
+  preference_response = sdk.preference().get(preference_id)
+  preference = preference_response["response"]
+  
+  return jsonify(preference), preference_response["status"]
+
+@api.route('/get_payment/<payment_id>', methods=['GET'])
+def get_payment(payment_id):
+  payment_response = sdk.payment().get(payment_id)
+  payment = payment_response["response"]
+  
+  return jsonify(payment), payment_response["status"]
+
+@api.route('/process_payment', methods=['POST'])
+def create_payment():
+    # print(request.json)
+    # Generar una clave del tipo string única para x-idempotency-key
+    idempotency_key = str(uuid.uuid4())
+   
+    request_options = mercadopago.config.RequestOptions()
+    request_options.custom_headers = {
+      'x-idempotency-key': idempotency_key
+    }
+
+    # Extraer los datos de la solicitud
+    payer=request.json.get("payer")
+    payment_data = {
+      "transaction_amount": float(request.json.get("transaction_amount")),
+      "token": request.json.get("token"),
+      "description": request.json.get("description"),
+      "installments": int(request.json.get("installments")),
+      "payment_method_id": request.json.get("payment_method_id"),
+      "payer": {
+        "email": payer["email"],
+        "identification": {
+          "type": payer["identification"]["type"], 
+          "number": payer["identification"]["number"]
+        },
+        "first_name": request.json.get("name")
+      }
+    }
+    print("mostrando datos a enviar a mp:",payment_data)
+    try:
+      # Procesar el pago con Mercado Pago
+      payment_response = sdk.payment().create(payment_data, request_options)
+      payment = payment_response.get("response")
+      print(payment)
+      return jsonify(payment), 200
+    except Exception as e:
+      print(f"Error al procesar el pago: {e}")
+      return jsonify({"error": str(e)}), 500
+#enviar pago procesado correctamenta a bd
+@api.route('/data_pay_mp', methods=['POST'])
+def save_payment_mp():
+  try:
+    # Obtener los datos del cuerpo de la solicitud http
+    data = request.json
+
+    authorization_code = data.get('authorization_code')
+    date_approved = data.get('date_approved')
+    date_created = data.get('date_created')
+    id_payment = data.get('id')
+    transaction_amount = data.get('transaction_amount')
+    installments = data.get('installments')
+    status = data.get('status')
+    metadata = data.get('metadata')
+
+    # Accede al email dentro de 'payer'
+    email_client = data.get('payer').get('email')
+
+    # Crear una nueva instancia del modelo Data_Pay_Mp con los datos recibidos desde el front
+    # print("mostrando:", professional_id)
+    payment = Data_Pay_Mp(
+      professional_id=metadata.get("appointment").get("professional").get("id"),
+      authorization_code=authorization_code,
+      date_approved=date_approved,
+      date_created=date_created,
+      id_payment=id_payment,
+      transaction_amount=transaction_amount,
+      installments=installments,
+      status=status,
+      email_client=email_client
+    )
+    
+    # Crear una nueva instancia del modelo Appointment con los datos recibidos desde el front
+    new_appointment = Appointment(
+      user_id=metadata.get("user").get("id"),
+      availability_id=metadata.get("appointment").get("availability_id"),
+      professional_id=metadata.get("appointment").get("professional").get("id"),
+      date=metadata.get("appointment").get("date"),
+      is_confirmed=True,
+      is_done=False,
+      type=metadata.get("appointment").get("reservation_type")
+    )
+    
+    payment.appointment = new_appointment
+    
+    # Deshabilitar la disponibilidad tomada
+    availability = Availability.query.get(metadata.get("appointment").get("availability_id"))
+    availability.is_available = False
+
+    # Guardar los datos en la base de datos
+    db.session.add(payment)
+    db.session.commit()
+    
+    return jsonify({"message": "Payment data saved successfully", "payment": payment.serialize()}), 201
+  except Exception as e:
+    return jsonify({"error": str(e)}), 500
+      
+@api.route('/refund_payment', methods=['POST'])
+def refund_payment():
+  try:
+    # Obtener usuario autenticado
+    payment_id = request.json.get('payment_id')
+    
+    payment = Data_Pay_Mp.query.filter_by(id_payment=payment_id).first()
+    if not payment:
+      raise APIException("Pago no encontrado", status_code=404)
+    
+    # Obtener los datos del pago
+    payment_response = sdk.payment().get(payment_id)
+    
+    # Obtener la cantidad total del pago
+    total_amount = payment_response.get("response").get('transaction_amount')
+
+    # Creando el reembolso
+    refund_response = sdk.refund().create(payment_id, { "amount": total_amount })
+    
+    # Verificar si el reembolso fue exitoso
+    if refund_response.get("response").get("status") == "approved":
+      # Habilitar la disponibilidad tomada
+      availability = Availability.query.get(payment.appointment.availability.id)
+      availability.is_available = True
+      
+      # Eliminar la reserva
+      db.session.delete(payment.appointment)
+      db.session.delete(payment)
+      db.session.commit()
+      
+    # Devolver la respuesta del reembolso
+    return jsonify(refund_response.get("response")), refund_response["status"]
+  except Exception as e:
+    print(str(e))
+    return jsonify({"error": str(e)}), 500
+       
+@api.route('/payments/<id_payment>', methods=['GET'])
+def get_payment_client(id_payment):
+    try:
+        # Utiliza el SDK para obtener la información del pago
+        payment_response = sdk.payment().get(id_payment)
+        
+        # Verifica si la respuesta contiene el pago
+        if payment_response["status"] == 200:
+            payment_data = payment_response["response"]
+            return jsonify(payment_data), 200
+        else:
+            return jsonify({"error": "No se pudo obtener el pago"}), payment_response["status"]
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({"error": str(e)}), 500
 
 @api.route('/upload', methods=['POST'])
 def upload_file():
@@ -44,9 +227,10 @@ def upload_file():
       return jsonify({ 'url': result['secure_url'] }), 200
     except Exception as e:
       print(e)
-      raise APIException("An error ocurred while uploading the file", status_code=400)
+      raise APIException("Ocurrió un error al subir el archivo", status_code=400)
   else:
-      raise APIException("No selected file", status_code=400)
+      raise APIException("No hay archivo seleccionado", status_code=400)
+
 
 @api.route('/users', methods=['GET', 'POST'])
 def handle_users():
@@ -63,10 +247,10 @@ def handle_users():
         
         # Check if required fields are not empty
         if not email or not password:
-            raise APIException("Missing required fields", status_code=400)
+            raise APIException("Faltan campos requeridos", status_code=400)
         
         if User.query.filter_by(email=email).first() or Professional.query.filter_by(email=email).first():
-            raise APIException("Professional or User with this email already exist", status_code=400)
+            raise APIException("Este correo ya lo está usando un profesional o un usuario", status_code=400)
         
         # Create user in the database
         try:
@@ -74,9 +258,9 @@ def handle_users():
           db.session.add(new_user)
           db.session.commit()
         except Exception as e:
-          raise APIException("An error ocurred while creating the user", status_code=400)
+          raise APIException("Ha ocurrido un error al intentar crear el usuario", status_code=400)
           
-        return jsonify({ "message": "User created successfully", "user_id": new_user.id }), 201
+        return jsonify({ "message": "Usuario creado satisfactoriamente", "user_id": new_user.id }), 201
     elif request.method == 'GET':
         users = User.query.all()
         users = list(map(lambda x: x.serialize(), users))
@@ -87,7 +271,7 @@ def handle_user(user_id):
   if request.method == 'GET':
     user = User.query.get(user_id)
     if user is None:
-        raise APIException("User not found", status_code=404)
+        raise APIException("Usuario no encontrado", status_code=404)
     return jsonify(user.serialize()), 200
   elif request.method == 'PUT':
     request_body = request.json
@@ -95,7 +279,7 @@ def handle_user(user_id):
     user = User.query.get(user_id)
     
     if user is None:
-        raise APIException("User not found", status_code=404)
+        raise APIException("Usuario no encontrado", status_code=404)
     
     user.first_name = request_body.get("first_name", user.first_name)
     user.last_name = request_body.get("last_name", user.last_name)
@@ -109,7 +293,7 @@ def handle_user(user_id):
     
     db.session.commit()
     
-    return jsonify({ "message": "User updated successfully" }), 200
+    return jsonify({ "message": "Usuario actualizado satisfactoriamente" }), 200
   elif request.method == 'DELETE':
     user = User.query.get(user_id)
     
@@ -119,7 +303,7 @@ def handle_user(user_id):
     db.session.delete(user)
     db.session.commit()
     
-    return jsonify({ "message": "User deleted successfully" }), 200
+    return jsonify({ "message": "Usuario eliminado stisfactoriamente" }), 200
 
 # Create a new user appointment
 @api.route('/users/appointments', methods=['GET', 'POST'])
@@ -136,20 +320,22 @@ def handle_user_appointments():
     type = request_body.get("type")
     
     if not availability_id or not date:
-      raise APIException("Missing required fields", status_code=400)
+      raise APIException("Faltan campos requeridos", status_code=400)
    
     if type and type not in ['remote', 'presential']:
-      raise APIException("Invalid type value", status_code=400)
+      raise APIException("Valor incorrecto", status_code=400)
     
     # Validate if availability exists
     availability = Availability.query.get(availability_id)
     if not availability:
-      raise APIException("Availability not found", status_code=404)
+      raise APIException("Disponibilidad no encontrada", status_code=404)
     
     # Verify if availability is already booked
     if not availability.is_available:
-        raise APIException("This availability is already booked", status_code=400)
-    
+        raise APIException("Esta disponibilidad ya fue tomada", status_code=400)
+        
+    data_pay_mp = Data_Pay_Mp.query.filter_by(appointment_id=availability_id).first()
+        
     # Create appointment in the database
     try:
       new_appointment = Appointment(
@@ -159,17 +345,18 @@ def handle_user_appointments():
         date=date,
         is_confirmed=is_confirmed,
         is_done=is_done,
-        type=type
+        type=type,
+        
       )
       db.session.add(new_appointment)
       db.session.commit()
     except Exception as e:
-      raise APIException(f"An error ocurred while creating the appointment {e}", status_code=400)
+      raise APIException(f"Ha ocurrido un error mientras intentabamos crear la reserva {e}", status_code=400)
     
     availability.is_available = False
     db.session.commit()
     
-    return jsonify({ "message": "Appointment created successfully" }), 201
+    return jsonify({ "message": "Reserva creada satisfactoriamente" }), 201
   elif request.method == 'GET':
     user = User.query.get(current_user_id)
     return jsonify(user.get_appointments()), 200
@@ -179,13 +366,13 @@ def handle_user_appointment(user_id, appointment_id):
   if request.method == 'GET':
     appointment = Appointment.query.filter_by(user_id=user_id, id=appointment_id).first()
     if appointment is None:
-      raise APIException("User appointment not found", status_code=404)
+      raise APIException("La reserva del usuario no se encuentra", status_code=404)
     return jsonify(appointment.serialize()), 200
   elif request.method == 'DELETE':
     appointment = Appointment.query.filter_by(user_id=user_id, id=appointment_id).first()
     
     if appointment is None:
-      raise APIException("User appointment not found", status_code=404)
+      raise APIException("No se encuentra esta reserva", status_code=404)
     
     availability = Availability.query.get(appointment.availability_id)
     
@@ -194,7 +381,7 @@ def handle_user_appointment(user_id, appointment_id):
     db.session.delete(appointment)
     db.session.commit()
     
-    return jsonify({ "message": "Appointment deleted successfully" }), 200
+    return jsonify({ "message": "La reserva se eliminó correctamente" }), 200
 
 @api.route('/professionals', methods=['GET', 'POST'])
 def handle_professionals():
@@ -216,10 +403,10 @@ def handle_professionals():
       
       # Check if required fields are not empty
       if not email or not password:
-        raise APIException("Missing required fields", status_code=400)
+        raise APIException("Faltan campos requeridos", status_code=400)
         
       if Professional.query.filter_by(email=email).first() or User.query.filter_by(email=email).first():
-        raise APIException("Professional or User with this email already exist", status_code=400)
+        raise APIException("El email ya está registrado", status_code=400)
         
       # Create professional in the database
       try:
@@ -241,9 +428,9 @@ def handle_professionals():
         db.session.add(new_professional)
         db.session.commit()
       except Exception as e:
-        raise APIException("An error ocurred while creating the professional", status_code=400)
+        raise APIException("Ha ocurrido un error mientras intentabamos crear el profesional", status_code=400)
           
-      return jsonify({ "message": "Professional created successfully", "professional_id": new_professional.id }), 201
+      return jsonify({ "message": "Profesional creado satisfactoriamente", "professional_id": new_professional.id }), 201
     elif request.method == 'GET':
       professionals = Professional.query.all()
       professionals = list(map(lambda x: x.serialize(), professionals))
@@ -254,7 +441,7 @@ def handle_professional(professional_id):
   if request.method == 'GET':
     professional = Professional.query.get(professional_id)
     if professional is None:
-      raise APIException("Professional not found", status_code=404)
+      raise APIException("Profesional no encontrado", status_code=404)
     return jsonify(professional.serialize()), 200
   elif request.method == 'PUT':
     request_body = request.json
@@ -262,11 +449,11 @@ def handle_professional(professional_id):
     professional = Professional.query.get(professional_id)
     
     if professional is None:
-      raise APIException("Professional not found", status_code=404)
+      raise APIException("Profesional no encontrado", status_code=404)
     
     speciality = Speciality.query.get(request_body.get("speciality_id"))
     if speciality is None:
-      raise APIException("Speciality not found", status_code=404)
+      raise APIException("Especialidad no encontrada", status_code=404)
     professional.specialities.append(speciality)
     
     professional.first_name = request_body.get("first_name", professional.first_name)
@@ -278,7 +465,7 @@ def handle_professional(professional_id):
     
     gender = request_body.get("gender", professional.gender)
     if gender and gender not in GenderEnum.__members__:
-      raise APIException("Invalid gender value", status_code=400)
+      raise APIException("Género incorrecto", status_code=400)
     professional.gender = GenderEnum[gender] if gender else professional.gender
     
     professional.gender = request_body.get("gender", professional.gender)
@@ -290,7 +477,7 @@ def handle_professional(professional_id):
     
     db.session.commit()
     
-    return jsonify({ "message": "Professional updated successfully" }), 200
+    return jsonify({ "message": "El profesional ha sido actualizado correctamente" }), 200
   elif request.method == 'DELETE':
     professional = Professional.query.get(professional_id)
     
@@ -300,7 +487,7 @@ def handle_professional(professional_id):
     db.session.delete(professional)
     db.session.commit()
     
-    return jsonify({ "message": "Professional deleted successfully" }), 200
+    return jsonify({ "message": "El profesional fue eliminado correctamente" }), 200
 
 @api.route('/professionals/<int:professional_id>/availabilities', methods=['GET'])
 def get_professional_appointments(professional_id):
@@ -323,28 +510,28 @@ def handle_professional_availabilities():
     
     # Check if one of is_remote or is_presential is true
     if not is_remote and not is_presential:
-      raise APIException("One of is_remote or is_presential must be true", status_code=400)
+      raise APIException("Alguno de 'is_remote' o 'is_presential' debe ser verdadero", status_code=400)
 
     # Check if required fields are not empty
     if not date or not start_time or not end_time:
-      raise APIException("Missing required fields", status_code=400)
+      raise APIException("Faltan campos requeridos", status_code=400)
     
     # Check if date is in the correct format
     try:
       start_time = datetime.strptime(start_time, "%H:%M:%S").time()
       end_time = datetime.strptime(end_time, "%H:%M:%S").time()
     except Exception as e:
-      raise APIException("Invalid time format", status_code=400)
+      raise APIException("Formato de tiempo incorrecto", status_code=400)
     
     # Check if start_time is less than end_time
     if end_time <= start_time:
-      raise APIException("End time must be greater than start time", status_code=400)
+      raise APIException("La hora de fin debe ser mayor que la hora de comienzo", status_code=400)
     
     # Check if availability already exists
     exist_availability = Availability.query.filter_by(professional_id=current_professional_id, date=date, start_time=start_time, end_time=end_time).first()
     
     if exist_availability:
-      raise APIException("Availability already exists", status_code=400)
+      raise APIException("Disponibilidad ya existe", status_code=400)
     
     # Check if availability overlaps with an existing one
     overlapping_availability = Availability.query.filter(
@@ -356,7 +543,7 @@ def handle_professional_availabilities():
     ).first()
     
     if overlapping_availability:
-      raise APIException("Availability overlaps with an existing one", status_code=400)
+      raise APIException("La disponibilidad se sobrepone sobre otras", status_code=400)
     
     # Create availability in the database
     try:
@@ -373,15 +560,15 @@ def handle_professional_availabilities():
       print(new_availability.weekly)
       
       if new_availability.weekly:
-        print("Generating recurrent availability")
+        print("Generando fechas recurrentes")
         new_availability.generate_recurrent_availability()
       
       db.session.add(new_availability)
       db.session.commit()
     except Exception as e:
-      raise APIException(f"An error ocurred while creating the availability {e}", status_code=400)
+      raise APIException(f"Ha ocurrido un error mientras intentamos crear la disponibilidad {e}", status_code=400)
     
-    return jsonify({ "message": "Availability created successfully" }), 201
+    return jsonify({ "message": "Disponibilidad creada correctamente" }), 201
   elif request.method == 'GET':
     availabilities = Availability.query.filter_by(professional_id=current_professional_id).all()
     availabilities = list(map(lambda x: x.serialize(), availabilities))
@@ -392,18 +579,18 @@ def handle_professional_availability(professional_id, availability_id):
   if request.method == 'GET':
     availability = Availability.query.filter_by(professional_id=professional_id, id=availability_id).first()
     if availability is None:
-      raise APIException("Professional availability not found", status_code=404)
+      raise APIException("No se encuentra la disponibilidad para este profesional", status_code=404)
     return jsonify(availability.serialize()), 200
   elif request.method == 'DELETE':
     availability = Availability.query.filter_by(professional_id=professional_id, id=availability_id).first()
     
     if availability is None:
-      raise APIException("Professional availability not found", status_code=404)
+      raise APIException("No se encuentra la disponibilidad para este profesional", status_code=404)
     
     db.session.delete(availability)
     db.session.commit()
     
-    return jsonify({ "message": "Availability deleted successfully" }), 200
+    return jsonify({ "message": "Disponibilidad eliminada correctamente" }), 200
   
 @api.route('/professionals/appointments', methods=['GET', 'DELETE'])
 @jwt_required()
@@ -412,11 +599,11 @@ def handle_professional_appointments():
 
   professional = Professional.query.get(current_professional_id)
   if professional is None:
-    raise APIException("Professional not found", status_code=404)
+    raise APIException("Profesional no encontrado", status_code=404)
   
   appointments = Appointment.query.filter_by(professional_id=current_professional_id).all()
   if appointments is None:
-    raise APIException("Professional appointments not found", status_code=404)
+    raise APIException("Reserva del profesional no encontrada", status_code=404)
   
   appointments = list(map(lambda x: x.serialize(), appointments))
   return jsonify(appointments), 200
@@ -430,7 +617,7 @@ def delete_professional_appointment(appointment_id):
   appointment = Appointment.query.filter_by(professional_id=current_professional_id, id=appointment_id).first()
   
   if appointment is None:
-    raise APIException("Professional appointment not found", status_code=404)
+    raise APIException("La reserva del profesional no se encuentra", status_code=404)
   
   availability = Availability.query.get(appointment.availability_id)
   
@@ -439,7 +626,7 @@ def delete_professional_appointment(appointment_id):
   db.session.delete(appointment)
   db.session.commit()
   
-  return jsonify({ "message": "Appointment deleted successfully" }), 200
+  return jsonify({ "message": "Reserva eliminada correctamente" }), 200
 
 @api.route('/comments', methods=['GET', 'POST'])
 def handle_comments():
@@ -452,13 +639,13 @@ def handle_comments():
     score = request_body.get("score")
     
     if not user_id or not professional_id or not score:
-      raise APIException("Missing required fields", status_code=400)
+      raise APIException("Faltan campos requeridos", status_code=400)
     
     new_comment = Comment(user_id=user_id, professional_id=professional_id, comment=comment, score=score)
     db.session.add(new_comment)
     db.session.commit()
     
-    return jsonify({ "message": "Comment created successfully" }), 201
+    return jsonify({ "message": "Comentario creado satisfactoriamente" }), 201
   elif request.method == 'GET':
     comments = Comment.query.all()
     comments = list(map(lambda x: x.serialize(), comments))
@@ -469,7 +656,7 @@ def handle_comment(comment_id):
   if request.method == 'GET':
     comment = Comment.query.get(comment_id)
     if comment is None:
-      raise APIException("Comment not found", status_code=404)
+      raise APIException("Comentario no encontrado", status_code=404)
     return jsonify(comment.serialize()), 200
   elif request.method == 'PUT':
     request_body = request.json
@@ -477,24 +664,65 @@ def handle_comment(comment_id):
     comment = Comment.query.get(comment_id)
     
     if comment is None:
-      raise APIException("Comment not found", status_code=404)
+      raise APIException("Comentario no encontrado", status_code=404)
     
     comment.comment = request_body.get("comment", comment.comment)
     comment.score = request_body.get("score", comment.score)
     
     db.session.commit()
     
-    return jsonify({ "message": "Comment updated successfully" }), 200
+    return jsonify({ "message": "Comentario editado correctamente" }), 200
   elif request.method == 'DELETE':
     comment = Comment.query.get(comment_id)
     
     if comment is None:
-      raise APIException("Comment not found", status_code=404)
+      raise APIException("Comentario no encontrado", status_code=404)
     
     db.session.delete(comment)
     db.session.commit()
     
-    return jsonify({ "message": "Comment deleted successfully" }), 200
+    return jsonify({ "message": "Comentario eliminado correctamente" }), 200
+
+##order professional by score comments
+@api.route('/get_professionals_comments_score', methods=['GET'])
+def get_professionals_ordered_by_avg_score():
+    try:
+        # Realiza una consulta que agrupe los comentarios por profesional y calcule el promedio de los scores
+        results = (
+            db.session.query(
+                Professional.id.label('professional_id'),
+                func.avg(Comment.score).label('average_score'),
+                Professional.first_name,
+                Professional.last_name,
+                Professional.email,
+                Professional.profile_picture,
+                City.name.label('city_name')
+            )
+            .join(Comment, Comment.professional_id == Professional.id)  # Join con la tabla de comentarios
+            .join(City, City.id == Professional.city_id)  # Join con la tabla de ciudades
+            .group_by(Professional.id, Professional.first_name, Professional.last_name, Professional.email, Professional.profile_picture, City.name)
+            .order_by(func.avg(Comment.score).desc())  # Ordena los resultados por promedio de score de mayor a menor
+            .all()
+        )
+
+        # Convertir los resultados en un array de diccionarios con los datos deseados
+        professionals_data = [
+            {
+                "professional_id": r.professional_id,
+                "average_score": round(r.average_score, 2),  # Redondear el promedio a dos decimales
+                "first_name": r.first_name,
+                "last_name": r.last_name,
+                "email": r.email,
+                "profile_picture": r.profile_picture,
+                "city_name": r.city_name
+            }
+            for r in results
+        ]
+        print(professionals_data)
+        # Devolver los datos como un JSON
+        return jsonify(professionals_data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 ##order professional by score comments
 @api.route('/get_professionals_comments_score', methods=['GET'])
@@ -545,19 +773,19 @@ def handle_states():
     name = request_body.get("name")
     
     if not name:
-      raise APIException("Missing required fields", status_code=400)
+      raise APIException("Faltan campos requeridos", status_code=400)
     
     if State.query.filter_by(name=name).first():
-      raise APIException("State already exists", status_code=400)
+      raise APIException("El departamento ya existe", status_code=400)
     
     try:
       new_state = State(name=name)
       db.session.add(new_state)
       db.session.commit()
     except Exception as e:
-      raise APIException("An error ocurred while creating the state", status_code=400)
+      raise APIException("Ha ocurrido un error mientras intentamos crear el departamento", status_code=400)
     
-    return jsonify({ "message": "State created successfully" }), 201
+    return jsonify({ "message": "Departamento creado correctamente" }), 201
   elif request.method == 'GET':
     states = State.query.all()
     states = list(map(lambda x: x.serialize(), states))
@@ -576,30 +804,36 @@ def handle_specialities():
     name = request_body.get("name")
     
     if not name:
-      raise APIException("Missing required fields", status_code=400)
+      raise APIException("Faltan campos requeridos", status_code=400)
     
     if Speciality.query.filter_by(name=name).first():
-      raise APIException("Speciality already exists", status_code=400)
+      raise APIException("Especialidad ya existe", status_code=400)
     
     try:
       new_speciality = Speciality(name=name)
       db.session.add(new_speciality)
       db.session.commit()
     except Exception as e:
-      raise APIException("An error ocurred while creating the speciality", status_code=400)
+      raise APIException("Ha ocurrido un error mientras intentabamos crear una especialidad", status_code=400)
     
-    return jsonify({ "message": "Speciality created successfully" }), 201
+    return jsonify({ "message": "Especialidad creada satisfactoriamente" }), 201
   elif request.method == 'GET':
     specialities = Speciality.query.all()
     specialities = list(map(lambda x: x.serialize(), specialities))
     return jsonify(specialities), 200
+  
+@api.route('/cities', methods=['GET'])
+def handle_cities():
+  cities = City.query.all()
+  cities = list(map(lambda x: x.serialize(), cities))
+  return jsonify(cities), 200
 
 @api.route('/states/<int:state_id>', methods=['GET', 'PUT', 'DELETE'])
 def handle_state(state_id):
   if request.method == 'GET':
     state = State.query.get(state_id)
     if state is None:
-      raise APIException("State not found", status_code=404)
+      raise APIException("Departamento no encontrado", status_code=404)
     return jsonify(state.serialize()), 200
   elif request.method == 'PUT':
     request_body = request.json
@@ -607,23 +841,23 @@ def handle_state(state_id):
     state = State.query.get(state_id)
     
     if state is None:
-      raise APIException("State not found", status_code=404)
+      raise APIException("Departamento no encontrado", status_code=404)
     
     state.name = request_body.get("name", state.name)
     
     db.session.commit()
     
-    return jsonify({ "message": "State updated successfully" }), 200
+    return jsonify({ "message": "Departamento editado correctamente" }), 200
   elif request.method == 'DELETE':
     state = State.query.get(state_id)
     
     if state is None:
-      raise APIException("State not found", status_code=404)
+      raise APIException("Departamento no encontrado", status_code=404)
     
     db.session.delete(state)
     db.session.commit()
     
-    return jsonify({ "message": "State deleted successfully" }), 200
+    return jsonify({ "message": "Departamento eliminado correctamente" }), 200
 
 # Login con JWT
 @api.route('/login', methods=['POST'])
@@ -633,7 +867,7 @@ def login():
   password = request_body.get("password")
   
   if not email or not password:
-    raise APIException("Required fields are missing", status_code=400)
+    raise APIException("Faltan campos requeridos", status_code=400)
   
   user = User.query.filter_by(email=email).first()
   professional = Professional.query.filter_by(email=email).first()
@@ -642,31 +876,31 @@ def login():
   if user:
     # Si existe el usuario, chequear si la contraseña es correcta
     if not check_password_hash(user.password, password):
-      raise APIException("User credentials incorrect", status_code=400)
+      raise APIException("Las credenciales del usuario son incorrectas", status_code=400)
     
     # Chequear si el usuario está activo
     if not user.is_active:
-      raise APIException("User is not active", status_code=400)
+      raise APIException("El usuario no está activo", status_code=400)
     
     # Devolver un token de acceso
     access_token = create_access_token(identity=user.id)
-    return jsonify({ "message": "Login successful", "token": access_token, "user": user.serialize() }), 200
+    return jsonify({ "message": "Inicio de sesión exitoso ", "token": access_token, "user": user.serialize() }), 200
   elif professional:
     # Si existe el profesional, chequear si la contraseña es correcta
     print(check_password_hash(professional.password, password))
     if not check_password_hash(professional.password, password):
-      raise APIException("Professional credentials incorrect", status_code=400)
+      raise APIException("Las credenciales del profesional son incorrectas", status_code=400)
     
     # Chequear si el profesional está activo
     if not professional.is_active:
-      raise APIException("Professional is not active, please contact with administrator", status_code=400)
+      raise APIException("El profesional aún no está activo, contacta con el administrador", status_code=400)
     
     # Devolver un token de acceso
     access_token = create_access_token(identity=professional.id)
-    return jsonify({ "message": "Login successful", "token": access_token, "professional": professional.serialize() }), 200
+    return jsonify({ "message": "Inicio de sesión exitoso", "token": access_token, "professional": professional.serialize() }), 200
   else:
     # Si no existe el usuario o el profesional, devolver un error
-    raise APIException("User or Professional not found", status_code=404)
+    raise APIException("Usuario o profesional no encontrado", status_code=404)
 
 @api.route('/verify_token', methods=['GET'])
 @jwt_required()
@@ -676,9 +910,9 @@ def verify_token():
     professional = Professional.query.get(id)
     
     if user:
-      return jsonify({ "status": 200, "message": "Token is valid", "user": user.serialize() }), 200
+      return jsonify({ "status": 200, "message": "El token es valido", "user": user.serialize() }), 200
     elif professional:
-      return jsonify({ "status": 200, "message": "Token is valid", "professional": professional.serialize() }), 200
+      return jsonify({ "status": 200, "message": "El token es valido", "professional": professional.serialize() }), 200
     
 
 # Recuperar contraseña

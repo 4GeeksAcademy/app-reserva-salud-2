@@ -16,8 +16,6 @@ const ImageUpload = ({ form, field }) => {
     const formData = new FormData();
     formData.append('file', image);
 
-    console.log(formData)
-
     if (formData.get('file').size > 1024 * 1024) {
       form.setFieldError(field.name, 'La imagen no puede pesar más de 1MB');
       setUploading(false);

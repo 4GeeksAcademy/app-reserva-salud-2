@@ -26,7 +26,6 @@ export const VistaNuevoRegistroPaciente = () => {
         const getCitiesByState = async () => {
             if (selectedState) {
                 const cities = await actions.getCitiesByState(selectedState);
-                console.log(cities)
                 setCities(cities);
             };
         };
@@ -53,7 +52,6 @@ export const VistaNuevoRegistroPaciente = () => {
             })}
 
             onSubmit={async (values) => {
-                console.log(values)
                 try {
                     const response = await actions.updateUser(id, { state_id: parseInt(values.state_id), city_id: parseInt(values.city_id), ...values })
                     if (response.status === 200) {

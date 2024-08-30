@@ -39,8 +39,6 @@ export const VistaPerfilPaciente = () => {
     fetchComments()
   }, []);
 
-  console.log(userAppointments);
-
   return (
     <div className="contenido container mb-5">
       <div className="row">
