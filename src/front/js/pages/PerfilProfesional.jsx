@@ -9,8 +9,6 @@ export const PerfilProfesional = () => {
 
   }, [])
 
-  console.log(eventos)
-
   return (
     <div className='container contenido py-4'>
       <div className="row row-cols-1 row-cols-md-2 g-4">

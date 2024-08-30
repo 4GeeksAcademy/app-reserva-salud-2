@@ -38,8 +38,6 @@ export const VistaPerfilProfesional = () => {
         getProfessionalAppointments();
     }, []);
 
-    console.log(professionalAppointments);
-
     return (
         <div className="contenido">
             <h1 className="text-title text-secondary text-center p-4 m-4">Bienvenido, Nombre Profesional</h1>

@@ -21,8 +21,6 @@ export const VistaPerfilPaciente = () => {
     getUserAppointments();
   }, []);
 
-  console.log(userAppointments);
-
   return (
     <div className="contenido container">
       <div className="row">
