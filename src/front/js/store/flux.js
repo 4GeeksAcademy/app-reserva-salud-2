@@ -74,6 +74,9 @@ const getState = ({ getStore, getActions, setStore }) => {
           });
           toast.dismiss();
           toast.success("Cita creada exitosamente", { icon: "🚀" })
+          console.log(appointment)
+          getActions().notifyUserAppointment(appointment)
+
           return response;
         } catch (error) {
           toast.dismiss();
@@ -372,22 +375,6 @@ const getState = ({ getStore, getActions, setStore }) => {
           return null
         }
       },
-
-      // updateProfessionalProfile: async (profileData) => {
-      //   try {
-      //     const response = await backendApi.put("/update-professional-profile", profileData);
-      //     toast.dismiss();
-      //     toast.success("Perfil actualizado con éxito", { icon: "🚀" });
-      //     return response.data;
-      //   } catch (error) {
-      //     toast.dismiss();
-      //     toast.error(error.response.data.message);
-      //     console.error(error);
-      //     return null;
-      //   }
-      // },
-
-
       // verifyEmail: async (email) => {
       //         try {
       //           const response = await backendApi.post("/verify-email", { email: email });
