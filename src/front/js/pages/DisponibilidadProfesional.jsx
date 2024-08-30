@@ -4,6 +4,7 @@ import "react-calendar/dist/Calendar.css";
 import { backendApi } from "../store/flux";
 import toast from "react-hot-toast";
 import { Context } from "../store/appContext";
+import toast from "react-hot-toast";
 
 export const DisponibilidadProfesional = () => {
     const { store } = useContext(Context);
@@ -62,14 +63,15 @@ export const DisponibilidadProfesional = () => {
             const successResponses = response.filter((res) => res.status === 201);
 
             if (successResponses.length === intervalos.length) {
-                alert("Disponibilidades creadas exitosamente");
+                toast('Disponibilidades creadas exitosamente!', { icon: '👏', position: "top-right" });
+
             } else {
-                alert("Error al crear disponibilidades");
+                toast.error("Error al crear disponibilidades.", { position: "top-right" });
+
             }
         } catch (error) {
             console.error("Error:", error);
-            toast.error(error.response.data.message);
-            alert("Error al crear disponibilidades");
+            toast.error("Error al crear disponibilidades.", { position: "top-right" });
         }
     };
 
