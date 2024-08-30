@@ -42,7 +42,7 @@ export const VistaPerfilPaciente = () => {
   console.log(userAppointments);
 
   return (
-    <div className="contenido container">
+    <div className="contenido container mb-5">
       <div className="row">
         <div className="col">
           <h1 className="text-title text-secondary text-center">Bienvenido, {store?.currentUser?.first_name} {store?.currentUser?.last_name}</h1>
@@ -50,7 +50,7 @@ export const VistaPerfilPaciente = () => {
       </div>
       <div className="row">
         <div className="col">
-          <h3 className="text-subtitle text-center">Próximas citas</h3>
+          <h3 className="text-subtitle text-center pb-3">Próximas citas</h3>
         </div>
       </div>
       <div className="row">
@@ -69,10 +69,10 @@ export const VistaPerfilPaciente = () => {
               
             }}
           >
-            {comments.map((comment) => (
-            <SwiperSlide key={comment.id}>
+            {comments.map((comment,index) => (
+            <SwiperSlide key={index}>
               <div className="d-flex justify-content-center">
-                <div className='card bg-secondary text-white w-75'>
+                <div className='card bg-secondary text-white w-75' style={{height:'200px'}} >
                   <div className="row align-items-center justify-content-center p-3">
                     <div className="col-5 text-center">
                       <img src={comment.profile_picture} className='img-fluid' height={100} width={100} alt="" />
@@ -96,7 +96,7 @@ export const VistaPerfilPaciente = () => {
         </div>
       </div>
       <div className="row">
-        <div className="col text-center">
+        <div className="col text-center pt-3">
           <Link to={"/profesionales"} className="btn text-btn text-white bg-primary">
             <i className="fa-solid fa-user-plus"></i> Agendar nueva cita
           </Link>
