@@ -7,18 +7,36 @@ import { TarjetaCitasUsuario } from "../component/TarjetaCitas.jsx";
 import "swiper/css/autoplay";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext.js";
+import { backendApi } from "../store/flux.js";
 
 export const VistaPerfilPaciente = () => {
   const { store, actions } = useContext(Context);
   const [userAppointments, setUserAppointments] = useState([]);
-
+  const [comments, setComments]= useState([]);
+  
   useEffect(() => {
     const getUserAppointments = async () => {
       const response = await actions.getUserAppointments();
       setUserAppointments(response);
     }
-
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(process.env.BACKEND_URL +'/api/get_professionals_comments_score');
+        const data = await res.json();
+        // setComments(data); // Guarda los comentarios en el estado
+        console.log(data)
+        if (Array.isArray(data)) {
+          setComments(data); 
+        } else {
+          console.error("Error: los datos recibidos no son un array", data);
+        }
+      
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
     getUserAppointments();
+    fetchComments()
   }, []);
 
   console.log(userAppointments);
@@ -48,15 +66,32 @@ export const VistaPerfilPaciente = () => {
                 slidesPerView: 1,
                 spaceBetween: 20,
               },
-              1440: {
-                slidesPerView: 3,
-                spaceBetween: 20,
-              },
+              
             }}
           >
-            <SwiperSlide>
-              Slider1
+            {comments.map((comment) => (
+            <SwiperSlide key={comment.id}>
+              <div className="d-flex justify-content-center">
+                <div className='card bg-secondary text-white w-75'>
+                  <div className="row align-items-center justify-content-center p-3">
+                    <div className="col-5 text-center">
+                      <img src={comment.profile_picture} className='img-fluid' height={100} width={100} alt="" />
+                        <h2 className='text-subtitle text-truncate'>{comment.first_name} {comment.last_name}</h2>
+                          </div>
+                            <div className="col-7">
+                              <h2 className='text-label'>Ciudad: {comment.city_name}</h2>
+                              <p className='text-label text-white'>Email: {comment.email}</p>
+                              <h2 className='text-label'>Calificacion:</h2>
+                              <div className="col">
+                                  <span className="badge rounded-pill py-2 bg-primary">{comment.average_score}</span>
+                              </div>
+                            </div>
+                        </div>
+                     </div>
+                  </div>          
+             {comment.user_id}{comment.comment}{comment.score}
             </SwiperSlide>
+          ))}
           </Swiper>
         </div>
       </div>

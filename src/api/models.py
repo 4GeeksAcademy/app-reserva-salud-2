@@ -28,7 +28,7 @@ class User(db.Model):
     email = db.Column(db.String(200), unique=True, nullable=False, index=True)
     password = db.Column(db.String(200), nullable=False)
     birth_date = db.Column(db.Date)
-    is_active = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
     state_id = db.Column(db.Integer, db.ForeignKey('state.id'))
     city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
     
