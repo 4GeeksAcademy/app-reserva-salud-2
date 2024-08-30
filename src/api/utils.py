@@ -1,3 +1,5 @@
+import base64
+from datetime import datetime, timedelta
 from flask import jsonify, url_for
 
 class APIException(Exception):
@@ -19,6 +21,23 @@ def has_no_empty_params(rule):
     defaults = rule.defaults if rule.defaults is not None else ()
     arguments = rule.arguments if rule.arguments is not None else ()
     return len(defaults) >= len(arguments)
+
+def encode_credentials(client_id, client_secret):
+    return base64.b64encode(f"{client_id}:{client_secret}".encode()).decode()
+
+def generate_recurrent_dates(my_date):
+    dates = []
+    given_date = datetime.strptime(my_date, '%Y-%m-%d')
+    today = datetime.now()
+    
+    day_of_week = given_date.strftime('%A') 
+    
+    for i in range(30):
+        date = today + timedelta(days=i)
+        if date.strftime('%A') == day_of_week:
+            dates.append(date.date().isoformat())
+    
+    return dates
 
 def generate_sitemap(app):
     links = ['/admin/']
