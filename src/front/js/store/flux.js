@@ -305,14 +305,13 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-verifyEmail: async (email) => {
+      verifyEmail: async (email) => {
         try {
           const response = await backendApi.post("/verify-email", { email: email });
           toast.dismiss();
 
           toast.success("Correo de activación enviado con éxito", { icon: "🚀" });
           return response;
-
         } catch (error) {
           toast.dismiss();
           toast.error(error.response.data.message);
