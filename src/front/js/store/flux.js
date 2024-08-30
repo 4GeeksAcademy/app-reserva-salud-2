@@ -305,38 +305,121 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-verifyEmail: async (email) => {
+      // Enviar correo al paciente con los datos de la cita que agendó:
+      notifyUserAppointment: async (appointment_id) => {
         try {
-          const response = await backendApi.post("/verify-email", { email: email });
+          const response = await backendApi.post("/notify-appointment", { appointment_id: appointment_id });
           toast.dismiss();
 
-          toast.success("Correo de activación enviado con éxito", { icon: "🚀" });
+          // toast.success("Se envió un correo con la información de la cita", { icon: "🚀" });
           return response;
 
         } catch (error) {
-          toast.dismiss();
-          toast.error(error.response.data.message);
+          // toast.dismiss();
+          // toast.error(error.response.data.message);
           console.error(error);
           return null
         }
       },
 
-      activateUser: async (email) => {
+      // Enviar correo profesional con los datos de cada nueva cita:
+      notifyProfessionalAppointment: async (appointment_id) => {
         try {
-          const response = await backendApi.post('/activate-user', {
-            email: email,
-          });
+          const response = await backendApi.post("//notify-new-appointment", { appointment_id: appointment_id });
+          toast.dismiss();
 
-          if (response.status === 200) {
-            toast.success("Cuenta actualizada con éxito", { icon: "🚀" });
-            return response.data;
-          }
+          // toast.success("Se envió un correo con la información de la cita", { icon: "🚀" });
+          return response;
+
         } catch (error) {
-          toast.error("Hubo un error al activar la cuenta.");
-          console.error("Error al activar la cuenta:", error);
-          return null;
+          // toast.dismiss();
+          // toast.error(error.response.data.message);
+          console.error(error);
+          return null
         }
       },
+
+      // Notificar al paciente de que el profesional canceló una cita
+      notifyUserAppointmentCancellation: async (appointment_id) => {
+        try {
+          const response = await backendApi.post("/notify-appointment-cancelled-patient", { appointment_id: appointment_id });
+          toast.dismiss();
+
+          // toast.success("Se envió un correo al paciente para notificarle", { icon: "🚀" });
+          return response;
+
+        } catch (error) {
+          // toast.dismiss();
+          // toast.error(error.response.data.message);
+          console.error(error);
+          return null
+        }
+      },
+
+      // Notificar al profesional de que el paciente canceló una cita
+      notifyProfessionalAppointmentCancellation: async (appointment_id) => {
+        try {
+          const response = await backendApi.post("/notify-appointment-cancelled-professional", { appointment_id: appointment_id });
+          toast.dismiss();
+
+          // toast.success("Se envió un correo al profesional para notificarle", { icon: "🚀" });
+          return response;
+
+        } catch (error) {
+          // toast.dismiss();
+          // toast.error(error.response.data.message);
+          console.error(error);
+          return null
+        }
+      },
+
+      // updateProfessionalProfile: async (profileData) => {
+      //   try {
+      //     const response = await backendApi.put("/update-professional-profile", profileData);
+      //     toast.dismiss();
+      //     toast.success("Perfil actualizado con éxito", { icon: "🚀" });
+      //     return response.data;
+      //   } catch (error) {
+      //     toast.dismiss();
+      //     toast.error(error.response.data.message);
+      //     console.error(error);
+      //     return null;
+      //   }
+      // },
+
+
+      // verifyEmail: async (email) => {
+      //         try {
+      //           const response = await backendApi.post("/verify-email", { email: email });
+      //           toast.dismiss();
+
+      //           toast.success("Correo de activación enviado con éxito", { icon: "🚀" });
+      //           return response;
+
+      //         } catch (error) {
+      //           toast.dismiss();
+      //           toast.error(error.response.data.message);
+      //           console.error(error);
+      //           return null
+      //         }
+      //       },
+
+      //       activateUser: async (email) => {
+      //         try {
+      //           const response = await backendApi.post('/activate-user', {
+      //             email: email,
+      //           });
+
+      //           if (response.status === 200) {
+      //             toast.success("Cuenta actualizada con éxito", { icon: "🚀" });
+      //             return response.data;
+      //           }
+      //         } catch (error) {
+      //           toast.error("Hubo un error al activar la cuenta.");
+      //           console.error("Error al activar la cuenta:", error);
+      //           return null;
+      //         }
+      //       },
 
     }
   }

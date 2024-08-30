@@ -22,8 +22,8 @@ export const TarjetaCitasProfesional = ({ appointment }) => {
         <div className='card bg-secondary text-white w-75 m-3'>
           <div className="row align-items-center justify-content-center p-3">
             <div className="col-md-4 col-sm-12 text-center">
-              <img src={appointment.professional?.profile_picture} className='img-fluid rounded-circle' height={100} width={100} alt="" />
-              <h2 className='text-subtitle text-truncate'>{appointment.professional?.first_name} {appointment.professional?.last_name}</h2>
+              <img src="https://avatar.iran.liara.run/public/boy" className='img-fluid rounded-circle' height={100} width={100} alt="" />
+              <h2 className='text-subtitle text-truncate'>{appointment.user?.first_name} {appointment.user?.last_name}</h2>
             </div>
             <div className="col-md-4 col-sm-12 text-center">
               <h2 className='text-label'>Día: {new Date(appointment.availability?.date).toLocaleDateString("es-UY", { timeZone: "UTC" })}</h2>
@@ -34,7 +34,7 @@ export const TarjetaCitasProfesional = ({ appointment }) => {
               </div>
             </div>
             <div className="col-md-4 col-sm-12 d-flex flex-column justify-content-center align-items-center">
-              <button className='btn bg-primary w-75 text-white text-normal text-center m-1'>Reprogramar </button>
+              {/* <button className='btn bg-primary w-75 text-white text-normal text-center m-1'>Reprogramar </button> */}
               <button className='btn bg-primary w-75 text-white text-normal text-center m-1' data-bs-toggle="modal" data-bs-target="#cancelModal">Cancelar</button>
               <Link to={"/datos-paciente"} className="btn bg-primary w-75 text-white text-normal text-center m-1">
                 Datos del paciente

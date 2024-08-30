@@ -2,33 +2,11 @@ import React, { useContext, useEffect, useState } from "react";
 import { TarjetaCitasProfesional } from "../component/TarjetaCitasProfesional.jsx";
 import { backendApi } from "../store/flux.js";
 import { Context } from "../store/appContext.js";
-
-const citas = [
-
-    {
-        id: "3",
-        fotoprofesional: "https://avatar.iran.liara.run/public/boy",
-        dia: "5 de setiembre",
-        hora: "10:30",
-        modalidad: "Virtual",
-        profesional: "Carlos Villar",
-        especialidad: "odontólogo"
-    },
-    {
-        id: "1",
-        fotoprofesional: "https://avatar.iran.liara.run/public/girl",
-        dia: "10 de agosto",
-        hora: "9:30",
-        modalidad: "Presencial",
-        profesional: "Juana Pérez",
-        especialidad: "nutricionista"
-    },
-
-]
+import { Link } from "react-router-dom";
 
 export const VistaPerfilProfesional = () => {
+    const { store, actions } = useContext(Context);
     const [professionalAppointments, setProfessionalAppointments] = useState([]);
-    const { actions } = useContext(Context);
 
     useEffect(() => {
         const getProfessionalAppointments = async () => {
@@ -42,7 +20,19 @@ export const VistaPerfilProfesional = () => {
 
     return (
         <div className="contenido">
-            <h1 className="text-title text-secondary text-center p-4 m-4">Bienvenido, Nombre Profesional</h1>
+            <div className="d-flex justify-content-center">
+            <div className="row py-4 w-75">
+                <div className="col-md-8">
+                    <h1 className="text-title text-secondary text-center">Bienvenido</h1>
+                </div>
+                <div className="col text-center">
+                    <Link to={"/editar-perfil"} className="btn text-btn text-primary bg-gray">
+                        <i class="fa-solid fa-pencil"></i>  Editar perfil
+                    </Link>
+                </div>
+                </div>
+
+            </div>
             <div className="d-flex justify-content-center">
                 <h3 className="text-subtitle mx-3 w-75">Pacientes agendados</h3>
             </div>
