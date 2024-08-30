@@ -718,11 +718,6 @@ def reset_password():
 #     except Exception as e:
 #       print(e)
 #       return jsonify({'error': 'Error al enviar la notificación'}), 500    
-
-from flask import request, jsonify, current_app
-from flask_mail import Message
-from your_app.models import Appointment, Professional
-
 @api.route('/notify-new-appointment', methods=['POST'])
 def notify_new_appointment_professional():
     request_body = request.get_json()
@@ -734,18 +729,21 @@ def notify_new_appointment_professional():
     if not professional:
         return jsonify({'message': 'El correo no está registrado'}), 404
 
+    # Buscar la cita por ID
     appointment = Appointment.query.filter_by(id=appointment_id).first()
     if not appointment:
         return jsonify({'message': 'No se encontró la cita especificada'}), 404
 
+    # Obtener detalles de la cita y el usuario
+    appointment_date = appointment.date
+    appointment_hour = appointment.hour
+    user = appointment.user
+    appointment_type = appointment.type
 
-    appointment_date = appointment.date  # Supongamos que el modelo tiene un campo 'date'
-    # appointment_time = appointment.time  # Y un campo 'time'
-    # patient_name = appointment.patient_name  # Y un campo 'patient_name'
-    # patient_email = appointment.patient_email  # Y un campo 'patient_email'
-    # appointment_type = appointment.type  # Y un campo 'type' para modalidad de la cita
+    patient_name = user.first_name 
+    patient_last_name = user.last_name 
+    patient_email = user.email 
 
-    # Crear mensaje de correo electrónico con los detalles de la cita
     msg = Message(
         'Nueva cita agendada',
         sender='reservasaluduy@gmail.com',
@@ -758,10 +756,10 @@ def notify_new_appointment_professional():
     <p>¡Hola!</p>
     <p>Desde Reserva Salud, te notificamos de un nuevo paciente que ha agendado una cita contigo:</p>
     <p><strong>Día de la cita:</strong> {appointment_date}</p>
-    <p><strong>Hora:</strong> </p>
-    <p><strong>Modalidad de la cita:</strong> </p>
-    <p><strong>Nombre del paciente:</strong> </p>
-    <p><strong>Email del paciente:</strong> </p>
+    <p><strong>Hora:</strong> {appointment_hour}</p>
+    <p><strong>Modalidad de la cita:</strong> {appointment_type}</p>
+    <p><strong>Nombre del paciente:</strong> {patient_name} {patient_last_name}</p>
+    <p><strong>Email del paciente:</strong> {patient_email}</p>
     <p>Inicia sesión en Reserva Salud para verificar los datos de esta cita o cancelarla.</p>
     <p> </p>
     <p>Si no eres el destinatario de esta comunicación, ignora este mensaje.</p>
@@ -769,12 +767,67 @@ def notify_new_appointment_professional():
     </html>
     """
 
+    # Enviar el correo
     try:
         current_app.mail.send(msg)
         return jsonify({'message': 'Notificación enviada con éxito'}), 200
     except Exception as e:
         print(e)
         return jsonify({'error': 'Error al enviar la notificación'}), 500
+
+# @api.route('/notify-new-appointment', methods=['POST'])
+# def notify_new_appointment_professional():
+#     request_body = request.get_json()
+#     email = request_body.get("email")
+#     appointment_id = request_body.get("appointment_id")
+    
+#     # Verificar si el correo electrónico existe en la base de datos de profesionales
+#     professional = Professional.query.filter_by(email=email).first()
+#     if not professional:
+#         return jsonify({'message': 'El correo no está registrado'}), 404
+
+#     appointment = Appointment.query.filter_by(id=appointment_id).first()
+#     if not appointment:
+#         return jsonify({'message': 'No se encontró la cita especificada'}), 404
+
+
+#     appointment_date = appointment.date
+#     appointment_hour = appointment.hour
+#     user = appointment.user
+#     # patient_name = appointment.patient_name
+#     # patient_email = appointment.patient_email 
+#     appointment_type = appointment.type 
+
+#     # Crear mensaje de correo electrónico con los detalles de la cita
+#     msg = Message(
+#         'Nueva cita agendada',
+#         sender='reservasaluduy@gmail.com',
+#         recipients=[email]
+#     )
+
+#     msg.html = f"""
+#     <html>
+#     <body>
+#     <p>¡Hola!</p>
+#     <p>Desde Reserva Salud, te notificamos de un nuevo paciente que ha agendado una cita contigo:</p>
+#     <p><strong>Día de la cita:</strong> {appointment_date}</p>
+#     <p><strong>Hora:</strong> {appointment_hour}</p>
+#     <p><strong>Modalidad de la cita:</strong> {appointment_type}</p>
+#     <p><strong>Nombre del paciente:</strong> {user}</p>
+#     <p><strong>Email del paciente:</strong> </p>
+#     <p>Inicia sesión en Reserva Salud para verificar los datos de esta cita o cancelarla.</p>
+#     <p> </p>
+#     <p>Si no eres el destinatario de esta comunicación, ignora este mensaje.</p>
+#     </body>
+#     </html>
+#     """
+
+#     try:
+#         current_app.mail.send(msg)
+#         return jsonify({'message': 'Notificación enviada con éxito'}), 200
+#     except Exception as e:
+#         print(e)
+#         return jsonify({'error': 'Error al enviar la notificación'}), 500
 
 
 @api.route('/new-password', methods=['POST'])
