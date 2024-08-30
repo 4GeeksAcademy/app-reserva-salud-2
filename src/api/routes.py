@@ -724,47 +724,6 @@ def get_professionals_ordered_by_avg_score():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-##order professional by score comments
-@api.route('/get_professionals_comments_score', methods=['GET'])
-def get_professionals_ordered_by_avg_score():
-    try:
-        # Realiza una consulta que agrupe los comentarios por profesional y calcule el promedio de los scores
-        results = (
-            db.session.query(
-                Professional.id.label('professional_id'),
-                func.avg(Comment.score).label('average_score'),
-                Professional.first_name,
-                Professional.last_name,
-                Professional.email,
-                Professional.profile_picture,
-                City.name.label('city_name')
-            )
-            .join(Comment, Comment.professional_id == Professional.id)  # Join con la tabla de comentarios
-            .join(City, City.id == Professional.city_id)  # Join con la tabla de ciudades
-            .group_by(Professional.id, Professional.first_name, Professional.last_name, Professional.email, Professional.profile_picture, City.name)
-            .order_by(func.avg(Comment.score).desc())  # Ordena los resultados por promedio de score de mayor a menor
-            .all()
-        )
-
-        # Convertir los resultados en un array de diccionarios con los datos deseados
-        professionals_data = [
-            {
-                "professional_id": r.professional_id,
-                "average_score": round(r.average_score, 2),  # Redondear el promedio a dos decimales
-                "first_name": r.first_name,
-                "last_name": r.last_name,
-                "email": r.email,
-                "profile_picture": r.profile_picture,
-                "city_name": r.city_name
-            }
-            for r in results
-        ]
-        print(professionals_data)
-        # Devolver los datos como un JSON
-        return jsonify(professionals_data), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
 @api.route('/states', methods=['GET', 'POST'])
 def handle_states():
   if request.method == 'POST':
