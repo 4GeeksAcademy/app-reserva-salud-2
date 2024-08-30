@@ -6,9 +6,27 @@ import { Link } from "react-router-dom";
 export const Home = () => {
   const { store, actions } = useContext(Context);
 
+  const handleVerifyEmail = async () => {
+    const email = store.currentUser?.email;
+    if (email) {
+      await actions.verifyEmail(email);
+    } else {
+      console.error("Email de usuario no encontrado.");
+    }
+  };
+
   return (
-    <>
+    <div className="contenido">
       <section className="container" style={{ paddingTop: "64px" }}>
+        {/* Lo muestra solo si el usuario está logueado y is_active=False */}
+        {store.currentUser && !store.currentUser.is_active && (
+          <div className="alert alert-info text-center text-normal" role="alert">
+            ¡Activa tu cuenta! Presiona aquí para verificar tu email:{" "}
+            <button onClick={handleVerifyEmail} className="btn btn-link">
+              Activar cuenta
+            </button>
+          </div>
+        )}
         <div className="d-flex flex-column align-items-center gap-4 py-4">
           <h2 className="text-title text-center">
             Reserva tu cita médica en línea, fácil y rápido
@@ -17,16 +35,13 @@ export const Home = () => {
             Encuentra al profesional que necesitas y agenda tu consulta en
             cuestión de minutos
           </p>
-          <Link
-            to={"/registro-usuario"}
-            className="text-btn text-white bg-primary btn"
-          >
+          <Link to={"/nuevo-registro"} className="text-btn text-white bg-primary btn">
             <i className="fa-solid fa-user-plus"></i> Registrarse
           </Link>
           <button className="btn">Button</button>
           <img
             className="img-fluid max-w-sm"
-            src="https://s3-alpha-sig.figma.com/img/ff90/f0d9/9a5bc8f8cd2610b2e82b81f2564ec111?Expires=1724025600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=O3rHVYu10HOub0jcrVBGn3gTnvlMs~7qePd3lB7zYAA4TjZrJT4v3qJr-SI0e8T6pSOvaoGFe9DTuYpbZMfV0vGqThphmFKMhd~yizpaL7A-qDxDxQ~Fm82NEGEdWuZ4qn81KkFgQk-1R16Et2XELsCMFa3uozoOGXjGp1UZrfCbvwzcE0HsFiFtm8KzYgE2wz8h1HZC2jjGBK3Ci0AeI5sGLJHrnpSwC1pZE0-m1tKVfBxG3XLNj~BqTv4ruzKtQJtQyvxYFwdcBLlqNOC8zeuZzFcyyOt4I1P7Ueqd~YM0LW2pid1ACvY0yqw9DupibdUdH4XKF~SGhSJ3Sf4kNA__"
+            src="https://s3-alpha-sig.figma.com/img/ff90/f0d9/9a5bc8f8cd2610b2e82b81f2564ec111?Expires=1725235200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=oaLk4cOSRNUQ8ZS9chLpryVcm7qxO72QlQ6AIhFgQ1FwLsDFV8IyRSHy8Lr0XL~DZ8-KLvv4G91hiM2W92dndbvSe14WCsS0l4ulXtazDFowr8XpuL8y9SqoxqMEOZJEhh701cedhgUIGMfI2xQcq7x20mMDUXSrJa7q--sUlfvHBf3vpRxKuzgwY6w~IUmgphZICHKAoULt~aVITk5ALqptRXk3HnYACpqLYfMRAb8kgf1fXLVwUU494LgaWCw0-hoX7Nl0eCwM5b9HE~JKQo~Do-rkl7owyLITF-Qna6wzjkRDQ2-wyyIte8Gl5WesivMqnKqlXdnSpL~d9eexAg__"
             alt="Illustration"
           />
         </div>
@@ -61,6 +76,49 @@ export const Home = () => {
           </div>
         </div>
       </section>
+
+      <section className="container-fluid bg-gray py-4 my-5 text-center shadow-md">
+        <div className="container text-primary">
+          <div className="row">
+            <div className="col-md-6 px-3">
+              <h2 className="text-title text-primary mt-5">Misión</h2>
+              <p className="text-normal text-start">Nuestra misión es conectar a profesionales de la salud con sus
+                pacientes de manera directa, ofreciendo una plataforma sencilla y eficiente que facilita la gestión de
+                citas, la comunicación y el pago de servicios.</p>
+              <p className="text-normal text-start">Nos enfocamos en brindar una experiencia transparente y
+                segura, garantizando la protección de los datos personales y asegurando la satisfacción tanto de los
+                profesionales como de los pacientes.</p>
+            </div>
+            <div className="col-md-6">
+              <img
+                className="img-fluid"
+                style={{ width: '300px', height: '300px' }}
+                src="https://cdni.iconscout.com/illustration/premium/thumb/man-booking-online-appointment-illustration-download-in-svg-png-gif-file-formats--booked-people-with-appointments-pack-illustrations-3485596.png"
+                alt="Illustration"
+              />
+            </div>
+            <div className="col-md-6">
+              <img
+                className="img-fluid max-w-sm"
+                src="https://cdni.iconscout.com/illustration/premium/thumb/woman-schedules-an-appointment-meeting-illustration-download-in-svg-png-gif-file-formats--business-schedule-calendar-planning-time-management-people-with-appointments-pack-illustrations-3485589.png?f=webp  "
+                alt="Illustration"
+              />
+            </div>
+            <div className="col-md-6 px-3">
+              <h2 className="text-title text-primary mt-5">Visión</h2>
+              <p className="text-normal text-start">Aspiramos a ser la plataforma líder en la gestión de citas y servicios de
+                salud en línea en Uruguay, reconocida por su eficiencia, facilidad de uso y
+                compromiso con la seguridad y privacidad de nuestros usuarios.</p>
+              <p className="text-normal text-start">Queremos
+                transformar la manera en que los pacientes acceden a los servicios de salud,
+                promoviendo un modelo más directo, accesible y personalizado, con la posibilidad
+                de acceder a consultas a distancia de forma segura.</p>
+            </div>
+          </div>
+        </div>
+      </section >
+
+
       <section className="container">
         <div className="d-flex flex-column align-items-center py-4">
           <h2 className="text-title">Preguntas Frecuentes</h2>
@@ -85,8 +143,8 @@ export const Home = () => {
                 data-bs-parent="#faq"
               >
                 <div className="accordion-body text-normal">
-                  Si, es posible tener reservadas varias citas siempre y cuando
-                  no coincidan en día y horario
+                  Sí, es posible tener reservadas varias citas, siempre y cuando
+                  no coincidan en día y horario. Podrás ver todas tus citas agendadas en tu cuenta.
                 </div>
               </div>
             </div>
@@ -100,7 +158,7 @@ export const Home = () => {
                   aria-expanded="false"
                   aria-controls="faq-2"
                 >
-                  ¿Puedo cancelar / reprogramar una cita?
+                  ¿Puedo cancelar o reprogramar una cita?
                 </button>
               </h2>
               <div
@@ -134,9 +192,9 @@ export const Home = () => {
                 data-bs-parent="#faq"
               >
                 <div className="accordion-body text-normal">
-                  Es muy sencillo. Solo tienes que seleccionar la el profesional
-                  o servicio que necesitas,&nbsp;&nbsp;hacer click en reservar y
-                  seguir los pasos indicados en el formulario de reserva
+                  Es muy sencillo. Solo tienes que seleccionar el o la profesional
+                  o servicio que necesitas, hacer click en reservar y
+                  seguir los pasos indicados en el formulario de reserva.
                 </div>
               </div>
             </div>
@@ -150,7 +208,7 @@ export const Home = () => {
                   aria-expanded="false"
                   aria-controls="faq-4"
                 >
-                  ¿Que formas de pago aceptan?
+                  ¿Qué formas de pago aceptan?
                 </button>
               </h2>
               <div
@@ -161,13 +219,13 @@ export const Home = () => {
                 <div className="accordion-body text-normal">
                   Utilizamos Mercado Pago como pasarela de pago, por lo que
                   aceptamos una amplia variedad de tarjetas e incluso pagos por
-                  redes de cobranza
+                  redes de cobranza.
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-    </>
+    </div >
   );
 };

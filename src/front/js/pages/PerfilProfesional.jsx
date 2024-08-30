@@ -3,26 +3,11 @@ import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
 export const PerfilProfesional = () => {
-  const { access_token, owner } = JSON.parse(localStorage.getItem('calendlyResponse'))
   const [eventos, setEventos] = useState({})
 
   useEffect(() => {
-    const getEvents = async () => {
-      try {
-        const response = await axios.get(`https://api.calendly.com/event_types?user=${owner}`, {
-          headers: {
-            Authorization: `Bearer ${access_token}`
-          }
-        })
-        setEventos(response.data)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    getEvents()
-  }, [])
 
-  console.log(eventos)
+  }, [])
 
   return (
     <div className='container contenido py-4'>

@@ -4,7 +4,7 @@ import { TerminosYCondiciones } from "../component/terminos-y-condiciones.jsx";
 export const VistaTerminosYCondiciones = () => {
     
     return (
-        <div>
+        <div className="contenido">
             <TerminosYCondiciones/>
         </div>
     )};

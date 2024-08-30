@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Context } from "../store/appContext.js";
-import { PopupButton } from "react-calendly";
+import { Link } from "react-router-dom";
 
 export const VistaInfoProfesional = () => {
   const { id } = useParams();
-  const { actions } = useContext(Context);
+  const { store, actions } = useContext(Context);
   const [professional, setProfessional] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getProfessional = async (professionalId) => {
@@ -52,9 +53,7 @@ export const VistaInfoProfesional = () => {
         <div className="col text-center">
           <img
             src={professional.profile_picture}
-            className="img-fluid"
-            width={200}
-            height={200}
+            className="profile-picture"
             alt="Profile picture"
           />
         </div>
@@ -127,16 +126,14 @@ export const VistaInfoProfesional = () => {
             <p>No hay comentarios</p>
           </div>
         )}
-      </div>
-
-      <div className="mt-5 row">
-        <div className="col text-center">
-          <PopupButton
-            url={professional.url_calendly}
-            rootElement={document.getElementById("app")}
-            text="Ver agenda"
-            className="btn bg-primary text-white"
-          />
+        <div className="d-flex justify-content-center m-4">
+          <button onClick={() => navigate(`/agenda/${id}`)} className="btn btn-primary" disabled={!store.currentUser}>
+            {
+              !store.currentUser
+                ? (<><i className="fa-solid fa-arrow-right-to-bracket"></i> Iniciar sesión para agendar cita</>)
+                : (<><i className="fa-solid fa-calendar-plus"></i> Agendar cita</>)
+            }
+          </button>
         </div>
       </div>
     </div>

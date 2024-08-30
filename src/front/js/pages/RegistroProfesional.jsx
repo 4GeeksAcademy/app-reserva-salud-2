@@ -3,7 +3,7 @@ import { RegistroProfesional } from "../component/form-registro-profesional.jsx"
 
 export const VistaRegistroProfesional = () => {
     return (
-        <div>
+        <div className="contenido">
             <RegistroProfesional />
         </div>
     )
