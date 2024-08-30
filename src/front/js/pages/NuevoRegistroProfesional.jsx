@@ -37,9 +37,6 @@ export const VistaNuevoRegistroProfesional = () => {
         getCitiesByState();
     }, [selectedState]);
 
-    console.log(states)
-    console.log(specialities)
-
     return (
         <>
             <Formik
@@ -73,7 +70,6 @@ export const VistaNuevoRegistroProfesional = () => {
                 })}
 
                 onSubmit={async (values) => {
-                    console.log(values)
                     const response = await actions.updateProfessional(id, { city_id: parseInt(values.city_id), speciality_id: parseInt(values.speciality_id), ...values });
                     if (response.status === 200) {
                         navigate("/login");

@@ -16,8 +16,6 @@ export const VistaPerfilProfesional = () => {
         getProfessionalAppointments();
     }, []);
 
-    console.log(professionalAppointments);
-
     return (
         <div className="contenido">
             <div className="d-flex justify-content-center">

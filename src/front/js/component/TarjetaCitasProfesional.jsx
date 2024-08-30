@@ -1,18 +1,22 @@
 import React, { useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Context } from '../store/appContext';
 import toast from 'react-hot-toast';
+import { backendApi } from '../store/flux';
 
 export const TarjetaCitasProfesional = ({ appointment }) => {
   const { actions } = useContext(Context);
+  const navigate = useNavigate();
 
   const cancelAppointment = async () => {
-    const cancellationReason = document.getElementById("motive").value;
-    const response = await actions.deleteProfessionalAppointment(appointment.id, cancellationReason);
-    if (response.status === 200) {
-      toast.success("Cita cancelada correctamente");
-    } else {
-      toast.error(response.data.message);
+    try {
+      const response = await backendApi.post('/refund_payment', { payment_id: appointment?.data_pay?.is_payment });
+      const { data } = response;
+      toast.success('La reserva se canceló correctamente');
+      navigate('/');
+    } catch (error) {
+      console.log(error);
+      toast.error('Hubo un problema al cancelar la reserva');
     }
   }
 
@@ -56,7 +60,7 @@ export const TarjetaCitasProfesional = ({ appointment }) => {
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-              <button type="button" className="btn btn-danger" onClick={cancelAppointment}>Cancelar reserva</button>
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={cancelAppointment}>Cancelar reserva</button>
             </div>
           </form>
         </div>

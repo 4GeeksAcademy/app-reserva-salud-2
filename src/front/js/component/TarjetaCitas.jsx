@@ -1,15 +1,26 @@
 import React from "react";
 import { backendApi } from "../store/flux";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export const TarjetaCitasUsuario = ({ appointment }) => {
+  const navigate = useNavigate();
+
   const cancelAppointment = async () => {
-    const response = await backendApi.delete(
-      `/users/${appointment.user.id}/appointments/${appointment.id}`
-    );
-    console.log(response);
+    try {
+      const response = await backendApi.post('/refund_payment', { payment_id: appointment?.data_pay?.is_payment });
+      const { data } = response;
+
+      if (data.status === 'approved') {
+        toast.success('Reserva cancelada con éxito');
+        navigate('/');
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Error cancelando la reserva');
+    }
   };
 
-  console.log(appointment);
 
   return (
     <div className="col">
