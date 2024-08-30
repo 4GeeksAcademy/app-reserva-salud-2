@@ -69,8 +69,10 @@ class Professional(db.Model):
     telephone = db.Column(db.String(200))
     is_active = db.Column(db.Boolean, default=False)
     is_validated = db.Column(db.Boolean, default=False)
+    state_id = db.Column(db.Integer, db.ForeignKey('state.id'))
     city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
     
+    state = db.relationship('State', back_populates='professionals', uselist=False)
     city = db.relationship('City', back_populates='professionals', uselist=False)
     comments = db.relationship('Comment', back_populates='professional', cascade='all, delete-orphan')
     availabilities = db.relationship('Availability', back_populates='professional', cascade='all, delete-orphan')
@@ -144,6 +146,7 @@ class State(db.Model):
     
     cities = db.relationship('City')
     users = db.relationship('User', back_populates='state')
+    professionals = db.relationship('Professional', back_populates='state')
     
     def __repr__(self):
         return f'<State {self.name}>'
@@ -264,6 +267,7 @@ class Appointment(db.Model):
             "is_confirmed": self.is_confirmed,
             "is_done": self.is_done,
             "type": self.type,
+            "data_pay": self.data_pay.serialize(),
             "created_at": self.created_at
         }
 
@@ -290,8 +294,8 @@ class Data_Pay_Mp(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "professional": self.professional.serialize(),
-            "appointment": self.appointment.serialize(),
+            "professional_id": self.professional_id,
+            "appointment": self.appointment.id if self.appointment else None,
             "date_approved": self.date_approved,
             "date_created": self.date_created,
             "is_payment": self.id_payment,
