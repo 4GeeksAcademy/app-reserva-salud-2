@@ -55,7 +55,7 @@ export const VistaNuevoRegistroPaciente = () => {
                 try {
                     const response = await actions.updateUser(id, { state_id: parseInt(values.state_id), city_id: parseInt(values.city_id), ...values })
                     if (response.status === 200) {
-                        navigate("/perfil");
+                        navigate("/login");
                     }
                 } catch (error) {
                     console.error("Error al actualizar el usuario", error);
