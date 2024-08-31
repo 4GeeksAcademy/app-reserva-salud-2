@@ -39,7 +39,7 @@ const Layout = () => {
   const { store } = useContext(Context);
 
   return (
-    <div>
+    <>
       <BrowserRouter basename={basename}>
         <Navbar />
         <Routes>
@@ -78,7 +78,7 @@ const Layout = () => {
         <Footer />
       </BrowserRouter>
       <Toaster />
-    </div>
+    </>
   );
 };
 
