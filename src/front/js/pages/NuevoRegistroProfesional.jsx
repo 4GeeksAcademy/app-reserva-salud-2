@@ -206,7 +206,7 @@ export const VistaNuevoRegistroProfesional = () => {
                                         Foto de perfil
                                     </label>
                                     <Field component={ImageUpload} name="profile_picture" />
-                                    <ErrorMessage name="profile_picture" />
+                                    <ErrorMessage name="profile_picture" component="div" />
                                 </div>
 
                                 <div className="mb-3 col-md-6 col-sm-12">
