@@ -5,7 +5,6 @@ import { backendApi } from "../store/flux";
 import toast from "react-hot-toast";
 import { Context } from "../store/appContext";
 
-
 export const DisponibilidadProfesional = () => {
     const { store } = useContext(Context);
     const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
