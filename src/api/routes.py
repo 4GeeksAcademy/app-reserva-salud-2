@@ -217,11 +217,20 @@ def get_payment_client(id_payment):
 @api.route('/upload', methods=['POST'])
 def upload_file():
   if 'file' not in request.files:
-      raise APIException("No file part", status_code=400)
+      raise APIException("No seleccionaste una foto", status_code=400)
   
   file = request.files['file']
   
+  file_size = len(file.read())
+  file.seek(0)
+  
   if file:
+    if file.content_type not in ['image/jpg', 'image/jpeg', 'image/png']:
+      raise APIException("Formato de archivo no permitido", status_code=400)
+
+    if file_size > 1024 * 1024: # 1MB
+      raise APIException("El archivo es muy grande", status_code=400)
+  
     try:
       result = cloudinary.uploader.upload(file)
       return jsonify({ 'url': result['secure_url'] }), 200
@@ -230,7 +239,6 @@ def upload_file():
       raise APIException("Ocurrió un error al subir el archivo", status_code=400)
   else:
       raise APIException("No hay archivo seleccionado", status_code=400)
-
 
 @api.route('/users', methods=['GET', 'POST'])
 def handle_users():

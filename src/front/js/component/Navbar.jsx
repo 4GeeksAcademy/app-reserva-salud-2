@@ -7,7 +7,7 @@ export function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <div className="navbar bg-base-200">
+    <div className="navbar fixed z-50 shadow backdrop-blur bg-opacity-85 bg-base-100 text-base-content">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost md:hidden">
