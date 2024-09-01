@@ -70,21 +70,21 @@ export const Home = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-2">
 
-            <div className="card bg-base-100 w-auto shadow-md">
+            <div className="card bg-base-200 border border-base-300 w-auto shadow-md">
               <div className="prose card-body text-center">
                 <i className="fa-solid fa-bolt"></i>
                 <h2 className="card-title justify-center">Rapidez</h2>
                 <p>Reserva en menos de 5 minutos</p>
               </div>
             </div>
-            <div className="card bg-base-100 shadow-md">
+            <div className="card bg-base-200 border border-base-300 shadow-md">
               <div className="prose card-body text-center">
                 <i className="fa-solid fa-house"></i>
                 <h2 className="card-title justify-center">Comodidad</h2>
                 <p>Desde la comodidad de tu hogar</p>
               </div>
             </div>
-            <div className="card bg-base-100 shadow-md">
+            <div className="card bg-base-200 border border-base-300 shadow-md">
               <div className="prose card-body text-center">
                 <i className="fa-solid fa-circle-nodes"></i>
                 <h2 className="card-title justify-center">Amplia red de profesionales</h2>
@@ -92,9 +92,9 @@ export const Home = () => {
                   salud</p>
               </div>
             </div>
-            <div className="card bg-base-100 shadow-md">
+            <div className="card bg-base-200 border border-base-300 shadow-md">
               <div className="prose card-body text-center">
-                <i className="fa-solid fa-circle-nodes"></i>
+                <i className="fa-solid fa-shield-halved"></i>
                 <h2 className="card-title justify-center">Confidencialidad</h2>
                 <p>Tus datos están seguros</p>
               </div>
