@@ -23,9 +23,9 @@ export const Wallet = ({ appointment }) => {
             },
           ],
           back_urls: {
-            success: "https://fantastic-system-r4x7vv9qq7wf6vj-3000.app.github.dev/payment-state",
-            failure: "https://fantastic-system-r4x7vv9qq7wf6vj-3000.app.github.dev/payment-state",
-            pending: "https://fantastic-system-r4x7vv9qq7wf6vj-3000.app.github.dev/payment-state",
+            success: `${process.env.FRONTEND_URL}/payment-state`,
+            failure: `${process.env.FRONTEND_URL}/payment-state`,
+            pending: `${process.env.FRONTEND_URL}/payment-state`
           },
           auto_return: "approved",
           metadata: {
