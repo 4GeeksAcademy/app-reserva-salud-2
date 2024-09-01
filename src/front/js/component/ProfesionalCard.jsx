@@ -34,42 +34,30 @@ export const ProfesionalCard = ({ professional }) => {
   };
 
   return (
-    <div className="card card-side bg-base-100 shadow-xl w-full border border-base-300" onClick={() => navigate(`${professional.id}`)} style={{ cursor: "pointer" }}>
-      <div>
-      <figure>
-        <img
-          className='w-60 rounded-md'
-          src={professional.profile_picture}
-          alt="Profile_picture" />
-      </figure>
+    <div
+      className="card bg-base-100 shadow-xl w-full border border-base-300 flex flex-col sm:flex-row"
+      onClick={() => navigate(`${professional.id}`)}
+      style={{ cursor: "pointer" }}
+    >
+      <div className="w-full sm:w-auto">
+        <figure className="w-full">
+          <img
+            className="w-full sm:w-60 rounded-md object-cover"
+            src={professional.profile_picture}
+            alt="Profile_picture"
+          />
+        </figure>
       </div>
-      <div className="card-body">
-      <p>{renderStars(averageScore())}</p>
-
+      <div className="card-body flex-1 p-4">
+        <p>{renderStars(averageScore())}</p>
         <h2 className="card-title">{professional?.first_name} {professional?.last_name}</h2>
-        <p>{professional?.specialities?.map(speciality => speciality.name)}</p>
-        <p><i className="fa-solid fa-location-dot"></i> {professional?.city?.name}, {professional?.city?.state?.name}</p>
-
+        <p>{professional?.specialities?.map(speciality => speciality.name).join(", ")}</p>
+        <p>
+          <i className="fa-solid fa-location-dot"></i> {professional?.city?.name}, {professional?.city?.state?.name}
+        </p>
         <div className="badge badge-outline">Presencial</div>
         <div className="badge badge-outline">Remoto</div>
-
-
       </div>
     </div>
-    // <div className='card bg-primary text-white' onClick={() => navigate(`${professional.id}`)} style={{ cursor: "pointer" }}>
-    //   <div className="row align-items-center justify-content-center p-3">
-    //     <div className="col-md-4 text-center">
-    //       <img src={professional.profile_picture} className='img-fluid profile-picture' alt="" />
-    //       <h2 className='text-subtitle text-truncate'>{professional?.first_name} {professional?.last_name}</h2>
-    //       <p>{renderStars(averageScore())}</p>
-    //     </div>
-    //     <div className="col-md-8">
-    //       <h2 className='text-label'>Título: {professional?.specialities?.map(speciality => speciality.name)}</h2>
-    //       <p className='text-body text-white'>{ }</p>
-    //       <h2 className='text-label'>Ubicación:</h2>
-    //       <p className='text-body text-white'><i className="fa-solid fa-location-dot"></i> {professional?.city?.name}, {professional?.city?.state?.name}</p>
-    //     </div>
-    //   </div>
-    // </div>
   )
 }
