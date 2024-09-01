@@ -34,21 +34,43 @@ export const ProfesionalCard = ({ professional }) => {
   };
 
   return (
+    <div className="card card-side bg-base-100 shadow-xl w-full" onClick={() => navigate(`${professional.id}`)} style={{ cursor: "pointer" }}>
+      <div>
+      <figure>
+        <img
+          className='w-60'
+          src={professional.profile_picture}
+          alt="Movie" />
+      </figure>
+      <p>{renderStars(averageScore())}</p>
+      </div>
+      <div className="card-body">
+        <h2 className="card-title">{professional?.first_name} {professional?.last_name}</h2>
+        <p>{professional?.specialities?.map(speciality => speciality.name)}</p>
+        <p><i className="fa-solid fa-location-dot"></i> {professional?.city?.name}, {professional?.city?.state?.name}</p>
 
-    <div className='card bg-primary text-white' onClick={() => navigate(`${professional.id}`)} style={{ cursor: "pointer" }}>
-      <div className="row align-items-center justify-content-center p-3">
-        <div className="col-md-4 text-center">
-          <img src={professional.profile_picture} className='img-fluid profile-picture' alt="" />
-          <h2 className='text-subtitle text-truncate'>{professional?.first_name} {professional?.last_name}</h2>
-          <p>{renderStars(averageScore())}</p>
-        </div>
-        <div className="col-md-8">
-          <h2 className='text-label'>Título: {professional?.specialities?.map(speciality => speciality.name)}</h2>
-          <p className='text-body text-white'>{ }</p>
-          <h2 className='text-label'>Ubicación:</h2>
-          <p className='text-body text-white'><i className="fa-solid fa-location-dot"></i> {professional?.city?.name}, {professional?.city?.state?.name}</p>
+        <div className="badge badge-outline">Presencial</div>
+        <div className="badge badge-outline">Remoto</div>
+
+        <div className="card-actions justify-end">
+          <button className="btn btn-primary">Ver más</button>
         </div>
       </div>
     </div>
+    // <div className='card bg-primary text-white' onClick={() => navigate(`${professional.id}`)} style={{ cursor: "pointer" }}>
+    //   <div className="row align-items-center justify-content-center p-3">
+    //     <div className="col-md-4 text-center">
+    //       <img src={professional.profile_picture} className='img-fluid profile-picture' alt="" />
+    //       <h2 className='text-subtitle text-truncate'>{professional?.first_name} {professional?.last_name}</h2>
+    //       <p>{renderStars(averageScore())}</p>
+    //     </div>
+    //     <div className="col-md-8">
+    //       <h2 className='text-label'>Título: {professional?.specialities?.map(speciality => speciality.name)}</h2>
+    //       <p className='text-body text-white'>{ }</p>
+    //       <h2 className='text-label'>Ubicación:</h2>
+    //       <p className='text-body text-white'><i className="fa-solid fa-location-dot"></i> {professional?.city?.name}, {professional?.city?.state?.name}</p>
+    //     </div>
+    //   </div>
+    // </div>
   )
 }

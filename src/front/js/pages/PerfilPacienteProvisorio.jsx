@@ -43,7 +43,7 @@ export const VistaPerfilPaciente = () => {
     <div className="contenido container mb-5">
       <div className="row">
         <div className="col">
-          <h1 className="mb-5 text-5xl font-bold">Bienvenido, {store?.currentUser?.first_name} {store?.currentUser?.last_name}</h1>
+          <h1 className="mb-5 text-5xl font-bold text-center">Bienvenido, {store?.currentUser?.first_name} {store?.currentUser?.last_name}</h1>
         </div>
       </div>
       <div className="row">
