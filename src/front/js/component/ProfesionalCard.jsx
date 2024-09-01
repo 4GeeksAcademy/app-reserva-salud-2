@@ -11,11 +11,11 @@ export const ProfesionalCard = ({ professional }) => {
     const stars = [];
 
     for (let i = 0; i < filledStars; i++) {
-      stars.push(<i key={i} className="fa-solid fa-star"></i>);
+      stars.push(<i key={i} className="fa-solid fa-star text-primary"></i>);
     }
 
     for (let i = 0; i < emptyStars; i++) {
-      stars.push(<i key={filledStars + i} className="fa-regular fa-star"></i>);
+      stars.push(<i key={filledStars + i} className="fa-regular fa-star text-primary"></i>);
     }
 
     return stars;
@@ -34,17 +34,18 @@ export const ProfesionalCard = ({ professional }) => {
   };
 
   return (
-    <div className="card card-side bg-base-100 shadow-xl w-full" onClick={() => navigate(`${professional.id}`)} style={{ cursor: "pointer" }}>
+    <div className="card card-side bg-base-100 shadow-xl w-full border border-base-300" onClick={() => navigate(`${professional.id}`)} style={{ cursor: "pointer" }}>
       <div>
       <figure>
         <img
-          className='w-60'
+          className='w-60 rounded-md'
           src={professional.profile_picture}
-          alt="Movie" />
+          alt="Profile_picture" />
       </figure>
-      <p>{renderStars(averageScore())}</p>
       </div>
       <div className="card-body">
+      <p>{renderStars(averageScore())}</p>
+
         <h2 className="card-title">{professional?.first_name} {professional?.last_name}</h2>
         <p>{professional?.specialities?.map(speciality => speciality.name)}</p>
         <p><i className="fa-solid fa-location-dot"></i> {professional?.city?.name}, {professional?.city?.state?.name}</p>
@@ -52,9 +53,7 @@ export const ProfesionalCard = ({ professional }) => {
         <div className="badge badge-outline">Presencial</div>
         <div className="badge badge-outline">Remoto</div>
 
-        <div className="card-actions justify-end">
-          <button className="btn btn-primary">Ver más</button>
-        </div>
+
       </div>
     </div>
     // <div className='card bg-primary text-white' onClick={() => navigate(`${professional.id}`)} style={{ cursor: "pointer" }}>

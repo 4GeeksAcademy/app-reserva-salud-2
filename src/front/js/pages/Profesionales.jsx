@@ -59,8 +59,8 @@ export const Profesionales = () => {
   }, [currentState, currentCity, professionals]);
 
   return (
-    <div>
-      <h1 className="mb-8  mt-14 text-5xl font-bold text-center">Profesionales</h1>
+    <div className="pt-28">
+      <h1 className="mb-8 text-5xl font-bold text-center">Profesionales</h1>
       <div className="d-flex flex-column gap-4">
         <div>
           {/* <h3 className="text-subtitle text-center">Destacados</h3> */}
@@ -161,9 +161,9 @@ export const Profesionales = () => {
           </div>
         </div> */}
 
-            <div className="flex mt-12 gap-12 mx-24">
-{/* Select para Especialidad */}
-{/* <div className="flex-1 w-64">
+            <div className="flex mt-12 gap-12 mx-44">
+              {/* Select para Especialidad */}
+              {/* <div className="flex-1 w-64">
     <label htmlFor="especialidad" className="text-sm font-medium mb-2">
       Especialidad
     </label>
@@ -186,8 +186,8 @@ export const Profesionales = () => {
     </select> */}
 
               {/* Select para Departamento */}
-              <div className="flex-1 w-64 text-center">
-                <label htmlFor="state" className="text-sm font-medium  mb-2">
+              <div className="flex-1 w-44 mb-12">
+                <label htmlFor="state" className="text-sm font-medium mb-2 ps-3">
                   Departamento
                 </label>
                 <select
@@ -207,8 +207,8 @@ export const Profesionales = () => {
               </div>
 
               {/* Select para Ciudad */}
-              <div className="flex-1 w-64 text-center">
-                <label htmlFor="city" className="text-sm font-medium mb-2">
+              <div className="flex-1 w-44">
+                <label htmlFor="city" className="text-sm font-medium mb-2 ps-3">
                   Localidad
                 </label>
                 <select
@@ -231,12 +231,12 @@ export const Profesionales = () => {
 
             <div className="flex justify-center my-6">
               {filteredProfessionals?.length > 0 ? (
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-2 gap-6">
                   {filteredProfessionals?.map((professional) => (
                     <ProfesionalCard
                       key={professional.id}
                       professional={professional}
-                      className="w-full max-w-sm mx-auto shadow-md rounded-lg overflow-hidden"
+                      className="w-full max-w-md mx-auto shadow-md rounded-lg overflow-hidden"
                     />
                   ))}
                 </div>
@@ -246,6 +246,7 @@ export const Profesionales = () => {
                 </h2>
               )}
             </div>
+
 
             {/* <div className="flex justify-center">
               {filteredProfessionals?.length > 0 ? (
@@ -265,9 +266,9 @@ export const Profesionales = () => {
               )} */}
           </div>
         </div>
-        </div>
-       
       </div>
-      // </div>
-      );
+
+    </div>
+    // </div>
+  );
 };
