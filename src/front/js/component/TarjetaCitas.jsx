@@ -67,106 +67,102 @@ export const TarjetaCitasUsuario = ({ appointment }) => {
   // console.log("isPastAppointment:", isPastAppointment);
   return (
     <>
-   {/* Contenedor de la tarjeta */}
-<div className="col">
-  <div className={`card shadow bg-primary ${isPastAppointment ? 'bg-light opacity-50' : ''}`}>
-    <div className="card-body p-2 mt-1 mb-1">
-      <div className="row justify-content-between">
-        <div className="col text-center">
-          <h5 className="card-title">{appointment?.availability?.professional?.appointment_type}</h5>
+      {/* Contenedor de la tarjeta */}
+      <div className="flex flex-col gap-2">
+        <div className={`card shadow bg-primary text-primary-content ${isPastAppointment ? 'opacity-50' : ''}`}>
+          <div className="card-body">
+            <h2 className="card-title mx-auto">{appointment?.type === "presential" ? "Presencial" : "Remoto"}</h2>
+            <div>
+              <h3 className="text-lg font-semibold">Apellido y nombre especialista:</h3>
+              <i className="fa-regular fa-user"></i> {appointment?.availability?.professional?.first_name}{' '}
+              {appointment?.availability?.professional?.last_name}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">Día de la cita:</h3>
+              <i className="fa-regular fa-calendar"></i>{' '}
+              {new Date(appointment?.availability?.date).toLocaleDateString('es-UY', { timeZone: 'UTC' })}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">Hora de la cita:</h3>
+              <i className="fa-regular fa-clock"></i> {appointment?.availability?.start_time}
+            </div>
+            {hasCommented && <span className="badge bg-success w-100 mb-3">Comentario realizado</span>}
+            {
+              !isPastAppointment && (
+                <button
+                  className={`btn btn-primary w-full text-white ${isPastAppointment ? 'btn-primary' : 'bg-blue-400'}`}
+                  onClick={cancelAppointment}
+                  disabled={isPastAppointment}
+                >
+                  Cancelar Reserva
+                </button>
+              )
+            }
+          </div>
         </div>
-      </div>
-      <div className="row justify-content-center">
-        <div className="col">
-          <p className="card-text text-body">
-            <h3 className="text-white">Apellido y nombre especialista:</h3>
-            <i className="fa-regular fa-user"></i> {appointment?.availability?.professional?.first_name}{' '}
-            {appointment?.availability?.professional?.last_name}
-          </p>
-          <p className="card-text text-body">
-          <h3 className="text-white">Día de la cita:</h3>
-            <i className="fa-regular fa-calendar"></i>{' '}
-            {new Date(appointment?.availability?.date).toLocaleDateString('es-UY', { timeZone: 'UTC' })}
-          </p>
-          <p className="card-text text-body">
-          <h3 className="text-white">Hora de la cita:</h3>
-            <i className="fa-regular fa-clock"></i> {appointment?.availability?.start_time}
-          </p>
-          {hasCommented && <span className="badge bg-success w-100 mb-3">Comentario realizado</span>}
-        </div>
-        <div className="col">
+
+        {/* Contenedor del botón modal fuera de la card */}
+        {isPastAppointment && (
           <button
-            className={`btn btn bg-blue-400 w-full text-white ${isPastAppointment ? 'btn-primary' : 'bg-blue-400'}`}
-            onClick={cancelAppointment}
-            disabled={isPastAppointment}
+            className={`btn btn-primary w-full`}
+            onClick={() => {
+              if (!hasCommented) {
+                document.getElementById('comment_modal').showModal();
+              } else {
+                toast.info('El servicio ya ha sido comentado.');
+              }
+            }}
+            disabled={hasCommented}
           >
-            Cancelar Reserva
+            Comentar Servicio
           </button>
-        </div>
+        )}
       </div>
-    </div>
-  </div>
 
-  {/* Contenedor del botón modal fuera de la card */}
-  {isPastAppointment && (
-      <button
-        className={`btn bg-blue-500 w-full ${hasCommented ? 'opacity-50' : ''}`}
-        onClick={() => {
-          if (!hasCommented) {
-            document.getElementById('comment_modal').showModal();
-          } else {
-            toast.info('El servicio ya ha sido comentado.');
-          }
-        }}
-        disabled={hasCommented}
-      >
-        Comentar Servicio
-      </button>
-    </div>
-  )}
-</div>
+      {/* Modal de DaisyUI */}
+      <dialog id="comment_modal" className="modal modal-bottom sm:modal-middle">
+        <form method="dialog" className="modal-box">
+          <h3 className="font-bold text-lg">Agregar Comentario</h3>
 
-{/* Modal de DaisyUI */}
-<dialog id="comment_modal" className="modal modal-bottom sm:modal-middle">
-  <form method="dialog" className="modal-box">
-    <h3 className="font-bold text-lg">Agregar Comentario</h3>
+          <div className="py-4">
+            {/* Textarea para el comentario */}
+            <textarea
+              className="textarea textarea-bordered w-full mb-4"
+              rows="4"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Escribe tu comentario aquí..."
+            ></textarea>
 
-    <div className="py-4">
-      {/* Textarea para el comentario */}
-      <textarea
-        className="textarea textarea-bordered w-full mb-4"
-        rows="4"
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        placeholder="Escribe tu comentario aquí..."
-      ></textarea>
+            {/* Input para la puntuación */}
+            <h6 className="font-medium">Agregar puntuación del servicio</h6>
+            <input
+              type="number"
+              className="input input-bordered w-full mb-4"
+              value={score}
+              onChange={(e) => setScore(e.target.value)}
+              placeholder="Ingresa un score del 1 al 5"
+              min="1"
+              max="5"
+            />
+          </div>
 
-      {/* Input para la puntuación */}
-      <h6 className="font-medium">Agregar puntuación del servicio</h6>
-      <input
-        type="number"
-        className="input input-bordered w-full mb-4"
-        value={score}
-        onChange={(e) => setScore(e.target.value)}
-        placeholder="Ingresa un score del 1 al 5"
-        min="1"
-        max="5"
-      />
-    </div>
+          <div className="modal-action">
+            {/* Botón para cerrar el modal */}
+            <button type="button" className="btn btn-secondary" onClick={() => document.getElementById('comment_modal').close()}>
+              Cerrar
+            </button>
 
-    <div className="modal-action">
-      {/* Botón para cerrar el modal */}
-      <button type="button" className="btn btn-secondary" onClick={() => document.getElementById('comment_modal').close()}>
-        Cerrar
-      </button>
-
-      {/* Botón para enviar el comentario */}
-      <button type="button" className="btn btn-primary" onClick={handleCommentSubmit}>
-        Enviar Comentario
-      </button>
-    </div>
-  </form>
-</dialog>
-</>
+            {/* Botón para enviar el comentario */}
+            <button type="button" className="btn btn-primary" onClick={() => {
+              handleCommentSubmit()
+              document.getElementById('comment_modal').close()
+            }}>
+              Enviar Comentario
+            </button>
+          </div>
+        </form>
+      </dialog>
+    </>
   );
 };
