@@ -5,7 +5,7 @@ export const Footer = () => {
   return (
     <footer className="footer bg-neutral text-neutral-content p-10">
       <aside>
-        <i class="fa-regular fa-2xl fa-calendar-plus mb-4"></i>
+        <i className="fa-regular fa-2xl fa-calendar-plus mb-4"></i>
         <p>
           RESERVA SALUD
           <br />
