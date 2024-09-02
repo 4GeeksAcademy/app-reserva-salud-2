@@ -15,10 +15,7 @@ export const AgendaProfesional = () => {
   const [availableHours, setAvailableHours] = useState([]);
   const [appointment, setAppointment] = useState(null);
   const [showCheckout, setShowCheckout] = useState(false);
-  const [amount, setAmount] = useState(100);
-  const handleCheckoutClick = () => {
-    setShowCheckout(true);
-  };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getProfessional = async () => {
@@ -30,6 +27,8 @@ export const AgendaProfesional = () => {
         setProfessional(response.data);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     };
     getProfessional();
@@ -78,55 +77,43 @@ export const AgendaProfesional = () => {
     );
   };
 
-  const handleCreateAppointment = async () => {
-    const response = await actions.createUserAppointment(appointment);
-    console.log(response);
-  };
 
-  const handleRefundReservation = async () => {
-    try {
-      const response = await fetch(`${process.env.BACKEND_URL}/api/refund_payment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          professional_id: professionalId // envío id profesional,falta id cita
-        }),
-      });
+  if (loading) {
+    return (
+      <div className="container min-h-screen mx-auto pt-20">
+        <div className="flex justify-center">
+          <div className="skeleton h-8 w-[450px]"></div>
+        </div>
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert('Reserva cancelada y reembolso procesado exitosamente.');
-      } else {
-        alert('Error al cancelar la reserva: ' + data.error);
-      }
-    } catch (error) {
-      console.error('Error al cancelar la reserva:', error);
-    }
-  };
+        <div className="grid md:grid-cols-2 mt-6 gap-4">
+          <div className="skeleton h-96 w-full"></div>
+          <div className="skeleton h-96 w-full"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="contenido container">
-      <h1 className="text-center text-title text-secondary">
+    <div className="container flex flex-col justify-center min-h-screen mx-auto pt-20">
+      <h1 className="text-4xl font-bold text-base-content text-center">
         Agenda de{" "}
         {professional?.first_name + " " + professional?.last_name ||
           professional?.email}
       </h1>
-      <div className="row justify-content-center my-4">
-        <div className="col text-center">
-          {professional && (
-            <Calendar
-              tileDisabled={tilesDisabled}
-              onClickDay={handleDayClick}
-            />
-          )}
-        </div>
-        <div className="col">
+
+      <div className="grid md:grid-cols-2 justify-items-center my-12">
+
+        {professional && (
+          <Calendar
+            tileDisabled={tilesDisabled}
+            onClickDay={handleDayClick}
+          />
+        )}
+
+        <div className="w-full">
           {selectedDate && (
-            <div className="">
-              <h2>
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-base-content text-center">
                 Horarios disponibles para{" "}
                 {selectedDate.toLocaleDateString(undefined, {
                   weekday: "long",
@@ -137,43 +124,49 @@ export const AgendaProfesional = () => {
               </h2>
 
               {availableHours.length > 0 && availableHours.some(interval => interval.is_available) ? (
-                <div className="list-group my-3">
+                <ul className="list-none flex flex-col items-center gap-2 mt-8">
                   {
                     availableHours.map((interval) => (
                       interval.is_available && (
-                        <li className="list-group-item" key={interval.availability_id}>
-                          <input className="form-check-input me-1" type="radio" name="intervals" value={interval.availability_id} onChange={(e) => setAppointment(interval)} id={`time-${interval.availability_id}`} />
-                          <label className="form-check-label" htmlFor={`time-${interval.availability_id}`}>{interval.start} - {interval.end}</label>
+                        <li className="form-control bg-base-200 rounded-box" key={interval.availability_id}>
+                          <label className="label cursor-pointer px-8">
+                            <input className="radio checked:bg-blue-500" type="radio" name="intervals" value={interval.availability_id} onChange={(e) => setAppointment(interval)} id={`time-${interval.availability_id}`} />
+                            <span className="label-text text-lg font-medium pl-8">{interval.start} - {interval.end}</span>
+                          </label>
                         </li>
                       )
                     ))
                   }
-                </div>
+                </ul>
               ) : (
-                <h4>No hay horarios disponibles</h4>
+                <h2 className="text-2xl font-bold text-base-content">No hay horarios disponibles</h2>
               )}
             </div>
           )}
           {appointment && (
             <>
-              <h2>Elegir tipo de reserva</h2>
+              <h3 className="text-xl font-bold text-base-content text-center">Elegir tipo de reserva</h3>
 
               {appointment.is_remote && (
-                <div className="form-check form-check-inline">
-                  <input className="form-check-input" type="radio" name="reservationType" id="remote" value="remote" onChange={(e) => {
-                    setAppointment({ ...appointment, reservationType: e.target.value })
-                    setShowCheckout(true)
-                  }} />
-                  <label className="form-check-label" htmlFor="remote">Remoto</label>
+                <div className="form-control flex flex-col items-center">
+                  <label className="label cursor-pointer">
+                    <input className="radio checked:bg-blue-500" type="radio" name="reservationType" id="remote" value="remote" onChange={(e) => {
+                      setAppointment({ ...appointment, reservationType: e.target.value })
+                      setShowCheckout(true)
+                    }} />
+                    <span className="label-text text-lg font-medium pl-8">Remoto</span>
+                  </label>
                 </div>
               )}
               {appointment.is_presential && (
-                <div className="form-check form-check-inline">
-                  <input className="form-check-input" type="radio" name="reservationType" id="presential" value="presential" onChange={(e) => {
-                    setAppointment({ ...appointment, reservationType: e.target.value })
-                    setShowCheckout(true)
-                  }} />
-                  <label className="form-check-label" htmlFor="presential">Presencial</label>
+                <div className="form-control flex flex-col items-center">
+                  <label className="label cursor-pointer">
+                    <input className="radio checked:bg-blue-500" type="radio" name="reservationType" id="presential" value="presential" onChange={(e) => {
+                      setAppointment({ ...appointment, reservationType: e.target.value })
+                      setShowCheckout(true)
+                    }} />
+                    <span className="label-text text-lg font-medium pl-6">Presencial</span>
+                  </label>
                 </div>
               )}
             </>
@@ -192,6 +185,34 @@ export const AgendaProfesional = () => {
 };
 
 
+// const handleCreateAppointment = async () => {
+//   const response = await actions.createUserAppointment(appointment);
+//   console.log(response);
+// };
+
+// const handleRefundReservation = async () => {
+//   try {
+//     const response = await fetch(`${process.env.BACKEND_URL}/api/refund_payment`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         professional_id: professionalId // envío id profesional,falta id cita
+//       }),
+//     });
+
+//     const data = await response.json();
+
+//     if (response.ok) {
+//       alert('Reserva cancelada y reembolso procesado exitosamente.');
+//     } else {
+//       alert('Error al cancelar la reserva: ' + data.error);
+//     }
+//   } catch (error) {
+//     console.error('Error al cancelar la reserva:', error);
+//   }
+// };
 
 // <>
 //   <button

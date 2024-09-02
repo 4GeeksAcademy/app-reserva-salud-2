@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import Calendar from "react-calendar";
+import { Calendar } from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { backendApi } from "../store/flux";
 import toast from "react-hot-toast";
@@ -75,12 +75,121 @@ export const DisponibilidadProfesional = () => {
     };
 
     return (
-        <div className="contenido container">
-            <h1 className="text-center text-title text-secondary pb-4">
+        <div className="container flex flex-col justify-center min-h-screen mx-auto pt-20 px-4">
+            <h1 className="text-4xl text-center font-bold text-secondary pb-4">
                 Disponibilidad
             </h1>
-            <div className="row">
-                <div className="col-sm-12 col-md-6 d-flex justify-content-center">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 justify-center gap-4">
+                <Calendar
+                    className="justify-self-center"
+                    onClickDay={setFechaSeleccionada}
+                    value={fechaSeleccionada}
+                    minDate={minDate}
+                    maxDate={maxDate}
+                />
+
+                <div className="w-full">
+                    <h2 className="text-2xl font-bold text-center text-title text-secondary pb-4">
+                        Datos de disponibilidad
+                    </h2>
+
+                    <div className="grid grid-cols-2 gap-6 justify-items-center">
+                        <label className="form-control w-full max-w-xs">
+                            <div className="label">
+                                <span className="label-text">Hora de inicio</span>
+                            </div>
+                            <input
+                                type="time"
+                                className="input input-bordered w-full max-w-xs"
+                                placeholder="Hora de inicio"
+                                id="start-time"
+                                name="start-time"
+                                value={startTime}
+                                onChange={(e) => setStartTime(e.target.value)}
+                            />
+                        </label>
+                        <label className="form-control w-full max-w-xs">
+                            <div className="label">
+                                <span className="label-text">Hora de fin</span>
+                            </div>
+                            <input
+                                type="time"
+                                className="input input-bordered w-full max-w-xs"
+                                placeholder="Hora de fin"
+                                id="end-time"
+                                name="end-time"
+                                value={endTime}
+                                onChange={(e) => setEndTime(e.target.value)}
+                            />
+                        </label>
+                        <label className="form-control w-full max-w-xs">
+                            <div className="label">
+                                <span className="label-text">Duración de la cita en minutos</span>
+                            </div>
+                            <input
+                                type="number"
+                                className="input input-bordered w-full max-w-xs"
+                                placeholder="Duración de la cita"
+                                id="duration"
+                                name="duration"
+                                min="30"
+                                max="120"
+                                value={duration}
+                                onChange={(e) => setDuration(Number(e.target.value))}
+                            />
+                        </label>
+                        <div>
+                            <div className="form-control pt-6">
+                                <label className="label cursor-pointer">
+                                    <span className="label-text pr-2">Presencial</span>
+                                    <input
+                                        type="checkbox"
+                                        className="checkbox checkbox-primary"
+                                        id="presential"
+                                        name="presential"
+                                        onChange={(e) => setIsPresential(e.target.checked)}
+                                    />
+                                </label>
+                            </div>
+                            <div className="form-control">
+                                <label className="label cursor-pointer">
+                                    <span className="label-text">Remoto</span>
+                                    <input
+                                        type="checkbox"
+                                        className="checkbox checkbox-primary"
+                                        id="remote"
+                                        name="remote"
+                                        onChange={(e) => setIsRemote(e.target.checked)}
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                        <div className="form-control col-span-2">
+                            <label className="label cursor-pointer">
+                                <span className="label-text pr-2">Semanal</span>
+                                <input
+                                    type="checkbox"
+                                    className="toggle toggle-primary"
+                                    id="weekly"
+                                    name="weekly"
+                                    onChange={(e) => setIsWeekly(e.target.checked)}
+                                />
+                            </label>
+                        </div>
+                        <button
+                            className="col-span-2 btn btn-primary btn-bg-primary-content btn-wide"
+                            onClick={handleConfirmar}
+                        >
+                            Confirmar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            {/* <div className="row">
+                <div className="col-sm-12 col-md-6 d-flex justify-center">
                     <div className="mb-3">
                         <Calendar
                             onClickDay={setFechaSeleccionada}
@@ -91,7 +200,7 @@ export const DisponibilidadProfesional = () => {
                     </div>
                 </div>
                 <div className="col-md-6">
-                    <h2 className="text-center text-title text-secondary pb-4">
+                    <h2 className="text-2xl font-bold text-center text-title text-secondary pb-4">
                         Datos de disponibilidad
                     </h2>
                     <div className="row mb-4">
@@ -207,7 +316,7 @@ export const DisponibilidadProfesional = () => {
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };

@@ -8,11 +8,13 @@ export const VistaInfoProfesional = () => {
   const { store, actions } = useContext(Context);
   const [professional, setProfessional] = useState({});
   const navigate = useNavigate();
+  const [login, setLogin] = useState(true);
 
   useEffect(() => {
     const getProfessional = async (professionalId) => {
       const professional = await actions.getProfessional(professionalId);
       setProfessional(professional);
+      setLogin(false);
     };
 
     getProfessional(id);
@@ -25,7 +27,7 @@ export const VistaInfoProfesional = () => {
     const stars = [];
 
     for (let i = 0; i < filledStars; i++) {
-      stars.push(<i key={i} className="fa-solid fa-star"></i>);
+      stars.push(<i key={i} className="fa-solid fa-star text-primary"></i>);
     }
 
     for (let i = 0; i < emptyStars; i++) {
@@ -47,94 +49,95 @@ export const VistaInfoProfesional = () => {
     return 0;
   };
 
+  if (login) {
+    return (
+      <div className="container mx-auto min-h-screen pt-20">
+        <div className="flex justify center items-start">
+          <div className="flex w-full max-w-4xl">
+            <div className="flex-1 flex justify-center items-center">
+              <div className="skeleton rounded-full h-64 w-64"></div>
+            </div>
+            <div className="flex-1 text-center pb-6">
+              <div className="my-4 skeleton h-8"></div>
+              <div className="skeleton h-6 w-64 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="container contenido py-5">
-      <div className="mb-3 row justify-content-center">
-        <div className="col text-center">
+    <div className="container mx-auto min-h-screen px-4 pt-20 max-w-4xl">
+      <div className="flex flex-col justify-evenly items-center gap-8 bg-base-200 border border-base-300 rounded-box p-8">
+        <div className="flex flex-col md:flex-row items-center gap-10">
           <img
             src={professional.profile_picture}
-            className="profile-picture"
+            className="w-64 rounded-full"
             alt="Profile picture"
           />
-        </div>
-      </div>
+          <div className="flex flex-col justify-center">
+            <h1 className="my-4 text-3xl text-primary font-bold text-center">{professional.first_name} {professional.last_name}</h1>
+            <h2 className="text-xl font-bold pb-8 text-primary text-center">{professional?.specialities?.map(speciality => speciality.name).join(", ")}</h2>
 
-      <div className="row gy-3">
-        <div className="col-12 text-center">
-          <h1 className="text-title text-primary">
-            {professional.first_name} {professional.last_name}
-          </h1>
-        </div>
-        <div className="col-12 text-center">
-          <h2 className="text-subtitle">{professional.title}</h2>
-        </div>
-        <div className="col-12 text-center">
-          <strong>{professional.state}</strong>
-        </div>
-      </div>
+            <div className="flex gap-8">
+              <div>
+                <h2 className="text-md font-bold">Calificación promedio</h2>
+                <p className="text-center">{renderStars(averageScore())}</p>
+              </div>
 
-      <div className="row justify-content-center">
-        <div className="col text-center">
-          <h2 className="text-subtitle">Calificación promedio</h2>
-          <p>{renderStars(averageScore())}</p>
-        </div>
-        <div className="col text-center">
-          <h2 className="text-subtitle">Comentarios</h2>
-          <h2 className="text-subtitle">{professional.comments?.length}</h2>
-        </div>
-      </div>
+              <div>
+                <h2 className="text-md font-bold">Comentarios</h2>
+                <p className="text-center text-xl font-bold">{professional.comments?.length}</p>
+              </div>
 
-      <div className="row">
-        <div className="col">
-          <h2 className="text-subtitle">Descripción</h2>
-          <p className="text-body">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloremque
-            ad possimus aliquid reiciendis. Quibusdam necessitatibus aperiam
-            eveniet molestias eum eligendi assumenda nobis consectetur expedita
-            praesentium! Harum corrupti tempore similique nisi.
+            </div>
+          </div>
+        </div>
+        <div className="w-full mt-8 px-8">
+          <h2 className="text-xl font-bold mb-4">Sobre mí</h2>
+          <p className="text-body mx-auto max-w-4xl text-base">
+            Profesional de la salud con una sólida formación académica y amplia experiencia en el área médica.
+            Tengo un fuerte compromiso con brindar atención de calidad, avalado con una trayectoria destacada
+            en el diagnóstico y tratamiento de diversas condiciones de salud. Promuevo un enfoque integral y
+            empático centrado en las necesidades individuales de cada paciente, garantizando un cuidado personalizado y basado en las
+            mejores prácticas médicas. Además, mantengo una continua actualización en mi especialidad,
+            participando en cursos y certificaciones para ofrecer siempre los tratamientos más avanzados
+            y efectivos.
           </p>
         </div>
       </div>
 
-      <div className="row gy-3">
-        <div className="col-12">
-          <h2 className="text-subtitle">Comentarios</h2>
-        </div>
-        {professional.comments?.length > 0 ? (
-          professional.comments.map((comment) => (
-            <div key={comment.id} className="col-12">
-              <div className="card">
-                <div className="card-header">
-                  <div className="row">
-                    <div className="col-auto me-auto">
-                      <h2 className="text-subtitle">
-                        {comment.user.first_name} {comment.user.last_name}
-                      </h2>
-                    </div>
-                    <div className="col-auto">{renderStars(comment.score)}</div>
-                  </div>
-                </div>
+
+      <div className="w-full mt-8">
+        <h2 className="text-xl text-neutral text-center mb-4">Comentarios</h2>
+        <div className="flex flex-col items-center">
+          {professional.comments?.length > 0 ? (
+            professional.comments.map((comment) => (
+              <div key={comment.id} className="card w-full max-w-4xl bg-base-100 shadow-xl mb-4 border border-base-300">
                 <div className="card-body">
+                  <div className="flex justify-between items-center mb-2">
+                    <h2 className="font-bold">{comment.user.first_name} {comment.user.last_name}</h2>
+                    <div>{renderStars(comment.score)}</div>
+                  </div>
                   <p className="card-text text-body">{comment.comment}</p>
-                  <small className="text-muted">{comment.created_at}</small>
+                  <small className="text-center text-neutral-content">{comment.created_at}</small>
                 </div>
               </div>
-            </div>
-          ))
-        ) : (
-          <div className="col-12">
+            ))
+          ) : (
             <p>No hay comentarios</p>
-          </div>
-        )}
-        <div className="d-flex justify-content-center m-4">
-          <button onClick={() => navigate(`/agenda/${id}`)} className="btn btn-primary" disabled={!store.currentUser}>
-            {
-              !store.currentUser
-                ? (<><i className="fa-solid fa-arrow-right-to-bracket"></i> Iniciar sesión para agendar cita</>)
-                : (<><i className="fa-solid fa-calendar-plus"></i> Agendar cita</>)
-            }
-          </button>
+          )}
         </div>
+      </div>
+
+      <div className="flex justify-center m-4">
+        <button onClick={() => navigate(`/agenda/${id}`)} className="btn btn-primary" disabled={!store.currentUser}>
+          {!store.currentUser
+            ? (<><i className="fa-solid fa-arrow-right-to-bracket"></i> Iniciar sesión para agendar cita</>)
+            : (<><i className="fa-solid fa-calendar-plus"></i> Agendar cita</>)
+          }
+        </button>
       </div>
     </div>
   );

@@ -11,11 +11,11 @@ export const ProfesionalCard = ({ professional }) => {
     const stars = [];
 
     for (let i = 0; i < filledStars; i++) {
-      stars.push(<i key={i} className="fa-solid fa-star"></i>);
+      stars.push(<i key={i} className="fa-solid fa-star text-primary"></i>);
     }
 
     for (let i = 0; i < emptyStars; i++) {
-      stars.push(<i key={filledStars + i} className="fa-regular fa-star"></i>);
+      stars.push(<i key={filledStars + i} className="fa-regular fa-star text-primary"></i>);
     }
 
     return stars;
@@ -34,20 +34,26 @@ export const ProfesionalCard = ({ professional }) => {
   };
 
   return (
-
-    <div className='card bg-primary text-white' onClick={() => navigate(`${professional.id}`)} style={{ cursor: "pointer" }}>
-      <div className="row align-items-center justify-content-center p-3">
-        <div className="col-md-4 text-center">
-          <img src={professional.profile_picture} className='img-fluid profile-picture' alt="" />
-          <h2 className='text-subtitle text-truncate'>{professional?.first_name} {professional?.last_name}</h2>
-          <p>{renderStars(averageScore())}</p>
-        </div>
-        <div className="col-md-8">
-          <h2 className='text-label'>Título: {professional?.specialities?.map(speciality => speciality.name)}</h2>
-          <p className='text-body text-white'>{ }</p>
-          <h2 className='text-label'>Ubicación:</h2>
-          <p className='text-body text-white'><i className="fa-solid fa-location-dot"></i> {professional?.city?.name}, {professional?.city?.state?.name}</p>
-        </div>
+    <div
+      className="card sm:card-side bg-base-200 border border-base-300 shadow-xl hover:cursor-pointer"
+      onClick={() => navigate(`${professional.id}`)}
+    >
+      <figure className='sm:max-w-60'>
+        <img
+          className='h-full'
+          src={professional.profile_picture}
+          alt="Profile_picture"
+        />
+      </figure>
+      <div className="card-body">
+        <p>{renderStars(averageScore())}</p>
+        <h2 className="card-title">{professional?.first_name} {professional?.last_name}</h2>
+        <p>{professional?.specialities?.map(speciality => speciality.name).join(", ")}</p>
+        <p>
+          <i className="fa-solid fa-location-dot"></i> {professional?.city?.name}, {professional?.city?.state?.name}
+        </p>
+        <div className="badge badge-outline">Presencial</div>
+        <div className="badge badge-outline">Remoto</div>
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 
 export function Navbar() {
@@ -7,110 +7,113 @@ export function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <nav className="navbar fixed-top navbar-expand-lg bg-primary">
-      <div className="container-fluid">
-        <Link className="navbar-title text-white text-decoration-none" to={"/"}>
-          <i className="fa-regular fa-calendar-plus"></i> Reserva Salud
-        </Link>
-        <button
-          className="navbar-toggler text-white bg-secondary"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbar"
-          aria-controls="navbar"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <i className="fa-solid fa-bars"></i>
-        </button>
-        <div className="collapse navbar-collapse" id="navbar">
-          <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <Link
-                className={`text-white text-normal nav-link ${({ isActive }) =>
-                  isActive ? "active" : ""}`}
-                to={"/"}
-              >
+    <div className="navbar fixed z-50 shadow backdrop-blur bg-opacity-85 bg-base-100 text-base-content">
+      <div className="navbar-start">
+        <div className="dropdown">
+          <div tabIndex={0} role="button" className="btn btn-ghost md:hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h8m-8 6h16" />
+            </svg>
+          </div>
+          <ul
+            tabIndex={0}
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+            <li>
+              <NavLink to="/">
                 Inicio
-              </Link>
+              </NavLink>
             </li>
-            <li className="nav-item">
-              <Link
-                className={`text-white text-normal nav-link ${({ isActive }) =>
-                  isActive ? "active" : ""}`}
-                to={"/profesionales"}
-              >
+            <li>
+              <NavLink to="/profesionales">
                 Profesionales
-              </Link>
+              </NavLink>
             </li>
-            <li className="nav-item">
-              <Link
-                className={`text-white text-normal nav-link ${({ isActive }) =>
-                  isActive ? "active" : ""}`}
-                to={"/contacto"}
-              >
+            <li>
+              <NavLink to="/contacto">
                 Contacto
-              </Link>
+              </NavLink>
             </li>
-            {store.currentUser ? (
-              <li className="nav-item">
-                <Link
-                  className={`nav-link text-white text-normal ${({ isActive }) =>
-                    isActive ? "active" : ""}`}
-                  to={"/perfil-paciente"}
-                >
-                  Perfil
-                </Link>
-              </li>
-            ) : store.currentProfessional ? (
-              <li className="nav-item">
-                <Link
-                  className={`nav-link text-white text-normal ${({ isActive }) =>
-                    isActive ? "active" : ""}`}
-                  to={"/perfil-profesional"}
-                >
-                  Perfil
-                </Link>
-              </li>
-            ) : null
-            }
-            {
-              store.currentProfessional && (
-                <li className="nav-item">
-                  <Link
-                    className={`nav-link text-white text-normal ${({ isActive }) =>
-                      isActive ? "active" : ""}`}
-                    to={"/disponibilidad"}
-                  >
-                    Disponibilidad
-                  </Link>
-                </li>
-              )
-            }
-            {
-              store.currentUser || store.currentProfessional
-                ? (
-                  <button
-                    className="btn text-primary text-btn bg-tertiary"
-                    onClick={() => {
-                      actions.logout();
-                      navigate("/");
-                    }}
-                  >
-                    <i className="fa-solid fa-arrow-right-to-bracket"></i> Salir
-                  </button>
-                )
-                : (
-                  <Link to={"/login"}>
-                    <button className="btn text-white text-btn bg-secondary">
-                      <i className="fa-solid fa-arrow-right-to-bracket"></i> Ingresar
-                    </button>
-                  </Link>
-                )
-            }
           </ul>
         </div>
+
+        <Link to="/" className="btn btn-ghost text-xl">
+          <i className="fa-regular fa-xl fa-calendar-plus"></i>
+          Reserva Salud
+        </Link>
       </div>
-    </nav>
+      <div className="navbar-center hidden md:flex">
+        <ul
+          tabIndex={0}
+          className="menu menu-horizontal gap-1">
+          <li>
+            <NavLink to="/">
+              Inicio
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/profesionales">
+              Profesionales
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/contacto">
+              Contacto
+            </NavLink>
+          </li>
+        </ul>
+      </div>
+      <div className="navbar-end">
+        {
+          store.currentUser || store.currentProfessional ? (
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                <div className="w-10 rounded-full">
+                  <img
+                    alt="Tailwind CSS Navbar component"
+                    src={store.currentProfessional
+                      ? store.currentProfessional?.profile_picture
+                      : `https://ui-avatars.com/api/?name=${store.currentUser.first_name}+${store.currentUser.last_name}`} />
+                </div>
+              </div>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-2 w-52 p-2 shadow">
+                <li>
+                  <NavLink to={store.currentUser ? "/perfil-paciente" : store.currentProfessional ? "/perfil-profesional" : ""}>
+                    Reservas
+                  </NavLink>
+                </li>
+                {
+                  store.currentProfessional && (
+                    <li>
+                      <NavLink to="/disponibilidad">
+                        Disponibilidad
+                      </NavLink>
+                    </li>
+                  )
+                }
+                <li>
+                  <a onClick={() => {
+                    actions.logout();
+                    navigate("/");
+                  }}>Cerrar Sesión</a>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <Link to="/login" className="btn btn-primary btn-md">Iniciar Sesión</Link>
+          )
+        }
+      </div>
+    </div>
   );
 }
