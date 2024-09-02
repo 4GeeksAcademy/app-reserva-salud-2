@@ -121,6 +121,10 @@ def save_payment_mp():
 
     # Accede al email dentro de 'payer'
     email_client = data.get('payer').get('email')
+    
+    # Si el id del pago ya existe en la base de datos, devolver un error
+    if Data_Pay_Mp.query.filter_by(id_payment=id_payment).first():
+      raise APIException("El pago ya existe", status_code=400)
 
     # Crear una nueva instancia del modelo Data_Pay_Mp con los datos recibidos desde el front
     # print("mostrando:", professional_id)
