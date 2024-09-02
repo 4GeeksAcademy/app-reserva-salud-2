@@ -109,7 +109,6 @@ export const TarjetaCitasUsuario = ({ appointment }) => {
 
   {/* Contenedor del botón modal fuera de la card */}
   {isPastAppointment && (
-    <div className="mt-2">
       <button
         className={`btn bg-blue-500 w-full ${hasCommented ? 'opacity-50' : ''}`}
         onClick={() => {
