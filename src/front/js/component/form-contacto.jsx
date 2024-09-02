@@ -19,11 +19,11 @@ export const FormContacto = () => {
     };
 
     return (
-        <div className="min-h-screen flex justify-center items-center bg-gray-100 pt-32 pb-28" style={{
+        <div className="min-h-screen flex justify-center items-center bg-base-100 pt-32 pb-28" style={{
             backgroundImage: "url(https://diariosanrafael.com.ar/wp-content/uploads/2023/09/bg-banner-coseguro2-960x426-1.jpg)",
             backgroundSize: "cover"
         }}>
-            <div className="bg-white bg-opacity-90 p-10 rounded-lg shadow-lg max-w-5xl w-full">
+            <div className="bg-base-100 bg-opacity-90 p-10 rounded-lg shadow-lg max-w-5xl w-full">
                 <h1 className="text-5xl font-bold text-center mb-10">Contáctate con nosotros</h1>
                 <div className="flex flex-col lg:flex-row justify-between items-start gap-8">
                     <div className="flex-1 max-w-md">

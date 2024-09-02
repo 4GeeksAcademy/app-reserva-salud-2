@@ -5,7 +5,6 @@ import { ProfesionalCard } from "../component/ProfesionalCard.jsx";
 export const Profesionales = () => {
   const { actions } = useContext(Context);
   const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
   const [currentState, setCurrentState] = useState("");
   const [currentCity, setCurrentCity] = useState("");
   const [professionals, setProfessionals] = useState([]);
@@ -18,6 +17,7 @@ export const Profesionales = () => {
         actions.getProfessionals(),
         actions.getStates(),
       ]);
+      console.log(professionals)
       setProfessionals(professionals);
       setStates(states);
       setLoading(false);
@@ -25,35 +25,19 @@ export const Profesionales = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const getCitiesByState = async () => {
-      if (currentState) {
-        const cities = await actions.getCitiesByState(currentState);
-        setCities(cities);
-      } else {
-        setCities([]);
-      }
-    }
-
-    getCitiesByState();
-  }, [currentState]);
+  console.log(professionals);
 
   useEffect(() => {
-    const filterProfessionals = () => {
-      let filtered = professionals;
-
-      if (currentState) {
-        filtered = filtered.filter(professional => professional.city.state.id == currentState);
-      }
+    let filteredProfessionals = professionals;
+    if (currentState) {
+      filteredProfessionals = professionals.filter((professional) => professional.state.id == currentState);
 
       if (currentCity) {
-        filtered = filtered.filter(professional => professional.city.id == currentCity);
+        filteredProfessionals = filteredProfessionals.filter((professional) => professional.city.id == currentCity);
       }
-
-      setFilteredProfessionals(filtered);
     }
 
-    filterProfessionals();
+    setFilteredProfessionals(filteredProfessionals);
   }, [currentState, currentCity, professionals]);
 
   if (loading) {
@@ -132,11 +116,13 @@ export const Profesionales = () => {
               onChange={(e) => setCurrentCity(e.target.value)}
             >
               <option value="">Seleccionar localidad</option>
-              {cities?.map((city) => (
-                <option key={city.id} value={city.id}>
-                  {city.name}
-                </option>
-              ))}
+              {
+                states?.find(state => state.id == currentState)?.cities?.map(city => (
+                  <option key={city.id} value={city.id}>
+                    {city.name}
+                  </option>
+                ))
+              }
             </select>
           </div>
         </div>

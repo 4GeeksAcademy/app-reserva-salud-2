@@ -97,6 +97,7 @@ class Professional(db.Model):
             "is_active": self.is_active,
             "is_validated": self.is_validated,
             "city": self.city.serialize(),
+            "state": self.state.serialize(),
             "comments": [comment.serialize() for comment in self.comments],
             "specialities": [speciality.serialize() for speciality in self.specialities],
         }
