@@ -35,20 +35,17 @@ export const ProfesionalCard = ({ professional }) => {
 
   return (
     <div
-      className="card bg-base-100 shadow-xl w-full border border-base-300 flex flex-col sm:flex-row"
+      className="card sm:card-side bg-base-200 border border-base-300 shadow-xl hover:cursor-pointer"
       onClick={() => navigate(`${professional.id}`)}
-      style={{ cursor: "pointer" }}
     >
-      <div className="w-full sm:w-auto">
-        <figure className="w-full">
-          <img
-            className="w-full sm:w-60 rounded-md object-cover"
-            src={professional.profile_picture}
-            alt="Profile_picture"
-          />
-        </figure>
-      </div>
-      <div className="card-body flex-1 p-4">
+      <figure className='sm:max-w-60'>
+        <img
+          className='h-full'
+          src={professional.profile_picture}
+          alt="Profile_picture"
+        />
+      </figure>
+      <div className="card-body">
         <p>{renderStars(averageScore())}</p>
         <h2 className="card-title">{professional?.first_name} {professional?.last_name}</h2>
         <p>{professional?.specialities?.map(speciality => speciality.name).join(", ")}</p>

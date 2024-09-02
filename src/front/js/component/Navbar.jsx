@@ -44,7 +44,11 @@ export function Navbar() {
             </li>
           </ul>
         </div>
-        <a className="btn btn-ghost text-xl">Reserva Salud</a>
+
+        <Link to="/" className="btn btn-ghost text-xl">
+          <i className="fa-regular fa-xl fa-calendar-plus"></i>
+          Reserva Salud
+        </Link>
       </div>
       <div className="navbar-center hidden md:flex">
         <ul
