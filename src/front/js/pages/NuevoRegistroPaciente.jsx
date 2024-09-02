@@ -9,8 +9,6 @@ import "../../styles/home.css";
 export const VistaNuevoRegistroPaciente = () => {
     const { actions } = useContext(Context);
     const [states, setStates] = useState([]);
-    const [selectedState, setSelectedState] = useState("");
-    const [cities, setCities] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
     const id = location.state ? location.state.id : null;
@@ -22,17 +20,6 @@ export const VistaNuevoRegistroPaciente = () => {
         }
         getStates();
     }, []);
-
-    useEffect(() => {
-        const getCitiesByState = async () => {
-            if (selectedState) {
-                const cities = await actions.getCitiesByState(selectedState);
-                setCities(cities);
-            };
-        };
-
-        getCitiesByState();
-    }, [selectedState]);
 
     return (
         <Formik
@@ -140,17 +127,15 @@ export const VistaNuevoRegistroPaciente = () => {
                                             placeholder="Departamento"
                                             name="state_id"
                                             className="select select-bordered"
-                                            onChange={(e) => {
-                                                setSelectedState(e.target.value);
-                                                handleChange(e);
-                                            }}
                                         >
                                             <option value="">Seleccione un departamento</option>
-                                            {states?.map((state) => (
-                                                <option key={state.id} value={state.id}>
-                                                    {state.name}
-                                                </option>
-                                            ))}
+                                            {
+                                                states?.map((state) => {
+                                                    return (
+                                                        <option key={state.id} value={state.id}>{state.name}</option>
+                                                    )
+                                                })
+                                            }
                                         </Field>
                                         <div className="label">
 
@@ -173,11 +158,13 @@ export const VistaNuevoRegistroPaciente = () => {
                                             className="select select-bordered"
                                         >
                                             <option value="">Seleccione una ciudad</option>
-                                            {cities.map((city) => (
-                                                <option key={city.id} value={city.id}>
-                                                    {city.name}
-                                                </option>
-                                            ))}
+                                            {
+                                                states?.find((state) => state.id === parseInt(values.state_id))?.cities.map((city) => {
+                                                    return (
+                                                        <option key={city.id} value={city.id}>{city.name}</option>
+                                                    )
+                                                })
+                                            }
                                         </Field>
                                         <div className="label">
                                             <ErrorMessage

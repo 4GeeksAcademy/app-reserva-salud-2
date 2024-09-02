@@ -8,8 +8,6 @@ import ImageUpload from "../component/ImageUpload.jsx";
 export const VistaNuevoRegistroProfesional = () => {
     const { actions } = useContext(Context);
     const [states, setStates] = useState([]);
-    const [selectedState, setSelectedState] = useState("")
-    const [cities, setCities] = useState([]);
     const [specialities, setSpecialities] = useState([]);
     const navigate = useNavigate();
     const { state: { id } } = useLocation();
@@ -26,16 +24,7 @@ export const VistaNuevoRegistroProfesional = () => {
         getData()
     }, []);
 
-    useEffect(() => {
-        const getCitiesByState = async () => {
-            if (selectedState) {
-                const cities = await actions.getCitiesByState(selectedState);
-                setCities(cities);
-            };
-        };
-
-        getCitiesByState();
-    }, [selectedState]);
+    console.log(states)
 
     return (
         <>
@@ -64,14 +53,15 @@ export const VistaNuevoRegistroProfesional = () => {
                             "OTHER"
                         ])
                         .required("Este campo es obligatorio"),
-                    state_id: Yup.number().required("Este campo es obligatorio"),
-                    city_id: Yup.number().required("Este campo es obligatorio"),
+                    state_id: Yup.string().required("Este campo es obligatorio"),
+                    city_id: Yup.string().required("Este campo es obligatorio"),
                     speciality_id: Yup.number().required("Este campo es obligatorio"),
                     telephone: Yup.string().required("Este campo es obligatorio"),
                     profile_picture: Yup.string().required("Este campo es obligatorio"),
                 })}
 
                 onSubmit={async (values) => {
+                    console.log(values)
                     const response = await actions.updateProfessional(id, { state_id: parseInt(values.state_id), city_id: parseInt(values.city_id), speciality_id: parseInt(values.speciality_id), ...values });
                     if (response.status === 200) {
                         navigate("/login");
@@ -187,7 +177,7 @@ export const VistaNuevoRegistroProfesional = () => {
                                                 <div className="label">
                                                     <span className="label-text">Departamento</span>
                                                 </div>
-                                                <Field as="select" className="select select-bordered" id="state_id" name="state_id" onChange={(e) => setSelectedState(e.target.value)}>
+                                                <Field as="select" className="select select-bordered" id="state_id" name="state_id">
                                                     <option value="">Seleccione un departamento</option>
                                                     {
                                                         states?.map((state) => {
@@ -209,7 +199,7 @@ export const VistaNuevoRegistroProfesional = () => {
                                                 <Field as="select" className="select select-bordered" id="city_id" name="city_id">
                                                     <option value="">Seleccione una ciudad</option>
                                                     {
-                                                        cities.map((city) => {
+                                                        states?.find((state) => state.id === parseInt(values.state_id))?.cities.map((city) => {
                                                             return (
                                                                 <option key={city.id} value={city.id}>{city.name}</option>
                                                             )

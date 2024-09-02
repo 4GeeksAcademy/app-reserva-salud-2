@@ -155,6 +155,7 @@ class State(db.Model):
         return {
             "id": self.id,
             "name": self.name,
+            "cities": [city.serialize() for city in self.cities]
         }
         
     def get_cities(self):
@@ -178,7 +179,6 @@ class City(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "state": self.state.serialize()
         }
         
 class Availability(db.Model):
