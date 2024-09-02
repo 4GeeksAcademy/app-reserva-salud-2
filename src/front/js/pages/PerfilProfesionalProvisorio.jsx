@@ -16,11 +16,11 @@ export const VistaPerfilProfesional = () => {
 
     return (
         <div className="contenido pt-28">
-            <h1 className="mb-4 text-4xl font-bold text-center">Bienvenido</h1>
+            <h1 className="mb-8 text-4xl font-bold text-center">Bienvenido</h1>
             <div className="d-flex justify-content-center">
-                <h3 className="text-2xl mx-3 w-75">Pacientes agendados</h3>
+                <h3 className="text-2xl mx-8 w-75">Pacientes agendados</h3>
             </div>
-            <div>
+            <div className="grid sm:grid-cols-2 gap-6 m-8">
                 {professionalAppointments.map((appointment) => (
                     <TarjetaCitasProfesional key={appointment.id} appointment={appointment} />))}
             </div>
