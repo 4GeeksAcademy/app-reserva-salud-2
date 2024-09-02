@@ -30,14 +30,6 @@ export const Login = () => {
               className="object-cover mix-blend-multiply w-full h-auto"
               alt="Background"
             />
-            <div className="absolute bottom-10 w-full flex flex-col items-center">
-              <p className="text-black text-center">
-                ¿Aún no tienes cuenta?
-                <Link to="/nuevo-registro" className="text-primary ml-1 underline">
-                  Regístrate
-                </Link>
-              </p>
-            </div>
           </div>
           {/* Contenedor del formulario */}
           <div className="w-full md:w-1/2 lg:max-w-lg p-6 lg:p-8 mx-auto relative">
@@ -111,30 +103,30 @@ export const Login = () => {
                       <div className="text-red-500 text-sm">{errors.password}</div>
                     ) : null}
                   </div>
+                  <p className='text-label text-center'>
+                    ¿Olvidaste tu contraseña?{" "}
+                    <Link onClick={abrirModal} className='link link-primary'>Restablecer</Link>
+                  </p>
                   <div className="form-control mt-6">
                     <button type="submit" className="btn btn-primary w-full">
                       Ingresar
                     </button>
-                    <p className="md:hidden text-black text-center mt-3">
-                      ¿Aún no tienes cuenta?
-                      <Link to="/nuevo-registro" className="text-primary ml-1 underline">
-                        Regístrate
-                      </Link>
-                    </p>
                   </div>
+                  <p className='text-center'>
+                    ¿Aún no tienes cuenta?{" "}
+                    <Link to="/nuevo-registro" className="link link-primary">
+                      Regístrate
+                    </Link>
+                  </p>
                 </Form>
               )}
             </Formik>
-            <p className='text-label text-center'>
-          ¿Olvidaste tu contraseña?
-          <Link onClick={abrirModal} className='text-primary underline'>Restablecer</Link>
-        </p>
-        {mostrarModal && <ModalRestablecerClave cerrarModal={cerrarModal} />}
+            {mostrarModal && <ModalRestablecerClave cerrarModal={cerrarModal} />}
           </div>
         </div>
       </div>
       <div>
-        
+
       </div>
     </>
   );
