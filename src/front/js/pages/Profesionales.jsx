@@ -1,9 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
 import { Context } from "../store/appContext";
-import "swiper/css";
-import "swiper/css/autoplay";
 import { ProfesionalCard } from "../component/ProfesionalCard.jsx";
 
 export const Profesionales = () => {
@@ -171,7 +167,6 @@ export const Profesionales = () => {
           </div>
         )}
       </div>
-
     </div>
   );
 };
