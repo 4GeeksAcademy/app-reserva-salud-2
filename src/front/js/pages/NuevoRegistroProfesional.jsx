@@ -45,6 +45,7 @@ export const VistaNuevoRegistroProfesional = () => {
                     last_name: "",
                     birth_date: "",
                     gender: "",
+                    state_id: "",
                     city_id: "",
                     speciality_id: "",
                     certificate: "",
@@ -63,6 +64,7 @@ export const VistaNuevoRegistroProfesional = () => {
                             "OTHER"
                         ])
                         .required("Este campo es obligatorio"),
+                    state_id: Yup.number().required("Este campo es obligatorio"),
                     city_id: Yup.number().required("Este campo es obligatorio"),
                     speciality_id: Yup.number().required("Este campo es obligatorio"),
                     telephone: Yup.string().required("Este campo es obligatorio"),
@@ -70,7 +72,7 @@ export const VistaNuevoRegistroProfesional = () => {
                 })}
 
                 onSubmit={async (values) => {
-                    const response = await actions.updateProfessional(id, { city_id: parseInt(values.city_id), speciality_id: parseInt(values.speciality_id), ...values });
+                    const response = await actions.updateProfessional(id, { state_id: parseInt(values.state_id), city_id: parseInt(values.city_id), speciality_id: parseInt(values.speciality_id), ...values });
                     if (response.status === 200) {
                         navigate("/login");
                     } else {
