@@ -79,7 +79,9 @@ export function Navbar() {
                 <div className="w-10 rounded-full">
                   <img
                     alt="Tailwind CSS Navbar component"
-                    src="https://avatar.iran.liara.run/public" />
+                    src={store.currentProfessional
+                      ? store.currentProfessional?.profile_picture
+                      : `https://ui-avatars.com/api/?name=${store.currentUser.first_name}+${store.currentUser.last_name}`} />
                 </div>
               </div>
               <ul
