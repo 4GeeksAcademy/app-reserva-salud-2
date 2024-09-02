@@ -9,11 +9,12 @@ import "../../styles/home.css";
 export const VistaNuevoRegistroPaciente = () => {
     const { actions } = useContext(Context);
     const [states, setStates] = useState([]);
-    const [selectedState, setSelectedState] = useState("")
+    const [selectedState, setSelectedState] = useState("");
     const [cities, setCities] = useState([]);
     const navigate = useNavigate();
-    const { state: { id } } = useLocation();
-
+    const location = useLocation();
+    const id = location.state ? location.state.id : null;
+   
     useEffect(() => {
         const getStates = async () => {
             const response = await actions.getStates();
@@ -53,7 +54,7 @@ export const VistaNuevoRegistroPaciente = () => {
 
             onSubmit={async (values) => {
                 try {
-                    const response = await actions.updateUser(id, { state_id: parseInt(values.state_id), city_id: parseInt(values.city_id), ...values })
+                    const response = await actions.updateUser(id, { state_id: parseInt(values.state_id), city_id: parseInt(values.city_id), ...values });
                     if (response.status === 200) {
                         navigate("/login");
                     }
@@ -62,117 +63,125 @@ export const VistaNuevoRegistroPaciente = () => {
                 }
             }}
         >
-            {
-                ({ values, errors, touched, handleChange }) => (
-                    <Form className="container contenido" style={{ maxWidth: "700px" }}>
-                        <div className="row p-3 justify-content-between align-items-center bg-tertiary rounded-top text-primary">
-                            <div className="col-auto">
-                                <h3 className="text-subtitle">Ingresa tus datos</h3>
-                            </div>
-                            <div className="col-auto">
-                                <i className="fa-solid fa-circle-user fa-3x"></i>
-                            </div>
-                        </div>
-                        <div className="row bg-gray p-3 rounded-bottom">
-                            <div className="row">
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="first_name" className="text-label form-label">
-                                        Nombre
-                                    </label>
-                                    <Field
-                                        type="text"
-                                        className="form-control"
-                                        id="first_name"
-                                        name="first_name"
-                                    />
-                                    <ErrorMessage className="text-normal text-primary" component="div" name="first_name" />
-                                </div>
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="last_name" className="text-label form-label">
-                                        Apellido
-                                    </label>
-                                    <Field
-                                        type="text"
-                                        className="form-control"
-                                        id="last_name"
-                                        name="last_name"
-                                    />
-                                    <ErrorMessage className="text-normal text-primary" component="div" name="last_name" />
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="mb-3 col-md-12 col-sm-12">
-                                    <label htmlFor="birth_date" className="text-label form-label">
-                                        Fecha de nacimiento
-                                    </label>
-                                    <Field
-                                        type="date"
-                                        className="form-control"
-                                        id="birth_date"
-                                        name="birth_date"
-                                    />
-                                    <ErrorMessage className="text-normal text-primary" component="div" name="birth_date" />
-                                </div>
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="state_id" className="text-label form-label">
-                                        Departamento
-                                    </label>
-                                    <Field as="select" className="form-select" id="state_id" name="state_id" onChange={(e) => {
-                                        setSelectedState(e.target.value)
-                                        handleChange(e)
-                                    }}>
-                                        <option value="">Seleccione un departamento</option>
-                                        {
-                                            states?.map((state) => {
-                                                return (
-                                                    <option key={state.id} value={state.id}>
-                                                        {state.name}
-                                                    </option>
-                                                )
-                                            })
-                                        }
-                                    </Field>
-                                    <ErrorMessage name="state_id" />
-                                </div>
-
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="city_id" className="text-label form-label">
-                                        Ciudad
-                                    </label>
-                                    <Field as="select" className="form-select" id="city_id" name="city_id">
-                                        <option value="">Seleccione una ciudad</option>
-                                        {
-                                            cities.map((city) => (
+            {({ handleChange }) => (
+                <div
+                    className="hero min-h-screen bg-cover bg-center"
+                    style={{ backgroundImage: "url('https://s2-g1.glbimg.com/5h3pKmve7qeMRwie_mwzVRhs0ng=/0x0:3500x2338/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2020/2/o/dn5AF5QLeyVU8VsEb2mA/bench-accounting-c3v88boorom-unsplash.jpg')" }}
+                >
+                    <div className="hero-content flex-col lg:flex-row-reverse w-full justify-center">
+                        <div className="card w-full max-w-4xl bg-base-100 glass shadow-2xl p-6">
+                            <h3 className="text-2xl font-bold text-center mb-5">Ingresa tus datos</h3>
+                            <Form className="form-control">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="form-control mb-4">
+                                        <label htmlFor="first_name" className="label">
+                                            <span className="label-text">Nombre</span>
+                                        </label>
+                                        <Field
+                                            type="text"
+                                            id="first_name"
+                                            name="first_name"
+                                            className="input input-bordered"
+                                        />
+                                        <ErrorMessage
+                                            name="first_name"
+                                            component="div"
+                                            className="text-error mt-1"
+                                        />
+                                    </div>
+                                    <div className="form-control mb-4">
+                                        <label htmlFor="last_name" className="label">
+                                            <span className="label-text">Apellido</span>
+                                        </label>
+                                        <Field
+                                            type="text"
+                                            id="last_name"
+                                            name="last_name"
+                                            className="input input-bordered"
+                                        />
+                                        <ErrorMessage
+                                            name="last_name"
+                                            component="div"
+                                            className="text-error mt-1"
+                                        />
+                                    </div>
+                                    <div className="form-control mb-4">
+                                        <label htmlFor="birth_date" className="label">
+                                            <span className="label-text">Fecha de nacimiento</span>
+                                        </label>
+                                        <Field
+                                            type="date"
+                                            id="birth_date"
+                                            name="birth_date"
+                                            className="input input-bordered"
+                                        />
+                                        <ErrorMessage
+                                            name="birth_date"
+                                            component="div"
+                                            className="text-error mt-1"
+                                        />
+                                    </div>
+                                    <div className="form-control mb-4">
+                                        <label htmlFor="state_id" className="label">
+                                            <span className="label-text">Departamento</span>
+                                        </label>
+                                        <Field
+                                            as="select"
+                                            id="state_id"
+                                            name="state_id"
+                                            className="select select-bordered"
+                                            onChange={(e) => {
+                                                setSelectedState(e.target.value);
+                                                handleChange(e);
+                                            }}
+                                        >
+                                            <option value="">Seleccione un departamento</option>
+                                            {states?.map((state) => (
+                                                <option key={state.id} value={state.id}>
+                                                    {state.name}
+                                                </option>
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage name="state_id" component="div" className="text-error mt-1" />
+                                    </div>
+                                    <div className="form-control mb-4">
+                                        <label htmlFor="city_id" className="label">
+                                            <span className="label-text">Ciudad</span>
+                                        </label>
+                                        <Field
+                                            as="select"
+                                            id="city_id"
+                                            name="city_id"
+                                            className="select select-bordered"
+                                        >
+                                            <option value="">Seleccione una ciudad</option>
+                                            {cities.map((city) => (
                                                 <option key={city.id} value={city.id}>
                                                     {city.name}
                                                 </option>
-                                            ))
-                                        }
-                                    </Field>
-                                    <ErrorMessage name="city_id" />
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage name="city_id" component="div" className="text-error mt-1" />
+                                    </div>
                                 </div>
-
-                            </div>
-                            <div className="col-12 text-center">
-                                <button type="submit" className="btn bg-primary text-white">
-                                    <i className="fa-solid fa-user-plus"></i> Registrarse
-                                </button>
-                            </div>
-
-                            <div className="mt-3 d-flex justify-content-center">
-                                <p>
-                                    ¿Ya tienes una cuenta?{" "}
-                                    <Link to={"/login"} className="fw-bold text-primary">
-                                        Inicia sesión
-                                    </Link>
-                                </p>
-                            </div>
+                                <div className="form-control mt-6">
+                                    <button type="submit" className="btn btn-primary">
+                                        <i className="fa-solid fa-user-plus"></i> Registrarse
+                                    </button>
+                                </div>
+                                <div className="mt-3 text-center">
+                                    <p>
+                                        ¿Ya tienes una cuenta?{" "}
+                                        <Link to={"/login"} className="link link-hover text-primary font-bold">
+                                            Inicia sesión
+                                        </Link>
+                                    </p>
+                                </div>
+                            </Form>
                         </div>
-                    </Form>
-                )
-            }
-
-
+                    </div>
+                </div>
+            )}
         </Formik>
     );
 };
