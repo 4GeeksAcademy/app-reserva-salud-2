@@ -14,7 +14,7 @@ export const VistaNuevoRegistroPaciente = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const id = location.state ? location.state.id : null;
-   
+
     useEffect(() => {
         const getStates = async () => {
             const response = await actions.getStates();
@@ -69,7 +69,7 @@ export const VistaNuevoRegistroPaciente = () => {
                     style={{ backgroundImage: "url('https://s2-g1.glbimg.com/5h3pKmve7qeMRwie_mwzVRhs0ng=/0x0:3500x2338/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2020/2/o/dn5AF5QLeyVU8VsEb2mA/bench-accounting-c3v88boorom-unsplash.jpg')" }}
                 >
                     <div className="hero-content flex-col lg:flex-row-reverse w-full justify-center">
-                        <div className="card w-full max-w-4xl bg-base-100 glass shadow-2xl p-6">
+                        <div className="card w-full max-w-4xl bg-base-100 bg-opacity-85 backdrop-blur shadow-2xl p-6">
                             <h3 className="text-2xl font-bold text-center mb-5">Ingresa tus datos</h3>
                             <Form className="form-control">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -80,14 +80,17 @@ export const VistaNuevoRegistroPaciente = () => {
                                         <Field
                                             type="text"
                                             id="first_name"
+                                            placeholder="Nombre"
                                             name="first_name"
                                             className="input input-bordered"
                                         />
-                                        <ErrorMessage
-                                            name="first_name"
-                                            component="div"
-                                            className="text-error mt-1"
-                                        />
+                                        <div className="label">
+                                            <ErrorMessage
+                                                name="first_name"
+                                                component="span"
+                                                className="text-error label-text"
+                                            />
+                                        </div>
                                     </div>
                                     <div className="form-control mb-4">
                                         <label htmlFor="last_name" className="label">
@@ -96,14 +99,17 @@ export const VistaNuevoRegistroPaciente = () => {
                                         <Field
                                             type="text"
                                             id="last_name"
+                                            placeholder="Apellido"
                                             name="last_name"
                                             className="input input-bordered"
                                         />
-                                        <ErrorMessage
-                                            name="last_name"
-                                            component="div"
-                                            className="text-error mt-1"
-                                        />
+                                        <div className="label">
+                                            <ErrorMessage
+                                                name="last_name"
+                                                component="span"
+                                                className="text-error label-text"
+                                            />
+                                        </div>
                                     </div>
                                     <div className="form-control mb-4">
                                         <label htmlFor="birth_date" className="label">
@@ -112,14 +118,17 @@ export const VistaNuevoRegistroPaciente = () => {
                                         <Field
                                             type="date"
                                             id="birth_date"
+                                            placeholder="Fecha de nacimiento"
                                             name="birth_date"
                                             className="input input-bordered"
                                         />
-                                        <ErrorMessage
-                                            name="birth_date"
-                                            component="div"
-                                            className="text-error mt-1"
-                                        />
+                                        <div className="label">
+                                            <ErrorMessage
+                                                name="birth_date"
+                                                component="span"
+                                                className="text-error label-text"
+                                            />
+                                        </div>
                                     </div>
                                     <div className="form-control mb-4">
                                         <label htmlFor="state_id" className="label">
@@ -128,6 +137,7 @@ export const VistaNuevoRegistroPaciente = () => {
                                         <Field
                                             as="select"
                                             id="state_id"
+                                            placeholder="Departamento"
                                             name="state_id"
                                             className="select select-bordered"
                                             onChange={(e) => {
@@ -142,7 +152,14 @@ export const VistaNuevoRegistroPaciente = () => {
                                                 </option>
                                             ))}
                                         </Field>
-                                        <ErrorMessage name="state_id" component="div" className="text-error mt-1" />
+                                        <div className="label">
+
+                                        </div>
+                                        <ErrorMessage
+                                            name="state_id"
+                                            component="span"
+                                            className="text-error label-text"
+                                        />
                                     </div>
                                     <div className="form-control mb-4">
                                         <label htmlFor="city_id" className="label">
@@ -151,6 +168,7 @@ export const VistaNuevoRegistroPaciente = () => {
                                         <Field
                                             as="select"
                                             id="city_id"
+                                            placeholder="Ciudad"
                                             name="city_id"
                                             className="select select-bordered"
                                         >
@@ -161,7 +179,13 @@ export const VistaNuevoRegistroPaciente = () => {
                                                 </option>
                                             ))}
                                         </Field>
-                                        <ErrorMessage name="city_id" component="div" className="text-error mt-1" />
+                                        <div className="label">
+                                            <ErrorMessage
+                                                name="city_id"
+                                                component="span"
+                                                className="text-error label-text"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="form-control mt-6">
