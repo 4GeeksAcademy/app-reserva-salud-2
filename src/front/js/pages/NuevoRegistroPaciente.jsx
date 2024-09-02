@@ -50,7 +50,7 @@ export const VistaNuevoRegistroPaciente = () => {
                 }
             }}
         >
-            {({ handleChange }) => (
+            {({ values, handleChange }) => (
                 <div
                     className="hero min-h-screen bg-cover bg-center"
                     style={{ backgroundImage: "url('https://s2-g1.glbimg.com/5h3pKmve7qeMRwie_mwzVRhs0ng=/0x0:3500x2338/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_59edd422c0c84a879bd37670ae4f538a/internal_photos/bs/2020/2/o/dn5AF5QLeyVU8VsEb2mA/bench-accounting-c3v88boorom-unsplash.jpg')" }}

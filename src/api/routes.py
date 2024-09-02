@@ -300,6 +300,7 @@ def handle_user(user_id):
       user.password = generate_password_hash(request_body.get("password")).decode('utf-8')
     user.birth_date = request_body.get("birth_date", user.birth_date)
     user.state_id = request_body.get("state_id", user.state_id)
+    user.state_id = request_body.get("state_id", user.state_id)
     user.city_id = request_body.get("city_id", user.city_id)
     user.is_active = request_body.get("is_active", user.is_active)
     
@@ -485,6 +486,7 @@ def handle_professional(professional_id):
     professional.is_active = request_body.get("is_active", professional.is_active)
     professional.is_validated = request_body.get("is_validated", professional.is_validated)
     professional.city_id = request_body.get("city_id", professional.city_id)
+    professional.state_id = request_body.get("state_id", professional.state_id)
     professional.profile_picture = request_body.get("profile_picture", professional.profile_picture)
     
     db.session.commit()

@@ -24,8 +24,6 @@ export const VistaNuevoRegistroProfesional = () => {
         getData()
     }, []);
 
-    console.log(states)
-
     return (
         <>
             <Formik
