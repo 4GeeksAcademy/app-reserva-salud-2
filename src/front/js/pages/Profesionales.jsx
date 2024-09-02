@@ -25,8 +25,6 @@ export const Profesionales = () => {
     fetchData();
   }, []);
 
-  console.log(professionals);
-
   useEffect(() => {
     let filteredProfessionals = professionals;
     if (currentState) {
