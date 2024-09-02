@@ -15,31 +15,40 @@ export const ModalRestablecerClave = ({ cerrarModal }) => {
     cerrarModal();
   };
 
-return (
-  <div className="modal fade show d-block" tabIndex="-1" role="dialog">
-    <div className="modal-dialog modal-dialog-centered" role="document">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h5 className="modal-title text-primary">Recuperar Contraseña</h5>
-          <button type="button" className="btn-close" data-bs-dismiss="modal" 
-          onClick={cerrarModal} aria-label="Close"></button>
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h5 className="text-lg font-semibold text-primary">Recuperar Contraseña</h5>
+          <button
+            type="button"
+            className="text-gray-500 hover:text-gray-700"
+            onClick={cerrarModal}
+            aria-label="Close"
+          >
+            &times;
+          </button>
         </div>
-        <div className="modal-body">
-          <p className='text-label'>Si olvidaste tu contraseña, ingresa aquí tu correo
-          electrónico para restablecerla:</p>
+        <div className="p-4">
+          <p className="text-sm mb-4">
+            Si olvidaste tu contraseña, ingresa aquí tu correo electrónico para restablecerla:
+          </p>
           <form onSubmit={resetPass}>
-            <div className="mb-3">
+            <div className="mb-4">
               <input
                 type="email"
-                className="form-control"
-                id="email"
+                className="w-full p-2 border rounded"
+                placeholder="Correo electrónico"
                 value={email}
                 onChange={handleEmailChange}
                 required
               />
             </div>
-            <div className='text-center'>
-              <button type="submit" className="btn bg-primary text-white">
+            <div className="text-center">
+              <button
+                type="submit"
+                className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark"
+              >
                 Enviar mensaje de recuperación
               </button>
             </div>
@@ -47,6 +56,5 @@ return (
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
