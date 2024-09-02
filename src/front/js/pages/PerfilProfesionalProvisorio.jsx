@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { TarjetaCitasProfesional } from "../component/TarjetaCitasProfesional.jsx";
 import { Context } from "../store/appContext.js";
 
-export const VistaPerfilProfesional = () => {
+export const VistaPerfilProfesional = ({ professional }) => {
     const [professionalAppointments, setProfessionalAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const { actions, store } = useContext(Context);

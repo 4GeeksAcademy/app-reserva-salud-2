@@ -140,7 +140,7 @@ export const DisponibilidadProfesional = () => {
                             />
                         </label>
                         <div>
-                            <div className="form-control">
+                            <div className="form-control pt-6">
                                 <label className="label cursor-pointer">
                                     <span className="label-text pr-2">Presencial</span>
                                     <input

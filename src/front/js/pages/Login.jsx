@@ -21,7 +21,7 @@ export const Login = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-screen bg-base-200">
+      <div className="flex items-center justify-center min-h-screen bg-base-200 pt-20">
         <div className="flex flex-col md:flex-row">
           {/* Contenedor de la imagen con el link */}
           <div className="relative hidden md:flex md:w-1/2 bg-cover bg-center items-center justify-end p-4 pb-10">
@@ -34,16 +34,16 @@ export const Login = () => {
           {/* Contenedor del formulario */}
           <div className="w-full md:w-1/2 lg:max-w-lg p-6 lg:p-8 mx-auto relative">
             <div
-              className="absolute inset-0 md:hidden bg-cover bg-center opacity-20"
+              className="absolute inset-0 md:hidden bg-cover bg-center opacity-18"
               style={{
                 backgroundImage:
                   "url('https://st2.depositphotos.com/1001599/43046/v/450/depositphotos_430460192-stock-illustration-sign-page-abstract-concept-vector.jpg')",
               }}
             ></div>
             <div className="flex justify-center">
-              <i className="fa-solid fa-circle-user fa-3x"></i>
+              
             </div>
-            <h1 className="text-3xl lg:text-4xl font-bold">Inicia sesión ahora!</h1>
+            <h1 className="text-3xl lg:text-4xl font-bold"><i className="fa-solid fa-circle-user fa-sm"></i>   Inicia sesión ahora!</h1>
             <p className="text-base lg:text-lg mt-4">
               Al ingresar a Reserva Salud, podrás buscar un profesional en tu departamento, vas a contar con amplia disponibilidad horaria para agendar una consulta y muchas funciones más...
             </p>
