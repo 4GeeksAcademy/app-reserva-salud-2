@@ -34,7 +34,7 @@ const ImageUpload = ({ form, field }) => {
     <div className="container">
       <div className="row">
         <div className="col">
-          <input className="form-control" type="file" onChange={handleImageChange} />
+          <input className="file-input file-input-bordered w-full" type="file" onChange={handleImageChange} />
           {uploading && <p>Subiendo imagen...</p>}
         </div>
       </div>

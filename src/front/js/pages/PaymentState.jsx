@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { backendApi } from '../store/flux';
-import { set } from 'date-fns';
 
 export const PaymentState = () => {
   const [paymentData, setPaymentData] = useState(null);
@@ -35,17 +34,16 @@ export const PaymentState = () => {
       })
 
   }, []);
-  return paymentData &&
-    paymentData.status === 'approved' ? (
-    <div className='contenido container text-center'>
-      <h1>Gracias por tu reserva</h1>
-      <p>El pago se realizó con éxito</p>
+  return paymentData && paymentData.status === 'approved' ? (
+    <div className='container mx-auto min-h-screen px-8 pt-20 text-center'>
+      <h1 className='text-4xl font-bold'>Gracias por tu reserva</h1>
+      <p className='text-lg font-semibold'>El pago se realizó con éxito</p>
       <button className='btn btn-primary' onClick={() => navigate('/')}>Volver al inicio</button>
     </div>
   ) : (
-    <div>
-      <h1>Hubo un problema con tu pago</h1>
-      <p>Por favor, intenta nuevamente</p>
+    <div className='container mx-auto min-h-screen px-8 pt-20 text-center'>
+      <h1 className='text-error text-4xl font-bold'>Hubo un problema con tu pago</h1>
+      <p className='text-lg font-semibold'>Por favor, intenta nuevamente</p>
     </div>
   )
 }

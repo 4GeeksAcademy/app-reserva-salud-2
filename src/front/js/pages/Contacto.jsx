@@ -3,7 +3,7 @@ import { FormContacto } from "../component/form-contacto.jsx";
 
 export const VistaContacto = () => {
     return (
-        <div>
+        <div className="">
             <FormContacto />
         </div>
     )

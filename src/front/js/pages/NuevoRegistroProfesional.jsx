@@ -79,166 +79,226 @@ export const VistaNuevoRegistroProfesional = () => {
                 }}
             >
                 {({ handleSubmit, values }) => (
-                    <Form onSubmit={handleSubmit} className="container contenido mb-5" style={{ paddingTop: "40px", maxWidth: "700px" }}>
-                        <div className="row p-3 justify-content-between align-items-center bg-tertiary rounded-top text-primary">
-                            <div className="col-auto">
-                                <h3 className="text-subtitle">Ingresa tus datos</h3>
-                            </div>
-                            <div className="col-auto">
-                                <i className="fa-solid fa-circle-user fa-3x"></i>
-                            </div>
+                    <div className="hero min-h-screen" style={{ backgroundImage: "url(https://d1eipm3vz40hy0.cloudfront.net/images/SSAC-Blog/argumentario-de-ventas.jpg)" }}>
+                        <div className="hero-overlay bg-opacity-70"></div>
+                        <div className="hero-content">
+                            <Form onSubmit={handleSubmit} className="container mx-auto min-h-screen pt-20">
+                                <div className="rounded-box border border-base-300 bg-base-200 bg-opacity-75 backdrop-blur">
+                                    <div className="flex items-center justify-between rounded-t-box px-8 py-4 text-primary">
+                                        <h3 className="text-2xl font-bold">Ingresa tus datos</h3>
+                                        <i className="fa-solid fa-circle-user fa-3x text-secondary"></i>
+                                    </div>
+                                    <div className="flex flex-col rounded-b-box px-8 py-4">
+                                        <div className="flex flex-col md:flex-row gap-4">
+                                            <div className="form-control w-full">
+                                                <div className="label">
+                                                    <span className="label-text">Nombre</span>
+                                                </div>
+                                                <label className="input input-bordered flex items-center gap-2">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 16 16"
+                                                        fill="currentColor"
+                                                        className="h-4 w-4 opacity-70">
+                                                        <path
+                                                            d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
+                                                    </svg>
+                                                    <Field
+                                                        type="text"
+                                                        placeholder="Nombre"
+                                                        id="first_name"
+                                                        name="first_name"
+                                                    />
+                                                </label>
+                                                <div className="label">
+                                                    <ErrorMessage className="label-text text-error" component="span" name="first_name" />
+                                                </div>
+                                            </div>
+
+                                            <div className="form-control w-full">
+                                                <div className="label">
+                                                    <span className="label-text">Apellido</span>
+                                                </div>
+                                                <label className="input input-bordered flex items-center gap-2">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 16 16"
+                                                        fill="currentColor"
+                                                        className="h-4 w-4 opacity-70">
+                                                        <path
+                                                            d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
+                                                    </svg>
+                                                    <Field
+                                                        type="text"
+                                                        placeholder="Apellido"
+                                                        id="last_name"
+                                                        name="last_name"
+                                                    />
+                                                </label>
+                                                <div className="label">
+                                                    <ErrorMessage className="label-text text-error" component="span" name="last_name" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div className="flex flex-col md:flex-row gap-4">
+                                            <div className="form-control w-full">
+                                                <div className="label">
+                                                    <span className="label-text">Fecha de nacimiento</span>
+                                                </div>
+                                                <Field
+                                                    type="date"
+                                                    className="input input-bordered"
+                                                    id="birth_date"
+                                                    name="birth_date"
+                                                />
+                                                <div className="label">
+                                                    <ErrorMessage className="label-text text-error" component="span" name="birth_date" />
+                                                </div>
+                                            </div>
+
+                                            <div className="form-control w-full">
+                                                <div className="label">
+                                                    <span className="label-text">Género</span>
+                                                </div>
+                                                <Field
+                                                    as="select"
+                                                    className="select select-bordered"
+                                                    type="date"
+                                                    id="gender"
+                                                    name="gender"
+                                                >
+                                                    <option value="">Seleccione su género</option>
+                                                    <option value="MALE">Hombre</option>
+                                                    <option value="FEMALE">Mujer</option>
+                                                    <option value="OTHER">Otro</option>
+                                                </Field>
+                                                <div className="label">
+                                                    <ErrorMessage className="label-text text-error" component="span" name="gender" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col md:flex-row gap-4">
+                                            <div className="form-control w-full">
+                                                <div className="label">
+                                                    <span className="label-text">Departamento</span>
+                                                </div>
+                                                <Field as="select" className="select select-bordered" id="state_id" name="state_id" onChange={(e) => setSelectedState(e.target.value)}>
+                                                    <option value="">Seleccione un departamento</option>
+                                                    {
+                                                        states?.map((state) => {
+                                                            return (
+                                                                <option key={state.id} value={state.id}>{state.name}</option>
+                                                            )
+                                                        })
+                                                    }
+                                                </Field>
+                                                <div className="label">
+                                                    <ErrorMessage className="label-text text-error" component="span" name="state_id" />
+                                                </div>
+                                            </div>
+
+                                            <div className="form-control w-full">
+                                                <div className="label">
+                                                    <span className="label-text">Ciudad</span>
+                                                </div>
+                                                <Field as="select" className="select select-bordered" id="city_id" name="city_id">
+                                                    <option value="">Seleccione una ciudad</option>
+                                                    {
+                                                        cities.map((city) => {
+                                                            return (
+                                                                <option key={city.id} value={city.id}>{city.name}</option>
+                                                            )
+                                                        })
+                                                    }
+                                                </Field>
+                                                <div className="label">
+                                                    <ErrorMessage className="label-text text-error" component="span" name="city_id" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col md:flex-row gap-4">
+                                            <div className="form-control w-full">
+                                                <div className="label">
+                                                    <span className="label-text">Especialidad</span>
+                                                </div>
+                                                <Field
+                                                    as="select"
+                                                    className="select select-bordered"
+                                                    id="speciality_id"
+                                                    name="speciality_id"
+                                                >
+                                                    <option value="">Seleccione una especialidad</option>
+                                                    {
+                                                        specialities?.map((speciality) => {
+                                                            return (
+                                                                <option key={speciality.id} value={speciality.id}>{speciality.name}</option>
+                                                            )
+                                                        })
+                                                    }
+                                                </Field>
+                                                <div className="label">
+                                                    <ErrorMessage className="label-text text-error" component="span" name="speciality_id" />
+                                                </div>
+                                            </div>
+
+                                            <div className="form-control w-full">
+                                                <div className="label">
+                                                    <span className="label-text">Teléfono</span>
+                                                </div>
+                                                <label className="input input-bordered flex items-center gap-2">
+                                                    <i className="fa-solid fa-phone h-4 w-4 opacity-70"></i>
+                                                    <Field
+                                                        type="tel"
+                                                        className="grow"
+                                                        placeholder="Teléfono"
+                                                        id="telephone"
+                                                        name="telephone"
+                                                    />
+                                                </label>
+                                                <div className="label">
+                                                    <ErrorMessage className="label-text text-error" component="span" name="telephone" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col md:flex-row gap-4">
+                                            <div className="form-control w-full">
+                                                <div className="label">
+                                                    <span className="label-text">Foto de perfil</span>
+                                                </div>
+                                                <Field component={ImageUpload} name="profile_picture" />
+                                                <div className="label">
+                                                    <ErrorMessage className="label-text text-error" component="span" name="profile_picture" />
+                                                </div>
+                                            </div>
+
+                                            <div className="form-control w-full">
+                                                <div className="label">
+                                                    <span className="label-text">Certificado</span>
+                                                </div>
+                                                <Field component={ImageUpload} name="certificate" />
+                                                <div className="label">
+                                                    <ErrorMessage className="label-text text-error" component="span" name="certificate" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-12 text-center">
+                                            <button type="submit" className="btn btn-primary">
+                                                <i className="fa-solid fa-user-plus"></i> Registrarse como profesional
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Form>
                         </div>
-                        <div className="row bg-gray p-3 rounded-bottom">
-                            <div className="row">
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="first_name" className="text-label form-label">
-                                        Nombre
-                                    </label>
-                                    <Field
-                                        type="text"
-                                        className="form-control"
-                                        id="first_name"
-                                        name="first_name"
-                                    />
-                                    <ErrorMessage className="text-normal text-primary" component="div" name="first_name" />
-                                </div>
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="last_name" className="text-label form-label">
-                                        Apellido
-                                    </label>
-                                    <Field
-                                        type="text"
-                                        className="form-control"
-                                        id="last_name"
-                                        name="last_name"
-                                    />
-                                    <ErrorMessage className="text-normal text-primary" component="div" name="last_name" />
-                                </div>
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="birth_date" className="text-label form-label">
-                                        Fecha de nacimiento
-                                    </label>
-                                    <Field
-                                        type="date"
-                                        className="form-control"
-                                        id="birth_date"
-                                        name="birth_date"
-                                    />
-                                    <ErrorMessage className="text-normal text-primary" component="div" name="birth_date" />
-                                </div>
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="gender" className="text-label form-label">
-                                        Género
-                                    </label>
-                                    <Field as="select" className="form-select" id="gender" name="gender">
-                                        <option value="">Seleccione su género</option>
-                                        <option value="MALE">Hombre</option>
-                                        <option value="FEMALE">Mujer</option>
-                                        <option value="OTHER">Otro</option>
-                                    </Field>
-                                </div>
-
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="state_id" className="text-label form-label">
-                                        Departamento
-                                    </label>
-                                    <Field as="select" className="form-select" id="state_id" name="state_id" onChange={(e) => setSelectedState(e.target.value)}>
-                                        <option value="">Seleccione un departamento</option>
-                                        {
-                                            states?.map((state) => {
-                                                return (
-                                                    <option key={state.id} value={state.id}>{state.name}</option>
-                                                )
-                                            })
-                                        }
-                                    </Field>
-                                </div>
-
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="city_id" className="text-label form-label">
-                                        Ciudad
-                                    </label>
-                                    <Field as="select" className="form-select" id="city_id" name="city_id">
-                                        <option value="">Seleccione una ciudad</option>
-                                        {
-                                            cities.map((city) => {
-                                                return (
-                                                    <option key={city.id} value={city.id}>{city.name}</option>
-                                                )
-                                            })
-                                        }
-                                    </Field>
-                                    <ErrorMessage name="city_id" />
-                                </div>
-
-                                <div className="mb-3 col-md-12 col-sm-12">
-                                    <label htmlFor="speciality_id" className="text-label form-label">
-                                        Especialidad
-                                    </label>
-                                    <Field as="select" className="form-select" id="speciality_id" name="speciality_id">
-                                        <option value="">Seleccione una especialidad</option>
-                                        {
-                                            specialities?.map((speciality) => {
-                                                return (
-                                                    <option key={speciality.id} value={speciality.id}>{speciality.name}</option>
-                                                )
-                                            })
-                                        }
-                                    </Field>
-                                    <ErrorMessage name="speciality_id" />
-                                </div>
-
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="certificate" className="text-label form-label">
-                                        Título o certificado habilitante
-                                    </label>
-                                    <Field
-                                        type="file"
-                                        className="form-control"
-                                        id="certificate"
-                                        name="certificate"
-                                    />
-                                    <ErrorMessage className="text-normal text-primary" component="div" name="certificate" />
-                                </div>
-
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="profile_picture" className="text-label form-label">
-                                        Foto de perfil
-                                    </label>
-                                    <Field component={ImageUpload} name="profile_picture" />
-                                    <ErrorMessage name="profile_picture" component="div" />
-                                </div>
-
-                                <div className="mb-3 col-md-6 col-sm-12">
-                                    <label htmlFor="telephone" className="text-label form-label">
-                                        Teléfono de contacto
-                                    </label>
-                                    <Field
-                                        type="telephone"
-                                        className="form-control"
-                                        id="telephone"
-                                        name="telephone"
-                                    />
-                                    <ErrorMessage name="telephone" />
-                                </div>
-                            </div>
-                            <div className="col-12 text-center">
-                                <button type="submit" className="btn bg-primary text-white">
-                                    <i className="fa-solid fa-user-plus"></i> Registrarse como profesional
-                                </button>
-                            </div>
-                        </div>
-                    </Form>
+                    </div>
                 )}
             </Formik>
-            <div className="mt-3 d-flex justify-content-center">
-                <p>
-                    ¿Ya tienes una cuenta?{" "}
-                    <Link to={"/login"} className="fw-bold text-primary">
-                        Inicia sesión
-                    </Link>
-                </p>
-            </div>
         </>
     );
 };
