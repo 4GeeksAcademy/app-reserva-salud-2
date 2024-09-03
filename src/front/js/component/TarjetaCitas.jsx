@@ -59,12 +59,14 @@ export const TarjetaCitasUsuario = ({ appointment }) => {
     }
   };
   console.log(appointment);
-  const appointmentDate = new Date(appointment?.availability?.date);
+  const appointmentDate = new Date(appointment?.availability?.date).setHours(appointment?.availability?.start_time.split(":")[0], appointment?.availability?.start_time.split(":")[1]); //
+  console.log("appointmentDate:", appointmentDate);
   const currentDate = new Date();
+  console.log("currentDate:", currentDate);
 
   // Verificar si la fecha de la cita es menor a la fecha actual
   const isPastAppointment = appointmentDate < currentDate;
-  // console.log("isPastAppointment:", isPastAppointment);
+  console.log("isPastAppointment:", isPastAppointment);
   return (
     <>
       {/* Contenedor de la tarjeta */}
