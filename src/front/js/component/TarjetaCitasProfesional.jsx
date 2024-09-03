@@ -88,7 +88,7 @@ export const TarjetaCitasProfesional = ({ appointment }) => {
           <div className="modal-action">
             <form method="dialog">
               <button className="btn mx-2">Cerrar</button>
-              <button type="button" className="btn btn-primary" onClick={cancelAppointment} disabled={isAppointmentPast}>Cancelar reserva</button>
+              <button type="button" className="btn btn-primary" onClick={cancelAppointment}>Cancelar reserva</button>
             </form>
           </div>
         </div>
