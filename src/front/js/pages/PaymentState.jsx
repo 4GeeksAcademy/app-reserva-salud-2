@@ -4,6 +4,7 @@ import { backendApi } from '../store/flux';
 
 export const PaymentState = () => {
   const [paymentData, setPaymentData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,8 +33,19 @@ export const PaymentState = () => {
       .catch((error) => {
         console.log(error)
       })
-
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
+
+  if (loading) {
+    return (
+      <div className='container mx-auto min-h-screen px-8 pt-20 text-center'>
+        <h1 className='text-4xl font-bold'><span className="loading loading-spinner loading-lg"></span> Procesando pago...</h1>
+      </div>
+    )
+  }
+
   return paymentData && paymentData.status === 'approved' ? (
     <div className='container mx-auto min-h-screen px-8 pt-20 text-center'>
       <h1 className='text-4xl font-bold'>Gracias por tu reserva</h1>
